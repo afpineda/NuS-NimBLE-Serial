@@ -1,0 +1,81 @@
+#ifndef __NUS_NIMBLE_HPP__
+#define __NUS_NIMBLE_HPP__
+
+#include <NimBLEServer.h>
+#include <NimBLEService.h>
+#include <NimBLECharacteristic.h>
+
+/**
+ * @brief Nordic UART Service (NuS) implementation using the NimBLE stack
+ *
+ * @note This is an abstract class.
+ *       Override NimBLECharacteristicCallbacks::onWrite(NimBLECharacteristic *pCharacteristic)
+ *       to process incoming data. A singleton pattern is suggested.
+ */
+class NordicUARTService : public NimBLEServerCallbacks, public NimBLECharacteristicCallbacks
+{
+public:
+  /**
+   * @brief Check if a peer is connected
+   *
+   * @return true When a connection is established
+   * @return false When no peer is connected
+   */
+  bool isConnected() { return connected; };
+
+  /**
+   * @brief Send bytes
+   *
+   * @param data Pointer to bytes to be sent.
+   * @param size Count of bytes to be sent.
+   * @return size_t Zero if no peer is connected, @p size otherwise.
+   */
+  size_t write(const uint8_t *data, size_t size);
+
+  /**
+   * @brief Send a null-terminated string
+   *
+   * @param str Pointer to null-terminated string to be sent.
+   * @return size_t Zero if no peer is connected.
+   *                Otherwise, string length, not counting the
+   *                null terminating character.
+   */
+  size_t send(char *str);
+
+  /**
+   * @brief Start the Nordic UART Service
+   *
+   * @note NimBLEDevice::init() **must** be called before.
+   * @note The service is unavailable if start() is not called, thus no peer connections
+   *       are accepted. Do not call start() before initialization is complete in your application.
+   *
+   * @throws std::runtime_error if the UART service is already created or can not be created
+   */
+  void start(void);
+
+  /**
+   * @brief Terminate current peer connection (if any)
+   *
+   */
+  void disconnect(void);
+
+public:
+  void onConnect(NimBLEServer *pServer) override;
+  void onDisconnect(NimBLEServer *pServer) override;
+
+private:
+  NimBLEServer *pServer = nullptr;
+  NimBLEService *pNuS = nullptr;
+  NimBLECharacteristic *pTxCharacteristic = nullptr;
+  bool connected = false;
+  bool started = false;
+
+  /**
+   * @brief Create the NuS service in a new GATT server
+   *
+   * @throws std::runtime_error if the UART service is already created or can not be created
+   */
+  void init();
+};
+
+#endif

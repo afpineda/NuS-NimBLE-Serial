@@ -1,0 +1,7 @@
+MeanAndVar	KEYWORD1
+reset	KEYWORD2
+add	KEYWORD2
+getMean	KEYWORD2
+getUnbiasedVariance	KEYWORD2
+getVariance	KEYWORD2
+getCount	KEYWORD2
