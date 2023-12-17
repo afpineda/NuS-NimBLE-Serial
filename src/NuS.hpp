@@ -35,12 +35,15 @@ public:
   /**
    * @brief Send a null-terminated string
    *
-   * @param str Pointer to null-terminated string to be sent.
+   * @param[in] str Pointer to null-terminated string to be sent.
+   * @param[in] includeNullTerminatingChar When true, the null terminating character is sent too.
+   *            When false, such a character is not sent, so @p str should end with another
+   *            termination token, like CR (Unix), LF (old MacOS) or CR+LF (Windows).
+   *
    * @return size_t Zero if no peer is connected.
-   *                Otherwise, string length, not counting the
-   *                null terminating character.
+   *                Otherwise, count of bytes sent.
    */
-  size_t send(char *str);
+  size_t send(const char *str, bool includeNullTerminatingChar = false);
 
   /**
    * @brief Start the Nordic UART Service

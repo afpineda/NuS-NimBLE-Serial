@@ -61,7 +61,7 @@ void NordicUARTService::start(void)
 void NordicUARTService::disconnect(void)
 {
   std::vector<uint16_t> devices = pServer->getPeerDevices();
-  for (uint16_t id: devices)
+  for (uint16_t id : devices)
     pServer->disconnect(id);
 }
 
@@ -95,11 +95,11 @@ size_t NordicUARTService::write(const uint8_t *data, size_t size)
   return 0;
 }
 
-size_t NordicUARTService::send(char *str)
+size_t NordicUARTService::send(const char *str, bool includeNullTerminatingChar)
 {
   if (connected)
   {
-    size_t size = strlen(str);
+    size_t size = includeNullTerminatingChar ? strlen(str) + 1 : strlen(str);
     pTxCharacteristic->setValue((uint8_t *)str, size);
     pTxCharacteristic->notify();
     return size;
