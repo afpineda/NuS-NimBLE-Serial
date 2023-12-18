@@ -4,7 +4,7 @@ Library for serial communications through Bluetooth Low Energy on ESP32-Arduino 
 
 In summary, this library provides:
 
-- A generic class to implement custom serial communications through BLE.
+- A generic class to implement custom protocols for serial communications through BLE.
 - A BLE serial communications object that can be used as Arduino's [Serial](https://www.arduino.cc/reference/en/language/functions/communication/serial/).
 - A more efficient BLE serial communications object that can handle incoming data in packets, eluding active wait thanks to blocking semantics.
 
@@ -22,9 +22,9 @@ However, this is not the case with the [Bluetooth Low Energy (BLE) specification
 As bluetooth classic is being dropped in favor of BLE, an alternative is needed. [Nordic UART Service (NuS)](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/bluetooth_services/services/nus.html) is a popular alternative, if not the *de facto* standard.
 This library implements the Nordic UART service on the *NimBLE-Arduino* stack.
 
-## BLE serial communications apps
+## Client-side terminal application
 
-You may need a generic terminal (PC or smartphone) application in order to communicate with your Android application. These are several free alternatives (known to me):
+You may need a generic terminal (PC or smartphone) application in order to communicate with your Arduino application. Such a generic application must support the Nordic UART Service. There are several free alternatives (known to me):
 
 - Android:
   - [nRF connect for mobile](https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp)
@@ -34,10 +34,17 @@ You may need a generic terminal (PC or smartphone) application in order to commu
 
 ## API
 
+Summary:
+
+- The `NuSerial` object provides non-blocking serial communications through BLE.
+- The `NuStream` object provides blocking serial communications through BLE.
+- Create your own object to provide a custom protocol based on serial communications through BLE, by deriving a new class from
+  `NordicUARTService`.
+
 The **basic rules** are:
 
 - You must initialize the *NimBLE stack* **before** using this library. See [NimBLEDevice::init()](https://h2zero.github.io/NimBLE-Arduino/class_nim_b_l_e_device.html).
-- You must also call `start()` **after** all code initialization is complete.
+- You must also call `<object>.start()` **after** all code initialization is complete.
 - Just one object can use the Nordic UART Service. For example, this code **fails** at run time:
 
   ```c++
@@ -48,7 +55,31 @@ The **basic rules** are:
   }
   ```
 
-Read code commentaries for more information. You may learn from the provided [examples](./examples/).
+- This library sets their own [server callbacks](https://h2zero.github.io/esp-nimble-cpp/class_nim_b_l_e_server_callbacks.html), except for custom protocols, so **don't overwrite them**. For example, this code **does not work**:
+
+  ```c++
+  void setup() {
+    ...
+    NimBLEDevice::init("MyDevice");
+    NuSerial.start();
+    // NuSerial callbacks are overwritten
+    NimBLEDevice::createServer()->setCallbacks(myOwnCallbacks);
+  }
+  ```
+
+  **Nor this one**:
+
+  ```c++
+  void setup() {
+    ...
+    NimBLEDevice::init("MyDevice");
+    NimBLEDevice::createServer()->setCallbacks(myOwnCallbacks);
+    // Your own callbacks are overwritten
+    NuSerial.start();
+  }
+  ```
+
+You may learn from the provided [examples](./examples/README.md). Read code commentaries for more information.
 
 ## Non-blocking serial communications
 

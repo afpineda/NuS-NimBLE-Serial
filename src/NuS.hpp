@@ -1,3 +1,14 @@
+/**
+ * @author Ángel Fernández Pineda. Madrid. Spain.
+ * @date 2023-12-18
+ * @brief Nordic UART Service implementation on NimBLE stack
+ *
+ * @note NimBLE-Arduino library is required.
+ *       https://github.com/h2zero/NimBLE-Arduino
+ *
+ * @copyright Creative Commons Attribution 4.0 International (CC BY 4.0)
+ *
+ */
 #ifndef __NUS_NIMBLE_HPP__
 #define __NUS_NIMBLE_HPP__
 
@@ -33,7 +44,7 @@ public:
   size_t write(const uint8_t *data, size_t size);
 
   /**
-   * @brief Send a null-terminated string
+   * @brief Send a null-terminated string (ANSI encoded)
    *
    * @param[in] str Pointer to null-terminated string to be sent.
    * @param[in] includeNullTerminatingChar When true, the null terminating character is sent too.

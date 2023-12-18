@@ -1,3 +1,15 @@
+/**
+ * @author Ángel Fernández Pineda. Madrid. Spain.
+ * @date 2023-12-18
+ * @brief Nordic UART Service implementation on NimBLE stack
+ *
+ * @note NimBLE-Arduino library is required.
+ *       https://github.com/h2zero/NimBLE-Arduino
+ *
+ * @copyright Creative Commons Attribution 4.0 International (CC BY 4.0)
+ *
+ */
+
 #include <NimBLEDevice.h>
 #include <exception>
 #include <vector>
@@ -81,7 +93,7 @@ void NordicUARTService::onDisconnect(NimBLEServer *pServer)
 };
 
 //-----------------------------------------------------------------------------
-// Data transmission and Print implementation
+// Data transmission
 //-----------------------------------------------------------------------------
 
 size_t NordicUARTService::write(const uint8_t *data, size_t size)

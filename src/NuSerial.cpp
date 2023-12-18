@@ -1,10 +1,18 @@
+/**
+ * @author Ángel Fernández Pineda. Madrid. Spain.
+ * @date 2023-12-18
+ * @brief Communications stream based on the Nordic UART Service
+ *        with non-blocking Arduino semantics
+ *
+ * @copyright Creative Commons Attribution 4.0 International (CC BY 4.0)
+ *
+ */
+
 #include "NuSerial.hpp"
 
 //-----------------------------------------------------------------------------
 // Globals
 //-----------------------------------------------------------------------------
-
-// using namespace NuS_NimBLE;
 
 NordicUARTSerial &NuSerial = NordicUARTSerial::getInstance();
 
@@ -34,10 +42,10 @@ void NordicUARTSerial::onWrite(NimBLECharacteristic *pCharacteristic)
     NimBLEAttValue val = pCharacteristic->getValue();
     buffer = (uint8_t *)val.data();
     availableByteCount = val.size();
-    Serial.printf("onWrite: enter. %d bytes\n", availableByteCount);
+    //Serial.printf("onWrite: enter. %d bytes\n", availableByteCount);
     while (availableByteCount > 0)
         xSemaphoreTake(dataConsumed, portMAX_DELAY);
-    Serial.printf("onWrite: exit. %d bytes\n", availableByteCount);
+    //Serial.printf("onWrite: exit. %d bytes\n", availableByteCount);
 }
 
 //-----------------------------------------------------------------------------

@@ -1,3 +1,13 @@
+/**
+ * @author Ángel Fernández Pineda. Madrid. Spain.
+ * @date 2023-12-18
+ * @brief Communications stream based on the Nordic UART Service
+ *        with non-blocking Arduino semantics
+ *
+ * @copyright Creative Commons Attribution 4.0 International (CC BY 4.0)
+ *
+ */
+
 #ifndef __NUSERIAL_HPP__
 #define __NUSERIAL_HPP__
 
@@ -6,11 +16,13 @@
 
 /**
  * @brief Non-blocking serial communications through BLE and Nordic UART Service
- * 
+ *
  */
 class NordicUARTSerial : public NordicUARTService, public Stream
 {
 public:
+    // Singleton pattern
+
     NordicUARTSerial(const NordicUARTSerial &) = delete;
     void operator=(NordicUARTSerial const &) = delete;
 
@@ -28,6 +40,8 @@ public:
     };
 
 public:
+    // Overriden methods (note there is multiple inheritance)
+
     void onWrite(NimBLECharacteristic *pCharacteristic) override;
 
     /**
@@ -76,6 +90,7 @@ public:
 
 public:
     // Methods not strictly needed. Provided to mimic `Serial`
+
     void begin(unsigned long baud, ...)
     {
         start();
