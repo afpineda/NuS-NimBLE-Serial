@@ -5,7 +5,7 @@
 - [NuSEcho.ino](./NuSEcho/NuSEcho.ino)
 
   Runs a service that takes incoming data from a BLE peer and dumps it back to the same peer.
-  This is called and "echo" service. The serial monitor is also feed with log messages.
+  This is called an "echo" service. The serial monitor is also feed with log messages.
   The device is advertised as "NuSerial Echo".
   Demonstrates the use of non-blocking communications by the means of `NuSerial`.
 
@@ -18,7 +18,7 @@
 - [CustomCommandProcessor.ino](./CustomCommandProcessor/CustomCommandProcessor.ino)
 
   Runs a service that parses commands and executes them. The serial monitor is also feed with log messages. The device is advertised as "Custom commands demo".
-  Demonstrates how to write a custom service based on NuS.
+  Demonstrates how to write a custom protocol based on NuS.
 
   Commands and their syntax:
 
@@ -29,5 +29,5 @@
 
 ## Testing
 
-In order to run those sketches, you need a serial terminal app compatible with NuS in your smartphone or PC. During development, this one was used (Android):
+In order to test those sketches, you need a serial terminal app compatible with NuS in your smartphone or PC. During development, this one was used (Android):
 [Serial bluetooth terminal](https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal).

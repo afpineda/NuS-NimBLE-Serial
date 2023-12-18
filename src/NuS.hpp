@@ -73,14 +73,62 @@ public:
    */
   void disconnect(void);
 
+  /**
+   * @brief Set your own server callbacks
+   *
+   * @note Use this method to chain your own server callbacks to NuS
+   *       server callbacks
+   *
+   * @param pServerCallbacks The callbacks to be invoked. Must remain
+   *                         valid forever (do not destroy).
+   */
+  void setCallbacks(NimBLEServerCallbacks *pServerCallbacks);
+
 public:
   void onConnect(NimBLEServer *pServer) override;
   void onDisconnect(NimBLEServer *pServer) override;
+
+  void onConnect(NimBLEServer *pServer, ble_gap_conn_desc *desc) override
+  {
+    if (pOtherServerCallbacks)
+      pOtherServerCallbacks->onConnect(pServer, desc);
+  };
+
+  void onDisconnect(NimBLEServer *pServer, ble_gap_conn_desc *desc) override
+  {
+    if (pOtherServerCallbacks)
+      pOtherServerCallbacks->onDisconnect(pServer, desc);
+  };
+
+  void onMTUChange(uint16_t MTU, ble_gap_conn_desc *desc) override
+  {
+    if (pOtherServerCallbacks)
+      pOtherServerCallbacks->onMTUChange(MTU, desc);
+  };
+
+  uint32_t onPassKeyRequest() override
+  {
+    if (pOtherServerCallbacks)
+      pOtherServerCallbacks->onPassKeyRequest();
+  };
+
+  void onAuthenticationComplete(ble_gap_conn_desc *desc) override
+  {
+    if (pOtherServerCallbacks)
+      pOtherServerCallbacks->onAuthenticationComplete(desc);
+  };
+
+  bool onConfirmPIN(uint32_t pin) override
+  {
+    if (pOtherServerCallbacks)
+      pOtherServerCallbacks->onConfirmPIN(pin);
+  };
 
 private:
   NimBLEServer *pServer = nullptr;
   NimBLEService *pNuS = nullptr;
   NimBLECharacteristic *pTxCharacteristic = nullptr;
+  NimBLEServerCallbacks *pOtherServerCallbacks = nullptr;
   bool connected = false;
   bool started = false;
 

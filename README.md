@@ -24,7 +24,7 @@ This library implements the Nordic UART service on the *NimBLE-Arduino* stack.
 
 ## Client-side terminal application
 
-You may need a generic terminal (PC or smartphone) application in order to communicate with your Arduino application. Such a generic application must support the Nordic UART Service. There are several free alternatives (known to me):
+You may need a generic terminal (PC or smartphone) application in order to communicate with your Arduino application through BLE. Such a generic application must support the Nordic UART Service. There are several free alternatives (known to me):
 
 - Android:
   - [nRF connect for mobile](https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp)
@@ -37,9 +37,8 @@ You may need a generic terminal (PC or smartphone) application in order to commu
 Summary:
 
 - The `NuSerial` object provides non-blocking serial communications through BLE.
-- The `NuStream` object provides blocking serial communications through BLE.
-- Create your own object to provide a custom protocol based on serial communications through BLE, by deriving a new class from
-  `NordicUARTService`.
+- The `NuStream` object provides blocking serial communications through BLE (recommended).
+- Create your own object to provide a custom protocol based on serial communications through BLE, by deriving a new class from `NordicUARTService`.
 
 The **basic rules** are:
 
@@ -55,7 +54,7 @@ The **basic rules** are:
   }
   ```
 
-- This library sets their own [server callbacks](https://h2zero.github.io/esp-nimble-cpp/class_nim_b_l_e_server_callbacks.html), except for custom protocols, so **don't overwrite them**. For example, this code **does not work**:
+- This library sets their own [server callbacks](https://h2zero.github.io/esp-nimble-cpp/class_nim_b_l_e_server_callbacks.html), so **don't overwrite them**. For example, this code **does not work**:
 
   ```c++
   void setup() {
@@ -78,6 +77,21 @@ The **basic rules** are:
     NuSerial.start();
   }
   ```
+
+- Nevertheless, you can have your own server callbacks. Use `<object>.setCallbacks()` instead of `NimBLEServer::setCallbacks()`.
+  For example:
+
+  ```c++
+  void setup() {
+    ...
+    NimBLEDevice::init("MyDevice");
+    // Your own callbacks are NOT overwritten in this way
+    NuSerial.setCallbacks(myOwnCallbacks);
+    NuSerial.start();
+  }
+  ```
+
+- The Nordic UART Service can coexist with other GATT services in your application.
 
 You may learn from the provided [examples](./examples/README.md). Read code commentaries for more information.
 
@@ -115,7 +129,7 @@ And take into account:
 
 - As you should know, inherited `Stream` methods (for example, `NuSerial.read()`) will immediately return if there is no data available. But, this is also the case when no peer device is connected. Use `NuSerial.isConnected()` to know the case.
 - `NuSerial.begin()` or `NuSerial.start()` must be called at least once before reading. Calling more than once have no effect.
-- `NuSerial.end()` (as well as `NuSerial.disconnect()`) will terminate any peer connection. It's not required to call `NuSerial.begin()` (nor `NuSerial.start()`) again after `NuSerial.end()` (or `NuSerial.disconnect()`).
+- `NuSerial.end()` (as well as `NuSerial.disconnect()`) will terminate any peer connection. It's not mandatory to call `NuSerial.begin()` (nor `NuSerial.start()`) again after `NuSerial.end()` (or `NuSerial.disconnect()`).
 
 ## Blocking serial communications
 
@@ -145,7 +159,7 @@ void setup()
 void loop()
 {
     size_t size;
-    const uint8_t *data = NuStream.read(size);
+    const uint8_t *data = NuStream.read(size); // "size" is an out parameter
     while (data)
     {
         // do something with data and size
@@ -182,12 +196,12 @@ void MyCustomSerialProtocol::onWrite(NimBLECharacteristic *pCharacteristic)
     // Retrieve a pointer to received data and its size
     NimBLEAttValue val = pCharacteristic->getValue();
     const uint8_t *receivedData = val.data();
-    suze_t receivedDataSize = val.size();
+    size_t receivedDataSize = val.size();
 
     // Custom processing here
     ...
 }
 ```
 
-Since just one object can use the Noridic UART Service, you should also implement a
+Since just one object can use the Nordic UART Service, you should also implement a
 [singleton pattern](https://www.geeksforgeeks.org/implementation-of-singleton-class-in-cpp/).

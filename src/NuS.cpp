@@ -84,13 +84,22 @@ void NordicUARTService::disconnect(void)
 void NordicUARTService::onConnect(NimBLEServer *pServer)
 {
   connected = true;
-};
+  if (pOtherServerCallbacks)
+    pOtherServerCallbacks->onConnect(pServer);
+}
 
 void NordicUARTService::onDisconnect(NimBLEServer *pServer)
 {
   connected = false;
+  if (pOtherServerCallbacks)
+    pOtherServerCallbacks->onDisconnect(pServer);
   pServer->startAdvertising();
-};
+}
+
+void NordicUARTService::setCallbacks(NimBLEServerCallbacks *pServerCallbacks)
+{
+  pOtherServerCallbacks = pServerCallbacks;
+}
 
 //-----------------------------------------------------------------------------
 // Data transmission
