@@ -62,7 +62,8 @@ void NordicUARTService::start(void)
     init();
     pNuS->start();
     started = true;
-    pServer->startAdvertising();
+    if (autoAdvertising)
+      pServer->startAdvertising();
   }
 }
 
@@ -93,7 +94,8 @@ void NordicUARTService::onDisconnect(NimBLEServer *pServer)
   connected = false;
   if (pOtherServerCallbacks)
     pOtherServerCallbacks->onDisconnect(pServer);
-  pServer->startAdvertising();
+  if (autoAdvertising)
+      pServer->startAdvertising();
 }
 
 void NordicUARTService::setCallbacks(NimBLEServerCallbacks *pServerCallbacks)
@@ -109,8 +111,7 @@ size_t NordicUARTService::write(const uint8_t *data, size_t size)
 {
   if (connected)
   {
-    pTxCharacteristic->setValue(data, size);
-    pTxCharacteristic->notify();
+    pTxCharacteristic->notify(data, size);
     return size;
   }
   return 0;

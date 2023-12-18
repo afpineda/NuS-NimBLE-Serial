@@ -39,13 +39,13 @@ NordicUARTSerial::~NordicUARTSerial()
 
 void NordicUARTSerial::onWrite(NimBLECharacteristic *pCharacteristic)
 {
-    // Wait for previous data to get consumed
+    // Wait for data to get consumed
     xSemaphoreTake(dataConsumed, portMAX_DELAY);
 
-    // Hold data until next read
-    NimBLEAttValue val = pCharacteristic->getValue();
-    incomingBuffer = val.data();
-    availableByteCount = val.size(); // this must be the last line. Important!!!
+    // Hold data
+    incomingPacket = pCharacteristic->getValue();
+    incomingBuffer = incomingPacket.data();
+    availableByteCount = incomingPacket.size(); // this must be the last line. Important!!!
 }
 
 //-----------------------------------------------------------------------------

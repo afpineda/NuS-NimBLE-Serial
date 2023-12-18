@@ -84,6 +84,28 @@ public:
    */
   void setCallbacks(NimBLEServerCallbacks *pServerCallbacks);
 
+  /**
+   * @brief Automatically advertise BLE services when no peer is connected
+   *
+   * @note This is the default behavior.
+   *
+   */
+  void enableAutoAdvertising()
+  {
+    autoAdvertising = true;
+  };
+
+  /**
+   * @brief Do not advertise BLE services when no peer is connected
+   *
+   * @note You should handle advertising on your own if you call this method.
+   *
+   */
+  void disableAutoAdvertising()
+  {
+    autoAdvertising = false;
+  };
+
 public:
   void onConnect(NimBLEServer *pServer) override;
   void onDisconnect(NimBLEServer *pServer) override;
@@ -129,6 +151,7 @@ private:
   NimBLEService *pNuS = nullptr;
   NimBLECharacteristic *pTxCharacteristic = nullptr;
   NimBLEServerCallbacks *pOtherServerCallbacks = nullptr;
+  bool autoAdvertising = true;
   bool connected = false;
   bool started = false;
 

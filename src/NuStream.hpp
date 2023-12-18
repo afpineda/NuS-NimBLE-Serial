@@ -92,6 +92,7 @@ private:
     SemaphoreHandle_t dataConsumed;
     SemaphoreHandle_t dataAvailable;
     SemaphoreHandle_t peerConnected;
+    NimBLEAttValue incomingPacket;
     size_t availableByteCount = 0;
     const uint8_t *incomingBuffer = nullptr;
     NordicUARTBlockingStream();

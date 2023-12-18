@@ -107,6 +107,7 @@ private:
     SemaphoreHandle_t dataConsumed;
     size_t availableByteCount = 0;
     const uint8_t *incomingBuffer = nullptr;
+    NimBLEAttValue incomingPacket;
     NordicUARTSerial();
     ~NordicUARTSerial();
 };

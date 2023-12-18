@@ -6,7 +6,7 @@ In summary, this library provides:
 
 - A generic class to implement custom protocols for serial communications through BLE.
 - A BLE serial communications object that can be used as Arduino's [Serial](https://www.arduino.cc/reference/en/language/functions/communication/serial/).
-- A more efficient BLE serial communications object that can handle incoming data in packets, eluding active wait thanks to blocking semantics.
+- A more efficient BLE serial communications object that can handle incoming data in packets, eluding active waiting thanks to blocking semantics.
 
 ## Supported DevKit boards
 
@@ -36,8 +36,8 @@ You may need a generic terminal (PC or smartphone) application in order to commu
 
 Summary:
 
-- The `NuSerial` object provides non-blocking serial communications through BLE.
-- The `NuStream` object provides blocking serial communications through BLE (recommended).
+- The `NuSerial` object provides non-blocking serial communications through BLE, *Arduino's style*.
+- The `NuStream` object provides blocking serial communications through BLE (recommended way to go).
 - Create your own object to provide a custom protocol based on serial communications through BLE, by deriving a new class from `NordicUARTService`.
 
 The **basic rules** are:
@@ -93,6 +93,9 @@ The **basic rules** are:
 
 - The Nordic UART Service can coexist with other GATT services in your application.
 
+- By default, this library will automatically advertise existing GATT services when no peer is connected. This includes the Nordic UART Service and other
+  services (if any). To change this behavior, call `<object>.disableAutoAdvertising()` and handle advertising on your own.
+
 You may learn from the provided [examples](./examples/README.md). Read code commentaries for more information.
 
 ## Non-blocking serial communications
@@ -125,11 +128,11 @@ void loop()
 }
 ```
 
-And take into account:
+Take into account:
 
-- As you should know, inherited `Stream` methods (for example, `NuSerial.read()`) will immediately return if there is no data available. But, this is also the case when no peer device is connected. Use `NuSerial.isConnected()` to know the case.
+- As you should know, inherited `Stream` methods (for example, `NuSerial.read()`) will immediately return if there is no data available. But, this is also the case when no peer device is connected. Use `NuSerial.isConnected()` to know the case (if you need to).
 - `NuSerial.begin()` or `NuSerial.start()` must be called at least once before reading. Calling more than once have no effect.
-- `NuSerial.end()` (as well as `NuSerial.disconnect()`) will terminate any peer connection. It's not mandatory to call `NuSerial.begin()` (nor `NuSerial.start()`) again after `NuSerial.end()` (or `NuSerial.disconnect()`).
+- `NuSerial.end()` (as well as `NuSerial.disconnect()`) will terminate any peer connection. If you pretend to read again, it's not mandatory to call `NuSerial.begin()` (nor `NuSerial.start()`) again, but you can.
 
 ## Blocking serial communications
 
@@ -170,7 +173,7 @@ void loop()
 }
 ```
 
-Take into account that:
+Take into account:
 
 - **Just one** OS task can work with `NuStream` (others will get blocked).
 - Data should be processed as soon as possible. Use other tasks and buffers/queues for time-consuming computation.
@@ -202,6 +205,8 @@ void MyCustomSerialProtocol::onWrite(NimBLECharacteristic *pCharacteristic)
     ...
 }
 ```
+
+In the previous example, the data pointed by `*receivedData` will **not remain valid** after `onWrite()` has finished to execute. If you need that data for later use, you must make a copy of the data itself, not just the pointer. For that purpose, you may store a copy of the `pCharacteristic->getValue()` object.
 
 Since just one object can use the Nordic UART Service, you should also implement a
 [singleton pattern](https://www.geeksforgeeks.org/implementation-of-singleton-class-in-cpp/).

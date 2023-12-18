@@ -51,7 +51,7 @@ void NordicUARTBlockingStream::onDisconnect(NimBLEServer *pServer)
 {
     NordicUARTService::onDisconnect(pServer);
 
-    // Awake task at endRead()
+    // Awake task at read()
     availableByteCount = 0;
     incomingBuffer = nullptr;
     xSemaphoreGive(dataAvailable);
@@ -67,9 +67,9 @@ void NordicUARTBlockingStream::onWrite(NimBLECharacteristic *pCharacteristic)
     xSemaphoreTake(dataConsumed, portMAX_DELAY);
 
     // Hold data until next read
-    NimBLEAttValue val = pCharacteristic->getValue();
-    incomingBuffer = val.data();
-    availableByteCount = val.size();
+    incomingPacket = pCharacteristic->getValue();
+    incomingBuffer = incomingPacket.data();
+    availableByteCount = incomingPacket.size();
 
     // signal available data
     xSemaphoreGive(dataAvailable);
