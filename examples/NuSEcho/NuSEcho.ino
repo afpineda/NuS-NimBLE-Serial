@@ -27,23 +27,28 @@ void loop()
             NuSerial.end();
         }
         else
-        {   
+        {
+            int processedCount = 0;
+            int availableCount = NuSerial.available();
+            if (availableCount)
+                Serial.printf("--Available %d bytes for processing\n", availableCount);
             while (NuSerial.available())
             {
                 int bleChar = NuSerial.read();
-                if (bleChar<0) 
+                if (bleChar < 0)
                     Serial.println("ERROR: NuSerial.read()<0, but NuSerial.available()>0. Should not happen.");
-                else {
-                    if (NuSerial.write((uint8_t)bleChar)<1)
+                else
+                {
+                    if (NuSerial.write((uint8_t)bleChar) < 1)
                         Serial.println("ERROR: NuSerial.write() failed");
-                else {
-                    Serial.print((char)bleChar);
+                    // Serial.print((char)bleChar);
+                    processedCount++;
                 }
-                Serial.println("");
             }
-            // int bleChar = NuSerial.read();
-            // if (bleChar >= 0)
-            //     NuSerial.write((uint8_t)bleChar); // Echo
+            if (processedCount)
+                Serial.printf("--Stream of %d bytes processed\n", processedCount);
+            if (processedCount != availableCount)
+                Serial.printf("ERROR: %d bytes were available, but %d bytes were processed.\n", availableCount, processedCount);
         }
     }
     else

@@ -7,13 +7,13 @@
   Runs a service that takes incoming data from a BLE peer and dumps it back to the same peer.
   This is called an "echo" service. The serial monitor is also feed with log messages.
   The device is advertised as "NuSerial Echo".
-  Demonstrates the use of non-blocking communications by the means of `NuSerial`.
+  Demonstrates the usage of non-blocking communications by the means of `NuSerial`.
 
 - [NuSerialDump.ino](./NuSerialDump/NuSerialDump.ino)
 
   Runs a service that takes incoming data from a BLE peer and dumps it into the serial monitor.
   The device is advertised as "NuStream demo".
-  Demonstrates the use of blocking communications by the means of `NuStream`.
+  Demonstrates the usage of blocking communications by the means of `NuStream`.
 
 - [CustomCommandProcessor.ino](./CustomCommandProcessor/CustomCommandProcessor.ino)
 

@@ -22,7 +22,7 @@
 class CustomCommandProcessor : public NordicUARTService
 {
 public:
-    // Do not be confused by this method's name.
+    // Do not get confused by this method's name.
     // Data is received here.
     void onWrite(NimBLECharacteristic *pCharacteristic) override;
 

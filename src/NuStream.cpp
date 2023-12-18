@@ -66,7 +66,7 @@ void NordicUARTBlockingStream::onWrite(NimBLECharacteristic *pCharacteristic)
     // Wait for previous data to get consumed
     xSemaphoreTake(dataConsumed, portMAX_DELAY);
 
-    // Hold data until endRead()
+    // Hold data until next read
     NimBLEAttValue val = pCharacteristic->getValue();
     incomingBuffer = val.data();
     availableByteCount = val.size();

@@ -1,7 +1,35 @@
-MeanAndVar	KEYWORD1
-reset	KEYWORD2
-add	KEYWORD2
-getMean	KEYWORD2
-getUnbiasedVariance	KEYWORD2
-getVariance	KEYWORD2
-getCount	KEYWORD2
+############################################
+# Syntax Coloring Map For NuS-NimBLE-Serial
+############################################
+
+############################################
+# Data types (KEYWORD1)
+############################################
+
+NordicUARTService	KEYWORD1
+NordicUARTSerial	KEYWORD1
+NordicUARTBlockingStream	KEYWORD1
+
+############################################
+# Methods and Functions (KEYWORD2)
+############################################
+
+start	KEYWORD2
+setCallbacks	KEYWORD2
+isConnected	KEYWORD2
+write	KEYWORD2
+send	KEYWORD2
+write	KEYWORD2
+disconnect	KEYWORD2
+available	KEYWORD2
+read	KEYWORD2
+peek	KEYWORD2
+begin	KEYWORD2
+end	KEYWORD2
+
+############################################
+# Constants (LITERAL1)
+############################################
+
+NuSerial	LITERAL1
+NuStream	LITERAL1

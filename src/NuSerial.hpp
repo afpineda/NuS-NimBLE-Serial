@@ -74,7 +74,10 @@ public:
      * @param byte Byte to write
      * @return size_t The number of bytes written
      */
-    size_t write(uint8_t byte) override;
+    virtual size_t write(uint8_t byte) override
+    {
+        return NordicUARTService::write(&byte, 1);
+    };
 
     /**
      * @brief Write bytes to the stream
@@ -83,7 +86,7 @@ public:
      * @param size Count of bytes to write
      * @return size_t Actual count of bytes that were written
      */
-    size_t write(const uint8_t *buffer, size_t size) override
+    virtual size_t write(const uint8_t *buffer, size_t size) override
     {
         return NordicUARTService::write(buffer, size);
     };
@@ -102,8 +105,8 @@ public:
 
 private:
     SemaphoreHandle_t dataConsumed;
-    int availableByteCount = 0;
-    uint8_t *buffer = nullptr;
+    size_t availableByteCount = 0;
+    const uint8_t *incomingBuffer = nullptr;
     NordicUARTSerial();
     ~NordicUARTSerial();
 };

@@ -23,6 +23,7 @@ NordicUARTSerial &NuSerial = NordicUARTSerial::getInstance();
 NordicUARTSerial::NordicUARTSerial() : NordicUARTService(), Stream()
 {
     availableByteCount = 0;
+    incomingBuffer = nullptr;
     dataConsumed = xSemaphoreCreateBinary();
     xSemaphoreGive(dataConsumed);
 }
@@ -38,14 +39,13 @@ NordicUARTSerial::~NordicUARTSerial()
 
 void NordicUARTSerial::onWrite(NimBLECharacteristic *pCharacteristic)
 {
-    // Note: do note change the order of these lines. This is critical.
+    // Wait for previous data to get consumed
+    xSemaphoreTake(dataConsumed, portMAX_DELAY);
+
+    // Hold data until next read
     NimBLEAttValue val = pCharacteristic->getValue();
-    buffer = (uint8_t *)val.data();
-    availableByteCount = val.size();
-    //Serial.printf("onWrite: enter. %d bytes\n", availableByteCount);
-    while (availableByteCount > 0)
-        xSemaphoreTake(dataConsumed, portMAX_DELAY);
-    //Serial.printf("onWrite: exit. %d bytes\n", availableByteCount);
+    incomingBuffer = val.data();
+    availableByteCount = val.size(); // this must be the last line. Important!!!
 }
 
 //-----------------------------------------------------------------------------
@@ -61,7 +61,7 @@ int NordicUARTSerial::peek()
 {
     int result = -1;
     if (availableByteCount > 0)
-        result = (int)buffer[0];
+        result = (int)incomingBuffer[0];
     return result;
 }
 
@@ -70,16 +70,11 @@ int NordicUARTSerial::read()
     int result = -1;
     if (availableByteCount > 0)
     {
-        result = (int)buffer[0];
-        buffer++;
+        result = (int)(incomingBuffer[0]);
+        incomingBuffer++;
         availableByteCount--;
         if (availableByteCount <= 0)
             xSemaphoreGive(dataConsumed);
     }
     return result;
 }
-
-size_t NordicUARTSerial::write(uint8_t byte)
-{
-    return NordicUARTService::write(&byte, 1);
-};
