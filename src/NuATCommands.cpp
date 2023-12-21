@@ -10,6 +10,7 @@
 #include <string.h>
 #include <exception>
 #include "NuATCommands.hpp"
+#include <Arduino.h>
 
 //-----------------------------------------------------------------------------
 // Globals
@@ -45,6 +46,7 @@ const char *followingCommand(const char *in, NuATCommandResult_t conditional = A
     else if (in[0] == ';')
         return in + 1;
     else
+        // should not enter here
         return nullptr;
 }
 
@@ -61,36 +63,41 @@ const char *findSuffix(const char *in)
 
 void NuATCommandParser::parseCommandLine(const char *in)
 {
+    lastParsingResult = AT_PR_NO_CALLBACKS;
     if (!pCmdCallbacks)
         // no callbacks: nothing to do here
         return;
 
-    size_t textLength = strlen(in);
     // Detect AT preamble
-    if ((textLength >= 2) && isATPreamble(in))
+    if (isATPreamble(in))
     {
         // skip preamble
         in = in + 2;
-        textLength = textLength - 2;
-        if ((textLength <= 0) || (in[0] != '\n'))
+        if ((in[0] == '\n') || (in[0] == '\0'))
         {
             // This is a preamble with no commands at all.
             // Response is OK to signal that AT commands are accepted.
             printResultResponse(AT_RESULT_OK);
+            lastParsingResult = AT_PR_NO_COMMANDS;
             return;
         }
     }
     else
     {
-        // Not an AT command
+        // Not an AT command line
+        lastParsingResult = AT_PR_NO_PREAMBLE;
         pCmdCallbacks->onNonATCommand(in);
         return;
     }
 
     // Parse all commands contained in incoming data
+    int commandIndex = 0;
     do
     {
+        Serial.printf("parseCommandLine(): %s",in);
+        lastParsingResult = AT_PR_OK; // may be changed later
         in = parseSingleCommand(in);
+        pCmdCallbacks->onFinished(commandIndex++, lastParsingResult);
     } while (in);
 }
 
@@ -98,14 +105,15 @@ const char *NuATCommandParser::parseSingleCommand(const char *in)
 {
     // Detect prefix.
     // Note: if prefix is '&', just a single letter is allowed as command name
+    Serial.printf("parseSingleCommand(): %s\n",in);
     if ((in[0] == '&') || (in[0] == '+'))
     {
         // Prefix is valid, now detect suffix.
         // Text between a prefix and a suffix is a command name.
         // Text between a prefix and ";", "\n" or "\0" is also a command name.
         const char *suffix = findSuffix(in + 1);
-        size_t cmdNameLength = suffix - in;
-        if ((cmdNameLength > 0) && (cmdNameLength < bufferSize) && ((in[0] != '&') || (cmdNameLength == 1)))
+        size_t cmdNameLength = suffix - (in + 1);
+        if ((cmdNameLength > 0) && (cmdNameLength < bufferSize) && ((in[0] == '+') || (cmdNameLength == 1)))
         {
             // store command name in "cmdName" as a null-terminated string
             char cmdName[bufferSize];
@@ -114,24 +122,35 @@ const char *NuATCommandParser::parseSingleCommand(const char *in)
 
             if (isAlphaString(cmdName))
             {
-                // check command availability
+                // check if command is supported
                 int commandId = pCmdCallbacks->getATCommandId(cmdName);
                 if (commandId >= 0)
                 {
+                    // continue parsing
                     return parseAction(suffix, commandId);
-                } // else this command is not supported
+                }
+                else // this command is not supported
+                    lastParsingResult = AT_PR_UNSUPPORTED_CMD;
+            }
+            else // command name contains non-alphabetic characters
+                lastParsingResult = AT_PR_INVALID_CMD2;
+        }
+        else // error: no command name, buffer overflow or command name has "&" prefix but more than one letter
+            lastParsingResult = AT_PR_INVALID_CMD1;
 
-            } // else command name contains non-alphabetic characters
-
-        } // else invalid prefix
-
-    } // else error: no command name, buffer overflow or command name has "&" prefix but more than one letter
+    } // invalid prefix
+    else
+    {
+        lastParsingResult = AT_PR_INVALID_PREFIX;
+        Serial.printf("Invalid prefix\n");
+    }
     printResultResponse(AT_RESULT_ERROR);
     return nullptr;
 }
 
 const char *NuATCommandParser::parseAction(const char *in, int commandId)
 {
+    Serial.printf("parseAction(): %s\n",in);
     // Note: "in" points to a suffix or an end-of-command token
     if ((in[0] == '=') && (in[1] == '?'))
     {
@@ -146,12 +165,12 @@ const char *NuATCommandParser::parseAction(const char *in, int commandId)
     else if (in[0] == '?')
     {
         // This is a READ/QUERY command
-        if (isCommandEndToken(in[2]))
+        if (isCommandEndToken(in[1]))
         {
             NuATCommandResult_t response = pCmdCallbacks->onQuery(commandId);
             printResultResponse(response);
             return followingCommand(in + 1, response);
-        } // else syntax error
+        } // else syntax Error
     }
     else if (in[0] == '=')
     {
@@ -163,8 +182,9 @@ const char *NuATCommandParser::parseAction(const char *in, int commandId)
         // This is an EXECUTE Command
         NuATCommandResult_t response = pCmdCallbacks->onExecute(commandId);
         printResultResponse(response);
-        return followingCommand(in + 1, response);
+        return followingCommand(in, response);
     } // else syntax error
+    lastParsingResult = AT_PR_END_TOKEN_EXPECTED;
     printResultResponse(AT_RESULT_ERROR);
     return nullptr;
 }
@@ -184,6 +204,7 @@ const char *NuATCommandParser::parseWriteParameters(const char *in, int commandI
     if (l >= bufferSize)
     {
         // buffer overflow
+        lastParsingResult = AT_PR_SET_OVERFLOW;
         printResultResponse(AT_RESULT_ERROR);
         return nullptr;
     }

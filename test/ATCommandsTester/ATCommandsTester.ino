@@ -68,7 +68,7 @@ public:
     {
         lastResponse = AT_RESULT_OK;
         memset(cmd, 8, 0);
-        id = -1;
+        id = 0;
         bExecute = false;
         bWrite = false;
         bRead = false;
@@ -91,13 +91,14 @@ public:
 // ASSERTION utilities
 //-----------------------------------------------------------------------------
 
-template<typename T>
+template <typename T>
 void assert_eq(T expected, T actual, int testID, bool eqOrNot = true)
 {
     bool test = (expected == actual);
     if (test != eqOrNot)
     {
-        Serial.printf("--Test #%d failure: expected %d, found %d\n", testID, expected, actual);
+        Serial.printf("  --Test #%d failure: expected %d, found %d\n", testID, expected, actual);
+        Serial.printf("  --Last parsing result: %d\n", tester.lastParsingResult);
     }
 }
 
@@ -127,56 +128,73 @@ void Test_parsing(char commandLine[], NuATCommandResult_t expectedResult)
 
 void Test_ActionExecute(char commandLine[])
 {
-    Serial.printf("--Test #%d. EXECUTE %s\n", testNumber++, commandLine);
+    Serial.printf("--Test #%d. EXECUTE %s\n", testNumber, commandLine);
     tester.reset();
     tester.test(commandLine);
     bool test = tester.bExecute && !tester.bRead && !tester.bWrite && !tester.bTest;
     if (!test)
-        Serial.println("--Test failed.");
+    {
+        Serial.println("  --Test failed.");
+        Serial.printf("  --Last parsing result: %d\n", tester.lastParsingResult);
+    }
     testNumber++;
 }
 
 void Test_ActionQuery(char commandLine[])
 {
-    Serial.printf("--Test #%d. QUERY %s\n", testNumber++, commandLine);
+    Serial.printf("--Test #%d. QUERY %s\n", testNumber, commandLine);
     tester.reset();
     tester.test(commandLine);
     bool test = !tester.bExecute && tester.bRead && !tester.bWrite && !tester.bTest;
     if (!test)
-        Serial.println("--Test failed.");
+    {
+        Serial.println("  --Test failed.");
+        Serial.printf("  --Last parsing result: %d\n", tester.lastParsingResult);
+    }
     testNumber++;
 }
 
 void Test_ActionSet(char commandLine[])
 {
-    Serial.printf("--Test #%d. SET %s\n", testNumber++, commandLine);
+    Serial.printf("--Test #%d. SET %s\n", testNumber, commandLine);
     tester.reset();
     tester.test(commandLine);
     bool test = !tester.bExecute && !tester.bRead && tester.bWrite && !tester.bTest;
     if (!test)
-        Serial.println("--Test failed.");
+    {
+        Serial.println("  --Test failed.");
+        Serial.printf("  --Last parsing result: %d\n", tester.lastParsingResult);
+    }
     testNumber++;
 }
 
 void Test_ActionTest(char commandLine[])
 {
-    Serial.printf("--Test #%d. TEST ACTION %s\n", testNumber++, commandLine);
+    Serial.printf("--Test #%d. TEST ACTION %s\n", testNumber, commandLine);
     tester.reset();
     tester.test(commandLine);
     bool test = !tester.bExecute && !tester.bRead && !tester.bWrite && tester.bTest;
     if (!test)
-        Serial.println("--Test failed.");
+    {
+        Serial.println("  --Test failed.");
+        Serial.printf("  --Last parsing result: %d\n", tester.lastParsingResult);
+    }
+
     testNumber++;
 }
 
 void Test_NoAction(char commandLine[])
 {
-    Serial.printf("--Test #%d. NO ACTION %s\n", testNumber++, commandLine);
+    Serial.printf("--Test #%d. NO ACTION %s\n", testNumber, commandLine);
     tester.reset();
     tester.test(commandLine);
     bool test = !tester.bExecute && !tester.bRead && !tester.bWrite && !tester.bTest;
     if (!test)
-        Serial.println("--Test failed.");
+    {
+        Serial.println("  --Test failed.");
+        Serial.printf("  --Last parsing result: %d\n", tester.lastParsingResult);
+    }
+
     testNumber++;
 }
 
@@ -207,7 +225,7 @@ void setup()
 
     // Test #10
     Test_parsing("AT&+F\n", AT_RESULT_ERROR);
-    Test_parsing("AT&F=\n", AT_RESULT_ERROR);
+    Test_parsing("AT&F=\n", AT_RESULT_OK);
     Test_parsing("AT+FFFF=\"value\"\n", AT_RESULT_OK);
     Test_parsing("AT+FFFF=\"value\",1\n", AT_RESULT_OK);
     Test_parsing("AT+FFFF=\"value\",\n", AT_RESULT_OK);
