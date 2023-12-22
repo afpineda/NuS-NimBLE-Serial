@@ -18,12 +18,12 @@ class NuATCommandTester : public NuATCommandParser, NuATCommandCallbacks
 {
 public:
     NuATCommandResult_t lastResponse;
-    char cmd[8];
     int id = 0;
     bool bExecute = false;
     bool bWrite = false;
     bool bRead = false;
     bool bTest = false;
+    bool bPrintParams = false;
 
 public:
     virtual void printATResponse(const char message[]) override
@@ -51,6 +51,12 @@ public:
 
     virtual NuATCommandResult_t onSet(int commandId, NuATCommandParameters_t &parameters) override
     {
+        if (bPrintParams)
+        {
+            int count = 1;
+            for (const char *param : parameters)
+                Serial.printf("Parameter %d: %s\n", count++, param);
+        }
         bWrite = true;
         return AT_RESULT_OK;
     };
@@ -70,12 +76,12 @@ public:
     void reset()
     {
         lastResponse = AT_RESULT_OK;
-        memset(cmd, 8, 0);
         id = 0;
         bExecute = false;
         bWrite = false;
         bRead = false;
         bTest = false;
+        bPrintParams = false;
     };
 
     NuATCommandResult_t test(const char commandLine[])
@@ -138,10 +144,19 @@ void Test_actionFlags(char commandLine[], bool mustExecute, bool mustRead, bool 
     if (!test)
     {
         Serial.printf("  --Test failed (execute,read,write,test). Expected (%d,%d,%d,%d). Found (%d,%d,%d,%d)\n",
-                       mustExecute, mustRead, mustWrite, mustTest,
-                       tester.bExecute, tester.bRead, tester.bWrite, tester.bTest);
+                      mustExecute, mustRead, mustWrite, mustTest,
+                      tester.bExecute, tester.bRead, tester.bWrite, tester.bTest);
         Serial.printf("  --Last parsing result: %d\n", tester.lastParsingResult);
     }
+    testNumber++;
+}
+
+void Test_setActionParameters(char commandLine[])
+{
+    tester.reset();
+    tester.bPrintParams = true;
+    Serial.printf("-- Test #%d. Check parameters for %s\n", testNumber, commandLine);
+    tester.test(commandLine);
     testNumber++;
 }
 
@@ -163,6 +178,7 @@ void setup()
     Test_parsing("AT+\n", AT_RESULT_ERROR);
     Test_parsing("AT&\n", AT_RESULT_ERROR);
     Test_parsing("AT$n\n", AT_RESULT_ERROR);
+
     Test_parsing("AT&F\n", AT_RESULT_OK);
     Test_parsing("AT&FF\n", AT_RESULT_ERROR);
     Test_parsing("AT+F\n", AT_RESULT_OK);
@@ -174,6 +190,7 @@ void setup()
     Test_parsing("AT+FFFF=\"value\"\n", AT_RESULT_OK);
     Test_parsing("AT+FFFF=\"value\",1\n", AT_RESULT_OK);
     Test_parsing("AT+FFFF=\"value\",\n", AT_RESULT_OK);
+
     Test_parsing("AT+FFFF=,1\n", AT_RESULT_OK);
     Test_parsing("AT+FFFF=,,,\n", AT_RESULT_OK);
     Test_parsing("AT+F?\n", AT_RESULT_OK);
@@ -186,19 +203,50 @@ void setup()
     Test_parsing("AT&F;&G=1;&H?\n", AT_RESULT_OK);
     Test_parsing("AT&F;&G=1;&H?;\n", AT_RESULT_ERROR);
     Test_parsing("AT&F;;&H?\n", AT_RESULT_ERROR);
-    Test_actionFlags("AT&FFF\n",false,false,false,false);
-    Test_actionFlags("AT+F/\n",false,false,false,false);
-    Test_actionFlags("AT&F\n",true,false,false,false);
-    Test_actionFlags("AT&F?\n",false,true,false,false);
-    Test_actionFlags("AT&F=99\n",false,false,true,false);
+
+    Test_parsing("AT&F=\"\"\n", AT_RESULT_OK);
+    Test_parsing("AT&F=error\"string\"\n", AT_RESULT_ERROR);
+    Test_parsing("AT&F=\"string\"error\n", AT_RESULT_ERROR);
+    Test_parsing("AT&F=\"error\n", AT_RESULT_ERROR);
+    Test_parsing("AT&F=error\"\n", AT_RESULT_ERROR);
 
     // Test #30
-    Test_actionFlags("AT&F=?\n",false,false,false,true);
-    Test_actionFlags("AT&+F/;&G\n",false,false,false,false);
-    Test_actionFlags("AT&G=?;&F\n",true,false,false,true);
-    Test_actionFlags("AT&G;&F?\n",true,true,false,false);
-    Test_actionFlags("AT&F;&G=99\n",true,false,true,false);
-    Test_actionFlags("AT&F=1&G=?\n",false,true,true,false);
+    Test_parsing("AT&F=\"a \\\\ b\"\n", AT_RESULT_OK);
+    Test_parsing("AT&F=\"a \\, b\"\n", AT_RESULT_OK);
+    Test_parsing("AT&F=\"a \\; b\"\n", AT_RESULT_OK);
+    Test_parsing("AT&F=\"a \\\" b\"\n", AT_RESULT_OK);
+    Test_parsing("AT&F=\"too long too long too long too long too long too long\"\n", AT_RESULT_ERROR);
+
+    Test_actionFlags("AT&FFF\n", false, false, false, false);
+    Test_actionFlags("AT+F/\n", false, false, false, false);
+    Test_actionFlags("AT&F\n", true, false, false, false);
+    Test_actionFlags("AT&F?\n", false, true, false, false);
+    Test_actionFlags("AT&F=99\n", false, false, true, false);
+
+    // Test #40
+    Test_actionFlags("AT&F=?\n", false, false, false, true);
+    Test_actionFlags("AT&+F/;&G\n", false, false, false, false);
+    Test_actionFlags("AT&G=?;&F\n", true, false, false, true);
+    Test_actionFlags("AT&G;&F?\n", true, true, false, false);
+    Test_actionFlags("AT&F;&G=99\n", true, false, true, false);
+
+    Test_actionFlags("AT&F=1;&G=?\n", false, false, true, true);
+
+    Serial.println("*****************************************");
+    Serial.println(" Non-Automated test (check visually)     ");
+    Serial.println("*****************************************");
+
+    // Test #46
+
+    Test_setActionParameters("AT&F=\"value\"\n");
+    Test_setActionParameters("AT&F=1,2,3,4,5\n");
+    Test_setActionParameters("AT&F=\"a \\\\ b\"\n");
+    Test_setActionParameters("AT&F=\"a \\, b\"\n");
+
+    // Test #50
+    Test_setActionParameters("AT&F=\"a \\; b\"\n");
+    Test_setActionParameters("AT&F=\"a \\\" b\"\n");
+    Test_setActionParameters("AT&F=\"a \\\n b\"\n");
 
     Serial.println("*****************************************");
     Serial.println("END");

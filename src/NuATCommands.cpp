@@ -10,7 +10,6 @@
 #include <string.h>
 #include <exception>
 #include "NuATCommands.hpp"
-#include <Arduino.h>
 
 //-----------------------------------------------------------------------------
 // Globals
@@ -94,7 +93,7 @@ void NuATCommandParser::parseCommandLine(const char *in)
     int commandIndex = 0;
     do
     {
-        Serial.printf("parseCommandLine(): %s",in);
+        // Serial.printf("parseCommandLine(): %s", in);
         lastParsingResult = AT_PR_OK; // may be changed later
         in = parseSingleCommand(in);
         pCmdCallbacks->onFinished(commandIndex++, lastParsingResult);
@@ -105,7 +104,7 @@ const char *NuATCommandParser::parseSingleCommand(const char *in)
 {
     // Detect prefix.
     // Note: if prefix is '&', just a single letter is allowed as command name
-    Serial.printf("parseSingleCommand(): %s\n",in);
+    // Serial.printf("parseSingleCommand(): %s\n", in);
     if ((in[0] == '&') || (in[0] == '+'))
     {
         // Prefix is valid, now detect suffix.
@@ -142,7 +141,7 @@ const char *NuATCommandParser::parseSingleCommand(const char *in)
     else
     {
         lastParsingResult = AT_PR_INVALID_PREFIX;
-        Serial.printf("Invalid prefix\n");
+        // Serial.printf("Invalid prefix\n");
     }
     printResultResponse(AT_RESULT_ERROR);
     return nullptr;
@@ -150,8 +149,8 @@ const char *NuATCommandParser::parseSingleCommand(const char *in)
 
 const char *NuATCommandParser::parseAction(const char *in, int commandId)
 {
-    Serial.printf("parseAction(): %s\n",in);
-    // Note: "in" points to a suffix or an end-of-command token
+    // Serial.printf("parseAction(): %s\n", in);
+    //  Note: "in" points to a suffix or an end-of-command token
     if ((in[0] == '=') && (in[1] == '?'))
     {
         // This is a TEST command
@@ -191,16 +190,96 @@ const char *NuATCommandParser::parseAction(const char *in, int commandId)
 
 const char *NuATCommandParser::parseWriteParameters(const char *in, int commandId)
 {
+    // See https://docs.espressif.com/projects/esp-at/en/release-v2.2.0.0_esp8266/AT_Command_Set/index.html
+    // about parameters' syntax.
+
     NuATCommandParameters_t paramList;
     char buffer[bufferSize];
     size_t l = 0;
+    bool doubleQuotes = false;
+    bool syntaxError = false;
+    char *currentParam = buffer;
 
-    // copy parameters to buffer
+    // Parse, tokenize and copy parameters to buffer
     while (!isCommandEndToken(in[0]) && (l < bufferSize))
     {
-        buffer[l++] = in[0];
-        in++;
+        if (doubleQuotes)
+        {
+            if ((in[0] == '\"') && ((in[1] == ',') || isCommandEndToken(in[1])))
+            {
+                // Closing double quotes
+                doubleQuotes = false;
+                in++;
+                continue;
+            }
+            else if (in[0] == '\"')
+            {
+                // there is more text after the closing double quotes
+                syntaxError = true;
+                break;
+            }
+            else if ((in[0] == '\\') && (in[1] != '\0'))
+            {
+                // Escaped character
+                in++;
+                buffer[l++] = in[0];
+                in++;
+                continue;
+            }
+        }
+        else
+        {
+            if ((in[0] == '\"') && (currentParam == (buffer + l)))
+            {
+                // Opening double quotes
+                doubleQuotes = true;
+                in++;
+                continue;
+            }
+            else if (in[0] == '\"')
+            {
+                // There is some text before the opening double quotes
+                syntaxError = true;
+                break;
+            }
+        }
+
+        // copy char to buffer and tokenize
+        if (in[0] == ',')
+        {
+            // Serial.println("param token");
+            if (doubleQuotes)
+            {
+                // Missing closing double quotes
+                syntaxError = true;
+                break;
+            }
+            else
+            {
+                // End of this parameter
+                buffer[l++] = '\0';
+                paramList.push_back(currentParam);
+                // Serial.printf("Prev param: %s\n", currentParam);
+                currentParam = (buffer + l);
+                in++;
+            }
+        }
+        else
+        {
+            buffer[l++] = in[0];
+            in++;
+        }
+    } // end-while
+
+    // check for syntax errors or missing double quotes in last parameter
+    if (syntaxError || doubleQuotes)
+    {
+        lastParsingResult = AT_PR_ILL_FORMED_STRING;
+        printResultResponse(AT_RESULT_ERROR);
+        return nullptr;
     }
+
+    // check for buffer overflow
     if (l >= bufferSize)
     {
         // buffer overflow
@@ -208,27 +287,16 @@ const char *NuATCommandParser::parseWriteParameters(const char *in, int commandI
         printResultResponse(AT_RESULT_ERROR);
         return nullptr;
     }
-    buffer[l] = '\0';
 
-    // Tokenize
-    paramList.push_back(in);
-    l = 0;
-    while (buffer[l] != '\0')
-    {
-        if (buffer[l] == ',')
-        {
-            paramList.push_back(buffer + l + 1);
-        }
-        l++;
-    }
+    // Add the last parameter
+    buffer[l] = '\0';
+    paramList.push_back(currentParam);
+   // Serial.printf("Last param: %s\n", currentParam);
 
     // Invoke callback
     NuATCommandResult_t response = pCmdCallbacks->onSet(commandId, paramList);
     printResultResponse(response);
-    if (response == AT_RESULT_OK)
-        return followingCommand(in);
-    else
-        return nullptr;
+    return followingCommand(in, response);
 }
 
 //-----------------------------------------------------------------------------

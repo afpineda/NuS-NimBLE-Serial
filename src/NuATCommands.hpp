@@ -41,7 +41,8 @@ typedef enum
     AT_PR_INVALID_CMD2,       /// Command name contains non alphabetic characters
     AT_PR_UNSUPPORTED_CMD,    /// Command name valid, but not supported by this app
     AT_PR_END_TOKEN_EXPECTED, /// Command-end token was expected but not found
-    AT_PR_SET_OVERFLOW        /// Buffer overflow in a SET command (parameters too long)
+    AT_PR_SET_OVERFLOW,       /// Buffer overflow in a SET command (parameters too long)
+    AT_PR_ILL_FORMED_STRING   /// A string parameter is not properly enclosed between double quotes
 } NuATParsingResult_t;
 
 typedef std::vector<const char *> NuATCommandParameters_t;
@@ -99,8 +100,8 @@ public:
      *
      * @param parameters A sorted list of null-terminated strings, one for each parameter,
      *                   from left to right. Total length of all parameters
-     *                   is limited by buffer size. Parameters may be empty strings.
-     *                   You must parse those parameters as needed.
+     *                   is limited by buffer size. There is at least one parameter, but any parameter
+     *                   may be an empty string. AT string parameters are properly parsed before calling.
      *
      * @return NuATCommandResult_t Proper result of command execution
      */
