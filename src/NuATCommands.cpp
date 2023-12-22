@@ -85,7 +85,13 @@ void NuATCommandParser::parseCommandLine(const char *in)
     {
         // Not an AT command line
         lastParsingResult = AT_PR_NO_PREAMBLE;
-        pCmdCallbacks->onNonATCommand(in);
+        try
+        {
+            pCmdCallbacks->onNonATCommand(in);
+        }
+        catch (...)
+        {
+        };
         return;
     }
 
@@ -96,7 +102,13 @@ void NuATCommandParser::parseCommandLine(const char *in)
         // Serial.printf("parseCommandLine(): %s", in);
         lastParsingResult = AT_PR_OK; // may be changed later
         in = parseSingleCommand(in);
-        pCmdCallbacks->onFinished(commandIndex++, lastParsingResult);
+        try
+        {
+            pCmdCallbacks->onFinished(commandIndex++, lastParsingResult);
+        }
+        catch (...)
+        {
+        };
     } while (in);
 }
 
@@ -115,17 +127,27 @@ const char *NuATCommandParser::parseSingleCommand(const char *in)
         if ((cmdNameLength > 0) && (cmdNameLength < bufferSize) && ((in[0] == '+') || (cmdNameLength == 1)))
         {
             // store command name in "cmdName" as a null-terminated string
-            char cmdName[bufferSize];
+            // char cmdName[bufferSize];
+            char *cmdName = (char *)malloc(cmdNameLength + 1);
             memcpy(cmdName, in + 1, cmdNameLength);
             cmdName[cmdNameLength] = '\0';
 
             if (isAlphaString(cmdName))
             {
                 // check if command is supported
-                int commandId = pCmdCallbacks->getATCommandId(cmdName);
+                int commandId;
+                try
+                {
+                    commandId = pCmdCallbacks->getATCommandId(cmdName);
+                }
+                catch (...)
+                {
+                    commandId = -1;
+                }
                 if (commandId >= 0)
                 {
                     // continue parsing
+                    free(cmdName);
                     return parseAction(suffix, commandId);
                 }
                 else // this command is not supported
@@ -133,6 +155,8 @@ const char *NuATCommandParser::parseSingleCommand(const char *in)
             }
             else // command name contains non-alphabetic characters
                 lastParsingResult = AT_PR_INVALID_CMD2;
+
+            free(cmdName);
         }
         else // error: no command name, buffer overflow or command name has "&" prefix but more than one letter
             lastParsingResult = AT_PR_INVALID_CMD1;
@@ -156,9 +180,17 @@ const char *NuATCommandParser::parseAction(const char *in, int commandId)
         // This is a TEST command
         if (isCommandEndToken(in[2]))
         {
-            pCmdCallbacks->onTest(commandId);
-            printResultResponse(AT_RESULT_OK);
-            return followingCommand(in + 2);
+            NuATCommandResult_t result = AT_RESULT_OK;
+            try
+            {
+                pCmdCallbacks->onTest(commandId);
+            }
+            catch (...)
+            {
+                result = AT_RESULT_ERROR;
+            }
+            printResultResponse(result);
+            return followingCommand(in + 2, result);
         } // else syntax error
     }
     else if (in[0] == '?')
@@ -166,7 +198,15 @@ const char *NuATCommandParser::parseAction(const char *in, int commandId)
         // This is a READ/QUERY command
         if (isCommandEndToken(in[1]))
         {
-            NuATCommandResult_t response = pCmdCallbacks->onQuery(commandId);
+            NuATCommandResult_t response;
+            try
+            {
+                response = pCmdCallbacks->onQuery(commandId);
+            }
+            catch (...)
+            {
+                response = AT_RESULT_ERROR;
+            }
             printResultResponse(response);
             return followingCommand(in + 1, response);
         } // else syntax Error
@@ -179,7 +219,15 @@ const char *NuATCommandParser::parseAction(const char *in, int commandId)
     else if (isCommandEndToken(in[0]))
     {
         // This is an EXECUTE Command
-        NuATCommandResult_t response = pCmdCallbacks->onExecute(commandId);
+        NuATCommandResult_t response;
+        try
+        {
+            response = pCmdCallbacks->onExecute(commandId);
+        }
+        catch (...)
+        {
+            response = AT_RESULT_ERROR;
+        }
         printResultResponse(response);
         return followingCommand(in, response);
     } // else syntax error
@@ -194,7 +242,8 @@ const char *NuATCommandParser::parseWriteParameters(const char *in, int commandI
     // about parameters' syntax.
 
     NuATCommandParameters_t paramList;
-    char buffer[bufferSize];
+    // char buffer[bufferSize];
+    char *buffer = (char *)malloc(bufferSize);
     size_t l = 0;
     bool doubleQuotes = false;
     bool syntaxError = false;
@@ -274,6 +323,7 @@ const char *NuATCommandParser::parseWriteParameters(const char *in, int commandI
     // check for syntax errors or missing double quotes in last parameter
     if (syntaxError || doubleQuotes)
     {
+        free(buffer);
         lastParsingResult = AT_PR_ILL_FORMED_STRING;
         printResultResponse(AT_RESULT_ERROR);
         return nullptr;
@@ -282,7 +332,7 @@ const char *NuATCommandParser::parseWriteParameters(const char *in, int commandI
     // check for buffer overflow
     if (l >= bufferSize)
     {
-        // buffer overflow
+        free(buffer);
         lastParsingResult = AT_PR_SET_OVERFLOW;
         printResultResponse(AT_RESULT_ERROR);
         return nullptr;
@@ -291,10 +341,19 @@ const char *NuATCommandParser::parseWriteParameters(const char *in, int commandI
     // Add the last parameter
     buffer[l] = '\0';
     paramList.push_back(currentParam);
-   // Serial.printf("Last param: %s\n", currentParam);
+    // Serial.printf("Last param: %s\n", currentParam);
 
     // Invoke callback
-    NuATCommandResult_t response = pCmdCallbacks->onSet(commandId, paramList);
+    NuATCommandResult_t response;
+    try
+    {
+        response = pCmdCallbacks->onSet(commandId, paramList);
+    }
+    catch (...)
+    {
+        response = AT_RESULT_ERROR;
+    }
+    free(buffer);
     printResultResponse(response);
     return followingCommand(in, response);
 }

@@ -181,7 +181,7 @@ public:
      *
      * @note An error response will be printed if command names or
      *       command parameters exceed this size. Buffer is allocated
-     *       in the stack, so keep it at a minimum value.
+     *       in the heap.
      *
      * @note Default size is 42 bytes
      *
@@ -202,11 +202,11 @@ private:
     NuATCommandCallbacks *pCmdCallbacks = nullptr;
     size_t bufferSize = 42;
 
-protected:
-    virtual const char *parseSingleCommand(const char *in);
-    virtual const char *parseAction(const char *in, int commandId);
-    virtual const char *parseWriteParameters(const char *in, int commandId);
+    const char *parseSingleCommand(const char *in);
+    const char *parseAction(const char *in, int commandId);
+    const char *parseWriteParameters(const char *in, int commandId);
 
+protected:
     virtual void printResultResponse(const NuATCommandResult_t response);
     void parseCommandLine(const char *in);
 };
@@ -263,6 +263,6 @@ private:
  * @brief Singleton instance of the NuATCommandProcessor class
  *
  */
-extern NuATCommandProcessor &NuSerial;
+extern NuATCommandProcessor &NuATCommands;
 
 #endif

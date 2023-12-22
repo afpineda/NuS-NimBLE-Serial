@@ -5,6 +5,7 @@ Library for serial communications through Bluetooth Low Energy on ESP32-Arduino 
 In summary, this library provides:
 
 - A generic class to implement custom protocols for serial communications through BLE.
+- A customizable and easy to use [AT command](https://www.twilio.com/docs/iot/supersim/introduction-to-modem-at-commands) processor based on NuS.
 - A BLE serial communications object that can be used as Arduino's [Serial](https://www.arduino.cc/reference/en/language/functions/communication/serial/).
 - A more efficient BLE serial communications object that can handle incoming data in packets, eluding active waiting thanks to blocking semantics.
 
@@ -38,6 +39,7 @@ Summary:
 
 - The `NuSerial` object provides non-blocking serial communications through BLE, *Arduino's style*.
 - The `NuStream` object provides blocking serial communications through BLE (recommended way to go).
+- The `NuATCommands` object provides custom processing of AT commands through BLE.
 - Create your own object to provide a custom protocol based on serial communications through BLE, by deriving a new class from `NordicUARTService`.
 
 The **basic rules** are:
@@ -162,7 +164,7 @@ void setup()
 void loop()
 {
     size_t size;
-    const uint8_t *data = NuStream.read(size); // "size" is an out parameter
+    const uint8_t *data = NuStream.read(size); // "size" is an output parameter
     while (data)
     {
         // do something with data and size
@@ -178,6 +180,27 @@ Take into account:
 - **Just one** OS task can work with `NuStream` (others will get blocked).
 - Data should be processed as soon as possible. Use other tasks and buffers/queues for time-consuming computation.
   While data is being processed, the peer will stay blocked, unable to send another packet.
+
+### Custom AT commands
+
+```c++
+#include "NuATCommands.hpp"
+
+class MyATCommands: public NuATCommandCallbacks {
+    public:
+        virtual int getATCommandId(const char commandName[]) override;
+    ...
+} myATCommandsObject;
+```
+
+- Derive a new class from `NuATCommandCallbacks`.
+- Override `getATCommandId()` to return a positive number on supported commands or a negative number on unsupported commands. This is mandatory.
+- Override `OnExecute()` to run commands with no suffix.
+- Override `onSet()` to run commands with "=" suffix.
+- Override `onQuery()` to run commands with "?" suffix.
+- Override `onTest()` to run commands with "=?" suffix.
+- Create a single instance of your derived class and pass it to `NuATCommands.setATCallbacks`.
+- Call `NuATCommands.start()`
 
 ### Custom serial communications protocol
 
