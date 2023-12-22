@@ -67,7 +67,7 @@ public:
     /**
      * @brief Identify supported command names
      *
-     * @note Override this method to know which commands are
+     * @note Override this method to inform which commands are
      *       supported or not. This is mandatory.
      *
      * @note AT commands should comprise uppercase characters, but this is up
@@ -90,7 +90,7 @@ public:
      * @param commandId Unique (non-negative) identification number as returned by getATCommandId()
      * @return NuATCommandResult_t Proper result of command execution
      */
-    virtual NuATCommandResult_t onExecute(int commandId) = 0;
+    virtual NuATCommandResult_t onExecute(int commandId) { return AT_RESULT_ERROR; };
 
     /**
      * @brief Execute or set the value given in a supported AT command (with '=' suffix)
@@ -104,7 +104,7 @@ public:
      *
      * @return NuATCommandResult_t Proper result of command execution
      */
-    virtual NuATCommandResult_t onSet(int commandId, NuATCommandParameters_t &parameters) = 0;
+    virtual NuATCommandResult_t onSet(int commandId, NuATCommandParameters_t &parameters) { return AT_RESULT_ERROR; };
 
     /**
      * @brief Print the value requested in a supported AT command (with '?' suffix)
@@ -115,7 +115,7 @@ public:
      *
      * @return NuATCommandResult_t Proper result of command execution
      */
-    virtual NuATCommandResult_t onQuery(int commandId) = 0;
+    virtual NuATCommandResult_t onQuery(int commandId) { return AT_RESULT_ERROR; };
 
     /**
      * @brief Print the syntax and parameters of a supported command (with '=?' suffix)

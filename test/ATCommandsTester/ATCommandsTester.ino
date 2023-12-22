@@ -61,7 +61,10 @@ public:
         return AT_RESULT_OK;
     };
 
-    virtual void onTest(int commandId) { bTest = true; };
+    virtual void onTest(int commandId) override
+    {
+        bTest = true;
+    };
 
 public:
     void reset()
@@ -126,75 +129,19 @@ void Test_parsing(char commandLine[], NuATCommandResult_t expectedResult)
     testNumber++;
 }
 
-void Test_ActionExecute(char commandLine[])
+void Test_actionFlags(char commandLine[], bool mustExecute, bool mustRead, bool mustWrite, bool mustTest)
 {
-    Serial.printf("--Test #%d. EXECUTE %s\n", testNumber, commandLine);
+    Serial.printf("--Test #%d. Callbacks for %s\n", testNumber, commandLine);
     tester.reset();
     tester.test(commandLine);
-    bool test = tester.bExecute && !tester.bRead && !tester.bWrite && !tester.bTest;
+    bool test = (tester.bExecute == mustExecute) && (tester.bRead == mustRead) && (tester.bWrite == mustWrite) && (tester.bTest == mustTest);
     if (!test)
     {
-        Serial.println("  --Test failed.");
+        Serial.printf("  --Test failed (execute,read,write,test). Expected (%d,%d,%d,%d). Found (%d,%d,%d,%d)\n",
+                       mustExecute, mustRead, mustWrite, mustTest,
+                       tester.bExecute, tester.bRead, tester.bWrite, tester.bTest);
         Serial.printf("  --Last parsing result: %d\n", tester.lastParsingResult);
     }
-    testNumber++;
-}
-
-void Test_ActionQuery(char commandLine[])
-{
-    Serial.printf("--Test #%d. QUERY %s\n", testNumber, commandLine);
-    tester.reset();
-    tester.test(commandLine);
-    bool test = !tester.bExecute && tester.bRead && !tester.bWrite && !tester.bTest;
-    if (!test)
-    {
-        Serial.println("  --Test failed.");
-        Serial.printf("  --Last parsing result: %d\n", tester.lastParsingResult);
-    }
-    testNumber++;
-}
-
-void Test_ActionSet(char commandLine[])
-{
-    Serial.printf("--Test #%d. SET %s\n", testNumber, commandLine);
-    tester.reset();
-    tester.test(commandLine);
-    bool test = !tester.bExecute && !tester.bRead && tester.bWrite && !tester.bTest;
-    if (!test)
-    {
-        Serial.println("  --Test failed.");
-        Serial.printf("  --Last parsing result: %d\n", tester.lastParsingResult);
-    }
-    testNumber++;
-}
-
-void Test_ActionTest(char commandLine[])
-{
-    Serial.printf("--Test #%d. TEST ACTION %s\n", testNumber, commandLine);
-    tester.reset();
-    tester.test(commandLine);
-    bool test = !tester.bExecute && !tester.bRead && !tester.bWrite && tester.bTest;
-    if (!test)
-    {
-        Serial.println("  --Test failed.");
-        Serial.printf("  --Last parsing result: %d\n", tester.lastParsingResult);
-    }
-
-    testNumber++;
-}
-
-void Test_NoAction(char commandLine[])
-{
-    Serial.printf("--Test #%d. NO ACTION %s\n", testNumber, commandLine);
-    tester.reset();
-    tester.test(commandLine);
-    bool test = !tester.bExecute && !tester.bRead && !tester.bWrite && !tester.bTest;
-    if (!test)
-    {
-        Serial.println("  --Test failed.");
-        Serial.printf("  --Last parsing result: %d\n", tester.lastParsingResult);
-    }
-
     testNumber++;
 }
 
@@ -209,8 +156,6 @@ void setup()
     Serial.println("*****************************************");
     Serial.println(" Automated test for AT command processor ");
     Serial.println("*****************************************");
-
-    // tester.setATCallbacks(tester);
 
     // Test #1
     Test_parsing("AT\n", AT_RESULT_OK);
@@ -241,19 +186,19 @@ void setup()
     Test_parsing("AT&F;&G=1;&H?\n", AT_RESULT_OK);
     Test_parsing("AT&F;&G=1;&H?;\n", AT_RESULT_ERROR);
     Test_parsing("AT&F;;&H?\n", AT_RESULT_ERROR);
-    Test_NoAction("AT&FFF\n");
-    Test_NoAction("AT+F/\n");
-    Test_ActionExecute("AT&F\n");
-    Test_ActionQuery("AT&F?\n");
-    Test_ActionSet("AT&F=99\n");
+    Test_actionFlags("AT&FFF\n",false,false,false,false);
+    Test_actionFlags("AT+F/\n",false,false,false,false);
+    Test_actionFlags("AT&F\n",true,false,false,false);
+    Test_actionFlags("AT&F?\n",false,true,false,false);
+    Test_actionFlags("AT&F=99\n",false,false,true,false);
 
     // Test #30
-    Test_ActionTest("AT&F=?\n");
-    Test_NoAction("AT&+F/;&G\n");
-    Test_ActionExecute("AT&G=?;&F\n");
-    Test_ActionQuery("AT&G;&F?\n");
-    Test_ActionSet("AT&F;G=99\n");
-    Test_ActionTest("AT&F=1&G=?\n");
+    Test_actionFlags("AT&F=?\n",false,false,false,true);
+    Test_actionFlags("AT&+F/;&G\n",false,false,false,false);
+    Test_actionFlags("AT&G=?;&F\n",true,false,false,true);
+    Test_actionFlags("AT&G;&F?\n",true,true,false,false);
+    Test_actionFlags("AT&F;&G=99\n",true,false,true,false);
+    Test_actionFlags("AT&F=1&G=?\n",false,true,true,false);
 
     Serial.println("*****************************************");
     Serial.println("END");
