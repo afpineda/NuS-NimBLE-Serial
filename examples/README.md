@@ -17,7 +17,8 @@
 
 - [CustomCommandProcessor.ino](./CustomCommandProcessor/CustomCommandProcessor.ino)
 
-  Runs a service that parses commands and executes them. The serial monitor is also feed with log messages. The device is advertised as "Custom commands demo".
+  Runs a service that parses incoming commands from a BLE peer and executes them.
+  The serial monitor is also feed with log messages. The device is advertised as "Custom commands demo".
   Demonstrates how to write a custom protocol based on NuS.
 
   Commands and their syntax:
@@ -26,6 +27,28 @@
   - `sum <int> <int>`: retrieve the sum of two integer numbers. Substitute `<int>` with those numbers.
 
   All commands are lower-case. Arguments must be separated by blank spaces.
+
+- [ATCommandDemo.ino](./ATCommandDemo/ATCommandDemo.ino)
+
+  Runs a service that parses incoming AT commands from a BLE peer and executes them.
+  The serial monitor is also feed with log messages. The device is advertised as "AT commands demo".
+  Demonstrates how to write an AT command processor based on NuS. The service works as a simple calculator.
+
+  Supported commands (always follow AT command syntax):
+
+  - `+OP1=<integer>`. Set the value of the first operand.
+  - `+OP1?`. Get the value of the first operand.
+  - `+OP2=<integer>`. Set the value of the second operand.
+  - `+OP2?`. Get the value of the second operand.
+  - `+OP=<integer>,<integer>`. Set the value of both operands.
+  - `+OP?`. Get the value of both operands, in order.
+  - `+SUM` or `+SUM?`. Get the sum OP1+OP2.
+  - `+SUB` or `+SUB?`. Get the subtraction OP1-OP2.
+  - `+MULT` or `+MULT?`. Get the multiplication OP1*OP2.
+  - `+DIV` or `+DIV?`. Get the division OP1/OP2.
+  - `&V`. Get the version number.
+
+  For example: `AT+OP=14,2;+DIV?`
 
 ## Testing
 

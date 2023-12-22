@@ -16,6 +16,7 @@ NordicUARTBlockingStream	KEYWORD1
 
 start	KEYWORD2
 setCallbacks	KEYWORD2
+setATCallbacks	KEYWORD2
 isConnected	KEYWORD2
 write	KEYWORD2
 send	KEYWORD2
@@ -26,6 +27,8 @@ read	KEYWORD2
 peek	KEYWORD2
 begin	KEYWORD2
 end	KEYWORD2
+printATResponse	KEYWORD2
+setBufferSize	KEYWORD2
 
 ############################################
 # Constants (LITERAL1)
@@ -33,3 +36,4 @@ end	KEYWORD2
 
 NuSerial	LITERAL1
 NuStream	LITERAL1
+NuATCommands	LITERAL1
