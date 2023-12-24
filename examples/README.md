@@ -13,9 +13,19 @@
 
 - [NuSerialDump.ino](./NuSerialDump/NuSerialDump.ino)
 
-  Runs a service that takes incoming data from a BLE peer and dumps it into the serial monitor.
+  Runs a service that takes incoming data from a BLE peer and dumps it to the serial monitor.
   The device is advertised as "NuPacket demo".
   Demonstrates the usage of blocking communications by the means of `NuPacket`.
+
+- [ReadBytesDemo.ino](./ReadBytesDemo/ReadBytesDemo.ino)
+
+  As the previous one, runs a service that takes incoming data from a BLE peer and dumps it into the serial monitor.
+  However, this example uses a fixed size buffer and does not care about packet size.
+  The device is advertised as "ReadBytes demo".
+  Demonstrates the usage of blocking communications by the means of `NuSerial.readBytes()` with no active waiting.
+
+  Since incoming data is buffered, you have to send at least 4 characters or disconnect to see any output at the serial monitor.
+  Note that the terminating LF character (`\n`) also counts.
 
 - [CustomCommandProcessor.ino](./CustomCommandProcessor/CustomCommandProcessor.ino)
 

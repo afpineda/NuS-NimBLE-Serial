@@ -4,6 +4,8 @@
  * @brief Example of a custom command processor
  *        based on the Nordic UART Service
  *
+ * @note See examples/README.md for a description
+ *
  * @copyright Creative Commons Attribution 4.0 International (CC BY 4.0)
  *
  */

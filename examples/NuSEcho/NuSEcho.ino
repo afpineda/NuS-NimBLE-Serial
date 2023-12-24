@@ -1,8 +1,11 @@
 /**
  * @author Ángel Fernández Pineda. Madrid. Spain.
  * @date 2023-12-18
+ *
  * @brief Example of a non-blocking communications stream
  *        based on the Nordic UART Service
+ *
+ * @note See examples/README.md for a description
  *
  * @copyright Creative Commons Attribution 4.0 International (CC BY 4.0)
  *
