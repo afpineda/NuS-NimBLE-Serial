@@ -132,9 +132,15 @@ void loop()
 
 Take into account:
 
-- As you should know, inherited `Stream` methods (for example, `NuSerial.read()`) will immediately return if there is no data available. But, this is also the case when no peer device is connected. Use `NuSerial.isConnected()` to know the case (if you need to).
+- `NuSerial` inherits from Arduino's `Stream`, so you can use it with other libraries.
+- As you should know, `read()` will immediately return if there is no data available.
+  But, this is also the case when no peer device is connected.
+  Use `NuSerial.isConnected()` to know the case (if you need to).
 - `NuSerial.begin()` or `NuSerial.start()` must be called at least once before reading. Calling more than once have no effect.
-- `NuSerial.end()` (as well as `NuSerial.disconnect()`) will terminate any peer connection. If you pretend to read again, it's not mandatory to call `NuSerial.begin()` (nor `NuSerial.start()`) again, but you can.
+- `NuSerial.end()` (as well as `NuSerial.disconnect()`) will terminate any peer connection.
+  If you pretend to read again, it's not mandatory to call `NuSerial.begin()` (nor `NuSerial.start()`) again, but you can.
+- As a bonus, `NuSerial.readBytes()` does not perform active waiting, unlike `Serial.readBytes()`.
+- As you should know, `Stream` read methods are not thread-safe. Do not read from two different OS tasks.
 
 ## Blocking serial communications
 
@@ -146,9 +152,9 @@ Use the `NuPacket` object, based on blocking semantics. The advantages are:
 
 - Efficiency in terms of CPU usage, since no active waiting is used.
 - Performance, since incoming bytes are processed in packets, not one bye one.
-- Simplicity. Only two methods are strictly needed: `read()` and `write()`. You don't need to worry about data being available or not.
-
-As a disadvantage, multi-tasking app design must be adopted.
+- Simplicity. Only two methods are strictly needed: `read()` and `write()`.
+  You don't need to worry about data being available or not.
+  However, you have to handle packet size.
 
 For example:
 
@@ -180,6 +186,8 @@ Take into account:
 - **Just one** OS task can work with `NuPacket` (others will get blocked).
 - Data should be processed as soon as possible. Use other tasks and buffers/queues for time-consuming computation.
   While data is being processed, the peer will stay blocked, unable to send another packet.
+- If you just pretend to read a known-sized burst of bytes, `NuSerial.readBytes()` do the job with the same benefits as `NuPacket`
+  and there is no need to manage packet sizes. Call `NuSerial.setTimeout(ULONG_MAX)` previously to get the blocking semantics.
 
 ### Custom AT commands
 
@@ -241,4 +249,4 @@ void MyCustomSerialProtocol::onWrite(NimBLECharacteristic *pCharacteristic)
 In the previous example, the data pointed by `*receivedData` will **not remain valid** after `onWrite()` has finished to execute. If you need that data for later use, you must make a copy of the data itself, not just the pointer. For that purpose, you may store a non-local copy of the `pCharacteristic->getValue()` object.
 
 Since just one object can use the Nordic UART Service, you should also implement a
-[singleton pattern](https://www.geeksforgeeks.org/implementation-of-singleton-class-in-cpp/).
+[singleton pattern](https://www.geeksforgeeks.org/implementation-of-singleton-class-in-cpp/) (not mandatory).

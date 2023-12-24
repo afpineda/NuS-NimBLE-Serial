@@ -9,6 +9,8 @@
   The device is advertised as "NuSerial Echo".
   Demonstrates the usage of non-blocking communications by the means of `NuSerial`.
 
+  You may type `E` or `e` at the serial monitor to forcedly terminate current peer connection and wait for another.
+
 - [NuSerialDump.ino](./NuSerialDump/NuSerialDump.ino)
 
   Runs a service that takes incoming data from a BLE peer and dumps it into the serial monitor.
@@ -32,7 +34,7 @@
 
   Runs a service that parses incoming AT commands from a BLE peer and executes them.
   The serial monitor is also feed with log messages. The device is advertised as "AT commands demo".
-  Demonstrates how to write an AT command processor based on NuS. The service works as a simple calculator.
+  Demonstrates how to serve custom AT commands on NuS. The service works as a simple calculator.
 
   Supported commands (always follow AT command syntax):
 

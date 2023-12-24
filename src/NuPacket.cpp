@@ -8,6 +8,7 @@
  *
  */
 
+#include <exception>
 #include "NuPacket.hpp"
 
 //-----------------------------------------------------------------------------
@@ -26,7 +27,8 @@ NordicUARTPacket::NordicUARTPacket() : NordicUARTService()
     incomingBuffer = nullptr;
     dataConsumed = xSemaphoreCreateBinary();
     dataAvailable = xSemaphoreCreateBinary();
-    peerConnected = xSemaphoreCreateBinary();
+    if ((dataConsumed == NULL) || (dataAvailable == NULL))
+        throw std::runtime_error("NordicUARTPacket: no system resources");
     xSemaphoreGive(dataConsumed);
 }
 
@@ -34,18 +36,11 @@ NordicUARTPacket::~NordicUARTPacket()
 {
     vSemaphoreDelete(dataConsumed);
     vSemaphoreDelete(dataAvailable);
-    vSemaphoreDelete(peerConnected);
 }
 
 //-----------------------------------------------------------------------------
 // GATT server events
 //-----------------------------------------------------------------------------
-
-void NordicUARTPacket::onConnect(NimBLEServer *pServer)
-{
-    NordicUARTService::onConnect(pServer);
-    xSemaphoreGive(peerConnected);
-};
 
 void NordicUARTPacket::onDisconnect(NimBLEServer *pServer)
 {
@@ -73,16 +68,6 @@ void NordicUARTPacket::onWrite(NimBLECharacteristic *pCharacteristic)
 
     // signal available data
     xSemaphoreGive(dataAvailable);
-}
-
-//-----------------------------------------------------------------------------
-// Connection events
-//-----------------------------------------------------------------------------
-
-bool NordicUARTPacket::connect(const unsigned int timeoutMillis)
-{
-    TickType_t waitTicks = (timeoutMillis == 0) ? portMAX_DELAY : pdMS_TO_TICKS(timeoutMillis);
-    return (xSemaphoreTake(peerConnected, waitTicks) == pdTRUE);
 }
 
 //-----------------------------------------------------------------------------

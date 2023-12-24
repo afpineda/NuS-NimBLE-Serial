@@ -35,6 +35,28 @@ public:
   bool isConnected() { return connected; };
 
   /**
+   * @brief Wait for a peer connection or a timeout if set (blocking)
+   *
+   * @param[in] timeoutMillis Maximum time to wait (in milliseconds) or
+   *                          zero to disable timeouts and wait forever
+   *
+   * @note It is not mandatory to call this method in order to read or write.
+   *
+   * @note Just one task can go beyond connect(), except in case of timeout,
+   *       if more than one exists.
+   *
+   * @return true on peer connection
+   * @return false on timeout
+   */
+  bool connect(const unsigned int timeoutMillis = 0);
+
+  /**
+   * @brief Terminate current peer connection (if any)
+   *
+   */
+  void disconnect(void);
+
+  /**
    * @brief Send bytes
    *
    * @param data Pointer to bytes to be sent.
@@ -66,12 +88,6 @@ public:
    * @throws std::runtime_error if the UART service is already created or can not be created
    */
   void start(void);
-
-  /**
-   * @brief Terminate current peer connection (if any)
-   *
-   */
-  void disconnect(void);
 
   /**
    * @brief Set your own server callbacks
@@ -107,50 +123,45 @@ public:
   };
 
 public:
-  void onConnect(NimBLEServer *pServer) override;
-  void onDisconnect(NimBLEServer *pServer) override;
+  virtual void onConnect(NimBLEServer *pServer) override;
+  virtual void onDisconnect(NimBLEServer *pServer) override;
+  virtual void onConnect(NimBLEServer *pServer, ble_gap_conn_desc *desc) override;
+  virtual void onDisconnect(NimBLEServer *pServer, ble_gap_conn_desc *desc) override;
 
-  void onConnect(NimBLEServer *pServer, ble_gap_conn_desc *desc) override
-  {
-    if (pOtherServerCallbacks)
-      pOtherServerCallbacks->onConnect(pServer, desc);
-  };
-
-  void onDisconnect(NimBLEServer *pServer, ble_gap_conn_desc *desc) override
-  {
-    if (pOtherServerCallbacks)
-      pOtherServerCallbacks->onDisconnect(pServer, desc);
-  };
-
-  void onMTUChange(uint16_t MTU, ble_gap_conn_desc *desc) override
+  virtual void onMTUChange(uint16_t MTU, ble_gap_conn_desc *desc) override
   {
     if (pOtherServerCallbacks)
       pOtherServerCallbacks->onMTUChange(MTU, desc);
   };
 
-  uint32_t onPassKeyRequest() override
+  virtual uint32_t onPassKeyRequest() override
   {
     if (pOtherServerCallbacks)
       pOtherServerCallbacks->onPassKeyRequest();
   };
 
-  void onAuthenticationComplete(ble_gap_conn_desc *desc) override
+  virtual void onAuthenticationComplete(ble_gap_conn_desc *desc) override
   {
     if (pOtherServerCallbacks)
       pOtherServerCallbacks->onAuthenticationComplete(desc);
   };
 
-  bool onConfirmPIN(uint32_t pin) override
+  virtual bool onConfirmPIN(uint32_t pin) override
   {
     if (pOtherServerCallbacks)
       pOtherServerCallbacks->onConfirmPIN(pin);
   };
+
+protected:
+  NordicUARTService();
+  virtual ~NordicUARTService();
 
 private:
   NimBLEServer *pServer = nullptr;
   NimBLEService *pNuS = nullptr;
   NimBLECharacteristic *pTxCharacteristic = nullptr;
   NimBLEServerCallbacks *pOtherServerCallbacks = nullptr;
+  SemaphoreHandle_t peerConnected;
   bool autoAdvertising = true;
   bool connected = false;
   bool started = false;

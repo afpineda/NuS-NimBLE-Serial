@@ -28,6 +28,17 @@
 // Constructor / Initialization
 //-----------------------------------------------------------------------------
 
+NordicUARTService::NordicUARTService()
+{
+  peerConnected = xSemaphoreCreateBinary();
+}
+
+NordicUARTService::~NordicUARTService()
+{
+  if (peerConnected != NULL)
+    vSemaphoreDelete(peerConnected);
+}
+
 void NordicUARTService::init()
 {
   pServer = NimBLEDevice::createServer();
@@ -55,6 +66,10 @@ void NordicUARTService::init()
   throw std::runtime_error("Unable to create BLE server and/or Nordic UART Service");
 }
 
+//-----------------------------------------------------------------------------
+// Start service
+//-----------------------------------------------------------------------------
+
 void NordicUARTService::start(void)
 {
   if (!started)
@@ -68,8 +83,19 @@ void NordicUARTService::start(void)
 }
 
 //-----------------------------------------------------------------------------
-// Terminate connection
+// Connection
 //-----------------------------------------------------------------------------
+
+bool NordicUARTService::connect(const unsigned int timeoutMillis)
+{
+  if (peerConnected != NULL)
+  {
+    TickType_t waitTicks = (timeoutMillis == 0) ? portMAX_DELAY : pdMS_TO_TICKS(timeoutMillis);
+    return (xSemaphoreTake(peerConnected, waitTicks) == pdTRUE);
+  }
+  else
+    return false;
+}
 
 void NordicUARTService::disconnect(void)
 {
@@ -87,6 +113,24 @@ void NordicUARTService::onConnect(NimBLEServer *pServer)
   connected = true;
   if (pOtherServerCallbacks)
     pOtherServerCallbacks->onConnect(pServer);
+  if (peerConnected != NULL)
+    xSemaphoreGive(peerConnected);
+}
+
+void NordicUARTService::onConnect(NimBLEServer *pServer, ble_gap_conn_desc *desc)
+{
+  connected = true;
+  if (pOtherServerCallbacks)
+    pOtherServerCallbacks->onConnect(pServer, desc);
+}
+
+void NordicUARTService::onDisconnect(NimBLEServer *pServer, ble_gap_conn_desc *desc)
+{
+  connected = false;
+  if (pOtherServerCallbacks)
+    pOtherServerCallbacks->onDisconnect(pServer, desc);
+  if (autoAdvertising)
+    pServer->startAdvertising();
 }
 
 void NordicUARTService::onDisconnect(NimBLEServer *pServer)
@@ -95,7 +139,7 @@ void NordicUARTService::onDisconnect(NimBLEServer *pServer)
   if (pOtherServerCallbacks)
     pOtherServerCallbacks->onDisconnect(pServer);
   if (autoAdvertising)
-      pServer->startAdvertising();
+    pServer->startAdvertising();
 }
 
 void NordicUARTService::setCallbacks(NimBLEServerCallbacks *pServerCallbacks)
@@ -122,8 +166,7 @@ size_t NordicUARTService::send(const char *str, bool includeNullTerminatingChar)
   if (connected)
   {
     size_t size = includeNullTerminatingChar ? strlen(str) + 1 : strlen(str);
-    pTxCharacteristic->setValue((uint8_t *)str, size);
-    pTxCharacteristic->notify();
+    pTxCharacteristic->notify((uint8_t *)str, size);
     return size;
   }
   return 0;

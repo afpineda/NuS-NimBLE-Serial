@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef __NUSTREAM_HPP__
-#define __NUSTREAM_HPP__
+#ifndef __NUPACKET_HPP__
+#define __NUPACKET_HPP__
 
 #include "NuS.hpp"
 
@@ -47,27 +47,10 @@ public:
 public:
     // Overriden Methods
 
-    void onConnect(NimBLEServer *pServer) override;
     void onDisconnect(NimBLEServer *pServer) override;
     void onWrite(NimBLECharacteristic *pCharacteristic) override;
 
 public:
-    /**
-     * @brief Wait for a peer connection or a timeout if set (blocking)
-     *
-     * @param[in] timeoutMillis Maximum time to wait (in milliseconds) or
-     *                          zero to disable timeouts and wait forever
-     *
-     * @note It is not mandatory to call this method in order to read or write.
-     *
-     * @note Just one task can go beyond connect(), except in case of timeout,
-     *       if more than one exists.
-     *
-     * @return true on peer connection
-     * @return false on timeout
-     */
-    bool connect(const unsigned int timeoutMillis = 0);
-
     /**
      * @brief Wait for and get incoming data in packets (blocking)
      *
@@ -92,7 +75,6 @@ public:
 private:
     SemaphoreHandle_t dataConsumed;
     SemaphoreHandle_t dataAvailable;
-    SemaphoreHandle_t peerConnected;
     NimBLEAttValue incomingPacket;
     size_t availableByteCount = 0;
     const uint8_t *incomingBuffer = nullptr;
