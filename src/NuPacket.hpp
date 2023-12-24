@@ -23,24 +23,24 @@
  *       However, a multi-tasking app design must be adopted.
  *
  */
-class NordicUARTBlockingStream : public NordicUARTService
+class NordicUARTPacket : public NordicUARTService
 {
 public:
     // Singleton pattern
 
-    NordicUARTBlockingStream(const NordicUARTBlockingStream &) = delete;
-    void operator=(NordicUARTBlockingStream const &) = delete;
+    NordicUARTPacket(const NordicUARTPacket &) = delete;
+    void operator=(NordicUARTPacket const &) = delete;
 
     /**
      * @brief Get the instance of the BLE stream
      *
-     * @note No need to use. Use `NuStream` instead.
+     * @note No need to use. Use `NuPacket` instead.
      *
-     * @return NordicUARTBlockingStream&
+     * @return NordicUARTPacket&
      */
-    static NordicUARTBlockingStream &getInstance()
+    static NordicUARTPacket &getInstance()
     {
-        static NordicUARTBlockingStream instance;
+        static NordicUARTPacket instance;
         return instance;
     };
 
@@ -96,14 +96,14 @@ private:
     NimBLEAttValue incomingPacket;
     size_t availableByteCount = 0;
     const uint8_t *incomingBuffer = nullptr;
-    NordicUARTBlockingStream();
-    ~NordicUARTBlockingStream();
+    NordicUARTPacket();
+    ~NordicUARTPacket();
 };
 
 /**
- * @brief Singleton instance of the NordicUARTBlockingStream class
+ * @brief Singleton instance of the NordicUARTPacket class
  *
  */
-extern NordicUARTBlockingStream &NuStream;
+extern NordicUARTPacket &NuPacket;
 
 #endif

@@ -12,8 +12,8 @@
 - [NuSerialDump.ino](./NuSerialDump/NuSerialDump.ino)
 
   Runs a service that takes incoming data from a BLE peer and dumps it into the serial monitor.
-  The device is advertised as "NuStream demo".
-  Demonstrates the usage of blocking communications by the means of `NuStream`.
+  The device is advertised as "NuPacket demo".
+  Demonstrates the usage of blocking communications by the means of `NuPacket`.
 
 - [CustomCommandProcessor.ino](./CustomCommandProcessor/CustomCommandProcessor.ino)
 

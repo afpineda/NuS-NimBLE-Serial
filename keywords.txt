@@ -8,7 +8,7 @@
 
 NordicUARTService	KEYWORD1
 NordicUARTSerial	KEYWORD1
-NordicUARTBlockingStream	KEYWORD1
+NordicUARTPacket	KEYWORD1
 
 ############################################
 # Methods and Functions (KEYWORD2)
@@ -35,5 +35,5 @@ setBufferSize	KEYWORD2
 ############################################
 
 NuSerial	LITERAL1
-NuStream	LITERAL1
+NuPacket	LITERAL1
 NuATCommands	LITERAL1

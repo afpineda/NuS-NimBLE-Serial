@@ -8,19 +8,19 @@
  *
  */
 
-#include "NuStream.hpp"
+#include "NuPacket.hpp"
 
 //-----------------------------------------------------------------------------
 // Globals
 //-----------------------------------------------------------------------------
 
-NordicUARTBlockingStream &NuStream = NordicUARTBlockingStream::getInstance();
+NordicUARTPacket &NuPacket = NordicUARTPacket::getInstance();
 
 //-----------------------------------------------------------------------------
 // Constructor / destructor
 //-----------------------------------------------------------------------------
 
-NordicUARTBlockingStream::NordicUARTBlockingStream() : NordicUARTService()
+NordicUARTPacket::NordicUARTPacket() : NordicUARTService()
 {
     availableByteCount = 0;
     incomingBuffer = nullptr;
@@ -30,7 +30,7 @@ NordicUARTBlockingStream::NordicUARTBlockingStream() : NordicUARTService()
     xSemaphoreGive(dataConsumed);
 }
 
-NordicUARTBlockingStream::~NordicUARTBlockingStream()
+NordicUARTPacket::~NordicUARTPacket()
 {
     vSemaphoreDelete(dataConsumed);
     vSemaphoreDelete(dataAvailable);
@@ -41,13 +41,13 @@ NordicUARTBlockingStream::~NordicUARTBlockingStream()
 // GATT server events
 //-----------------------------------------------------------------------------
 
-void NordicUARTBlockingStream::onConnect(NimBLEServer *pServer)
+void NordicUARTPacket::onConnect(NimBLEServer *pServer)
 {
     NordicUARTService::onConnect(pServer);
     xSemaphoreGive(peerConnected);
 };
 
-void NordicUARTBlockingStream::onDisconnect(NimBLEServer *pServer)
+void NordicUARTPacket::onDisconnect(NimBLEServer *pServer)
 {
     NordicUARTService::onDisconnect(pServer);
 
@@ -61,7 +61,7 @@ void NordicUARTBlockingStream::onDisconnect(NimBLEServer *pServer)
 // NordicUARTService implementation
 //-----------------------------------------------------------------------------
 
-void NordicUARTBlockingStream::onWrite(NimBLECharacteristic *pCharacteristic)
+void NordicUARTPacket::onWrite(NimBLECharacteristic *pCharacteristic)
 {
     // Wait for previous data to get consumed
     xSemaphoreTake(dataConsumed, portMAX_DELAY);
@@ -79,7 +79,7 @@ void NordicUARTBlockingStream::onWrite(NimBLECharacteristic *pCharacteristic)
 // Connection events
 //-----------------------------------------------------------------------------
 
-bool NordicUARTBlockingStream::connect(const unsigned int timeoutMillis)
+bool NordicUARTPacket::connect(const unsigned int timeoutMillis)
 {
     TickType_t waitTicks = (timeoutMillis == 0) ? portMAX_DELAY : pdMS_TO_TICKS(timeoutMillis);
     return (xSemaphoreTake(peerConnected, waitTicks) == pdTRUE);
@@ -89,7 +89,7 @@ bool NordicUARTBlockingStream::connect(const unsigned int timeoutMillis)
 // Reading
 //-----------------------------------------------------------------------------
 
-const uint8_t *NordicUARTBlockingStream::read(size_t &size)
+const uint8_t *NordicUARTPacket::read(size_t &size)
 {
     xSemaphoreGive(dataConsumed);
     xSemaphoreTake(dataAvailable, portMAX_DELAY);

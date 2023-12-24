@@ -4,10 +4,10 @@ Library for serial communications through Bluetooth Low Energy on ESP32-Arduino 
 
 In summary, this library provides:
 
-- A generic class to implement custom protocols for serial communications through BLE.
-- A customizable and easy to use [AT command](https://www.twilio.com/docs/iot/supersim/introduction-to-modem-at-commands) processor based on NuS.
 - A BLE serial communications object that can be used as Arduino's [Serial](https://www.arduino.cc/reference/en/language/functions/communication/serial/).
 - A more efficient BLE serial communications object that can handle incoming data in packets, eluding active waiting thanks to blocking semantics.
+- A generic class to implement custom protocols for serial communications through BLE.
+- A customizable and easy to use [AT command](https://www.twilio.com/docs/iot/supersim/introduction-to-modem-at-commands) processor based on NuS.
 
 ## Supported DevKit boards
 
@@ -38,7 +38,7 @@ You may need a generic terminal (PC or smartphone) application in order to commu
 Summary:
 
 - The `NuSerial` object provides non-blocking serial communications through BLE, *Arduino's style*.
-- The `NuStream` object provides blocking serial communications through BLE (recommended way to go).
+- The `NuPacket` object provides blocking serial communications through BLE (recommended way to go).
 - The `NuATCommands` object provides custom processing of AT commands through BLE.
 - Create your own object to provide a custom protocol based on serial communications through BLE, by deriving a new class from `NordicUARTService`.
 
@@ -52,7 +52,7 @@ The **basic rules** are:
   void setup() {
     ...
     NuSerial.start();
-    NuStream.start(); // raises an exception (runtime_error)
+    NuPacket.start(); // raises an exception (runtime_error)
   }
   ```
 
@@ -139,10 +139,10 @@ Take into account:
 ## Blocking serial communications
 
 ```c++
-#include "NuStream.hpp"
+#include "NuPacket.hpp"
 ```
 
-Use the `NuStream` object (not to be confused with Arduino's streams), based on blocking semantics. The advantages are:
+Use the `NuPacket` object, based on blocking semantics. The advantages are:
 
 - Efficiency in terms of CPU usage, since no active waiting is used.
 - Performance, since incoming bytes are processed in packets, not one bye one.
@@ -158,18 +158,18 @@ void setup()
     ...
     NimBLEDevice::init("My device");
     ... // other initialization
-    NuStream.start(); // don't forget this!!
+    NuPacket.start(); // don't forget this!!
 }
 
 void loop()
 {
     size_t size;
-    const uint8_t *data = NuStream.read(size); // "size" is an output parameter
+    const uint8_t *data = NuPacket.read(size); // "size" is an output parameter
     while (data)
     {
         // do something with data and size
         ...
-        data = NuStream.read(size);
+        data = NuPacket.read(size);
     }
     // No peer connection at this point
 }
@@ -177,7 +177,7 @@ void loop()
 
 Take into account:
 
-- **Just one** OS task can work with `NuStream` (others will get blocked).
+- **Just one** OS task can work with `NuPacket` (others will get blocked).
 - Data should be processed as soon as possible. Use other tasks and buffers/queues for time-consuming computation.
   While data is being processed, the peer will stay blocked, unable to send another packet.
 

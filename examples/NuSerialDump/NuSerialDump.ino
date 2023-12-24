@@ -10,7 +10,7 @@
 
 #include <Arduino.h>
 #include <NimBLEDevice.h>
-#include "NuStream.hpp"
+#include "NuPacket.hpp"
 
 void setup()
 {
@@ -22,8 +22,8 @@ void setup()
     Serial.println("--Initializing--");
 
     // Initialize BLE stack and Nordic UART service
-    NimBLEDevice::init("NuStream demo");
-    NuStream.start();
+    NimBLEDevice::init("NuPacket demo");
+    NuPacket.start();
 
     // Initialization complete
     Serial.println("--Ready--");
@@ -34,7 +34,7 @@ void loop()
     Serial.println("--Waiting for connection--");
     // Block current task until a connection is established.
     // This is not active waiting, so the CPU is free for other tasks.
-    if (NuStream.connect())
+    if (NuPacket.connect())
     {
         Serial.println("--Connected--");
         // "data" is a pointer to the incoming bytes
@@ -44,7 +44,7 @@ void loop()
         // Receive first packet:
         // current task is blocked until data is received or connection is lost.
         // This is not active waiting.
-        const uint8_t *data = NuStream.read(size);
+        const uint8_t *data = NuPacket.read(size);
         while (data)
         {
             // Dump incoming data to the serial monitor
@@ -54,10 +54,10 @@ void loop()
             Serial.println("--end of packet--");
 
             // Acknowledge data reception
-            NuStream.send("Data received. Ready for more.\n");
+            NuPacket.send("Data received. Ready for more.\n");
 
             // Receive next packet
-            data = NuStream.read(size);
+            data = NuPacket.read(size);
         }
         // data==nullptr here, which means that the
         // the connection is lost

@@ -62,7 +62,7 @@ void loop()
                     // If we send bytes quicker than they are consumed by the peer,
                     // the internal buffer of NimBLE will overflow, thus losing some bytes.
                     // BLE is designed to transmit a larger chunk of bytes slowly rather than a single byte quickly.
-                    // That's another reason to use NuStream instead of NuSerial.
+                    // That's another reason to use NuPacket instead of NuSerial.
                     delay(30);
 
                     // log ASCII/ANSI codes
