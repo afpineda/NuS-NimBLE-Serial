@@ -69,7 +69,7 @@ public:
     bool connect(const unsigned int timeoutMillis = 0);
 
     /**
-     * @brief Wait for and get incoming data (blocking)
+     * @brief Wait for and get incoming data in packets (blocking)
      *
      * @note The calling task will get blocked until incoming data is
      *       available or the connection is lost. Just one task
@@ -80,7 +80,8 @@ public:
      *       app responsiveness.
      *
      * @param[out] size Count of incoming bytes,
-     *                  or zero if the connection was lost.
+     *                  or zero if the connection was lost. This is the size of
+     *                  the data packet.
      * @return uint8_t* Pointer to incoming data, or `nullptr` if the connection
      *                  was lost.
      *                  Do not access more bytes than available as given in

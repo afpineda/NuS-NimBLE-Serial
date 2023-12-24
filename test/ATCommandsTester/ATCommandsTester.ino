@@ -24,6 +24,7 @@ public:
     bool bRead = false;
     bool bTest = false;
     bool bPrintParams = false;
+    bool bPrintCmd = false;
 
 public:
     virtual void printATResponse(const char message[]) override
@@ -40,6 +41,8 @@ public:
 
     virtual int getATCommandId(const char commandName[]) override
     {
+        if (bPrintCmd)
+            Serial.printf("Command: %s\n", commandName);
         return id;
     };
 
@@ -82,6 +85,7 @@ public:
         bRead = false;
         bTest = false;
         bPrintParams = false;
+        bPrintCmd = false;
     };
 
     NuATCommandResult_t test(const char commandLine[])
@@ -156,6 +160,15 @@ void Test_setActionParameters(char commandLine[])
     tester.reset();
     tester.bPrintParams = true;
     Serial.printf("-- Test #%d. Check parameters for %s\n", testNumber, commandLine);
+    tester.test(commandLine);
+    testNumber++;
+}
+
+void Test_commandName(char commandLine[])
+{
+    tester.reset();
+    tester.bPrintCmd = true;
+    Serial.printf("-- Test #%d. Check command names for %s\n", testNumber, commandLine);
     tester.test(commandLine);
     testNumber++;
 }
@@ -247,6 +260,7 @@ void setup()
     Test_setActionParameters("AT&F=\"a \\; b\"\n");
     Test_setActionParameters("AT&F=\"a \\\" b\"\n");
     Test_setActionParameters("AT&F=\"a \\\n b\"\n");
+    Test_commandName("AT&F;+AB;+ABC;+ABCD\n");
 
     Serial.println("*****************************************");
     Serial.println("END");

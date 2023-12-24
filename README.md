@@ -199,8 +199,17 @@ class MyATCommands: public NuATCommandCallbacks {
 - Override `onSet()` to run commands with "=" suffix.
 - Override `onQuery()` to run commands with "?" suffix.
 - Override `onTest()` to run commands with "=?" suffix.
-- Create a single instance of your derived class and pass it to `NuATCommands.setATCallbacks`.
+- Create a single instance of your derived class and pass it to `NuATCommands.setATCallbacks()`.
 - Call `NuATCommands.start()`
+
+Never found an "official" specification for AT commands. Implementation is based in these sources:
+
+- [Espressif's AT command set](https://docs.espressif.com/projects/esp-at/en/release-v2.2.0.0_esp8266/AT_Command_Set/index.html)
+- [An Introduction to AT Commands](https://www.twilio.com/docs/iot/supersim/introduction-to-modem-at-commands)
+- [GSM AT Commands Tutorial](https://microcontrollerslab.com/at-commands-tutorial/#Response_of_AT_commands)
+- [General Syntax of Extended AT Commands](https://www.developershome.com/sms/atCommandsIntro2.asp)
+
+As a bonus, you may use class `NuATCommandParser` to implement an AT command processor that takes data from other sources.
 
 ### Custom serial communications protocol
 
@@ -229,7 +238,7 @@ void MyCustomSerialProtocol::onWrite(NimBLECharacteristic *pCharacteristic)
 }
 ```
 
-In the previous example, the data pointed by `*receivedData` will **not remain valid** after `onWrite()` has finished to execute. If you need that data for later use, you must make a copy of the data itself, not just the pointer. For that purpose, you may store a copy of the `pCharacteristic->getValue()` object.
+In the previous example, the data pointed by `*receivedData` will **not remain valid** after `onWrite()` has finished to execute. If you need that data for later use, you must make a copy of the data itself, not just the pointer. For that purpose, you may store a non-local copy of the `pCharacteristic->getValue()` object.
 
 Since just one object can use the Nordic UART Service, you should also implement a
 [singleton pattern](https://www.geeksforgeeks.org/implementation-of-singleton-class-in-cpp/).

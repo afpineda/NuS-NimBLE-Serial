@@ -36,16 +36,16 @@
 
   Supported commands (always follow AT command syntax):
 
-  - `+OP1=<integer>`. Set the value of the first operand.
-  - `+OP1?`. Get the value of the first operand.
-  - `+OP2=<integer>`. Set the value of the second operand.
-  - `+OP2?`. Get the value of the second operand.
+  - `+A=<integer>`. Set the value of the first operand.
+  - `+A?`. Get the value of the first operand.
+  - `+B=<integer>`. Set the value of the second operand.
+  - `+B?`. Get the value of the second operand.
   - `+OP=<integer>,<integer>`. Set the value of both operands.
-  - `+OP?`. Get the value of both operands, in order.
-  - `+SUM` or `+SUM?`. Get the sum OP1+OP2.
-  - `+SUB` or `+SUB?`. Get the subtraction OP1-OP2.
-  - `+MULT` or `+MULT?`. Get the multiplication OP1*OP2.
-  - `+DIV` or `+DIV?`. Get the division OP1/OP2.
+  - `+OP?`. Get the value of both operands, A then B.
+  - `+SUM` or `+SUM?`. Get the sum A+B.
+  - `+SUB` or `+SUB?`. Get the subtraction A-B.
+  - `+MULT` or `+MULT?`. Get the multiplication A*B.
+  - `+DIV` or `+DIV?`. Get the division A/B.
   - `&V`. Get the version number.
 
   For example: `AT+OP=14,2;+DIV?`
@@ -54,3 +54,5 @@
 
 In order to test those sketches, you need a serial terminal app compatible with NuS in your smartphone or PC. During development, this one was used (Android):
 [Serial bluetooth terminal](https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal).
+
+Configure LF (line feed, aka `\n`) as the line-terminating character.

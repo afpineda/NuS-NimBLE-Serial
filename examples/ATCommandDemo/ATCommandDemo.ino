@@ -1,7 +1,7 @@
 /**
  * @author Ángel Fernández Pineda. Madrid. Spain.
- * @date 2023-12-19
- * @brief Example of a an AT command processor based on
+ * @date 2023-12-24
+ * @brief Example of an AT command processor based on
  *        the Nordic UART Service
  *
  * @copyright Creative Commons Attribution 4.0 International (CC BY 4.0)
@@ -16,27 +16,40 @@
 #include <errno.h>
 
 //------------------------------------------------------
-// AT Commands implementation
+// AT Commands implementation for a simple calculator
 //------------------------------------------------------
 
 class MyATCommandCallbacks : public NuATCommandCallbacks
 {
 public:
-    virtual void onNonATCommand(const char text[]) override;
+    // commands are implemented by overriding the following Methods
+
     virtual int getATCommandId(const char commandName[]) override;
     virtual NuATCommandResult_t onExecute(int commandId) override;
     virtual NuATCommandResult_t onSet(int commandId, NuATCommandParameters_t &parameters) override;
     virtual NuATCommandResult_t onQuery(int commandId) override;
     virtual void onTest(int commandId) override;
+
+    // The following methods are overriden for logging purposes
+
+    virtual void onNonATCommand(const char text[]) override;
     virtual void onFinished(int index, NuATParsingResult_t parsingResult) override;
 
 private:
+    // operands for add, sub, mult and div operators
+
     intmax_t op1 = 0LL;
     intmax_t op2 = 0LL;
 
+    // macro to print a number into the BLE serial port in AT format
     static void printNumberATResponse(intmax_t number);
+
+    // macro to parse a string into an integer
     static bool strToIntMax(const char text[], intmax_t &number);
-} myATCallbacks;
+
+} myATCallbacks; // just one global instance is needed
+
+// Identifiers for supported commands (arbitrary non-negative integers)
 
 #define CMD_VERSION 0
 #define CMD_ADD 1
@@ -49,7 +62,7 @@ private:
 
 void MyATCommandCallbacks::printNumberATResponse(intmax_t number)
 {
-    char buffer[64];
+    char buffer[64]; // should be enough for a single integer number
     snprintf(buffer, 64, "%lld", number);
     buffer[63] = '\0';
     NuATCommands.printATResponse(buffer);
@@ -81,17 +94,19 @@ int MyATCommandCallbacks::getATCommandId(const char commandName[])
     Serial.println("--Command identification request--");
     Serial.println(commandName);
 
-    // Must return a non-negative number for supported commands
-    // Command aliases returns the same number
+    // Must return a non-negative integer for supported commands
+    // Command aliases returns the same integer
     if ((strcmp(commandName, "V") == 0) || (strcmp(commandName, "v") == 0))
         return CMD_VERSION;
-    if ((strcmp(commandName, "OP1") == 0) || (strcmp(commandName, "op1") == 0))
+    if ((strcmp(commandName, "A") == 0) || (strcmp(commandName, "a") == 0))
         return CMD_OPERAND1;
-    if ((strcmp(commandName, "OP2") == 0) || (strcmp(commandName, "op2") == 0))
+    if ((strcmp(commandName, "B") == 0) || (strcmp(commandName, "b") == 0))
         return CMD_OPERAND2;
     if ((strcmp(commandName, "OP") == 0) || (strcmp(commandName, "op") == 0))
         return CMD_OPERANDS;
     if ((strcmp(commandName, "ADD") == 0) || (strcmp(commandName, "add") == 0))
+        return CMD_ADD;
+    if ((strcmp(commandName, "SUM") == 0) || (strcmp(commandName, "sum") == 0))
         return CMD_ADD;
     if ((strcmp(commandName, "SUBTRACT") == 0) || (strcmp(commandName, "subtract") == 0))
         return CMD_SUB;
@@ -103,15 +118,15 @@ int MyATCommandCallbacks::getATCommandId(const char commandName[])
         return CMD_DIV;
     if ((strcmp(commandName, "DIV") == 0) || (strcmp(commandName, "div") == 0))
         return CMD_DIV;
-    Serial.println("-- command not supported. Supported commands are: V OP1 OP2 OP ADD SUB MULT DIV --");
+    Serial.println("-- command not supported. Supported commands are: V A B OP ADD SUB MULT DIV --");
 
-    //  Must return a negative number for unsupported commands
+    //  Must return a negative integer for unsupported commands
     return -1;
 }
 
 NuATCommandResult_t MyATCommandCallbacks::onExecute(int commandId)
 {
-    Serial.printf("--Command execution (no parameters) request. ID %d--\n", commandId);
+    Serial.printf("--Command execution (no parameters). ID %d--\n", commandId);
     switch (commandId)
     {
     case CMD_VERSION:
@@ -139,7 +154,7 @@ NuATCommandResult_t MyATCommandCallbacks::onExecute(int commandId)
 
 NuATCommandResult_t MyATCommandCallbacks::onSet(int commandId, NuATCommandParameters_t &parameters)
 {
-    Serial.printf("--Command execution (with parameters) request. ID %d--\n", commandId);
+    Serial.printf("--Command execution (with parameters). ID %d--\n", commandId);
     int c = 1;
     for (const char *param : parameters)
         Serial.printf("Parameter %d: %s\n", c++, param);
@@ -149,14 +164,20 @@ NuATCommandResult_t MyATCommandCallbacks::onSet(int commandId, NuATCommandParame
     case CMD_OPERAND1:
         if ((parameters.size() == 1) && strToIntMax(parameters.at(0), op1))
             return AT_RESULT_OK;
+        else
+            return AT_RESULT_INVALID_PARAM;
         break;
     case CMD_OPERAND2:
         if ((parameters.size() == 1) && strToIntMax(parameters.at(0), op1))
             return AT_RESULT_OK;
+        else
+            return AT_RESULT_INVALID_PARAM;
         break;
     case CMD_OPERANDS:
         if ((parameters.size() == 2) && strToIntMax(parameters.at(0), op1) && strToIntMax(parameters.at(1), op2))
             return AT_RESULT_OK;
+        else
+            return AT_RESULT_INVALID_PARAM;
         break;
     }
     return AT_RESULT_ERROR;
@@ -164,8 +185,7 @@ NuATCommandResult_t MyATCommandCallbacks::onSet(int commandId, NuATCommandParame
 
 NuATCommandResult_t MyATCommandCallbacks::onQuery(int commandId)
 {
-    Serial.println("-- Query request--");
-    Serial.println(commandId);
+    Serial.printf("--Data request. ID %d--\n", commandId);
     switch (commandId)
     {
     case CMD_OPERAND1:
@@ -179,18 +199,20 @@ NuATCommandResult_t MyATCommandCallbacks::onQuery(int commandId)
         printNumberATResponse(op2);
         return AT_RESULT_OK;
     }
+    Serial.println("--Routing as an \"execute\" command--");
     return onExecute(commandId);
 }
 
 void MyATCommandCallbacks::onTest(int commandId)
 {
+    Serial.printf("--Command Syntax request. ID %d--\n", commandId);
     switch (commandId)
     {
     case CMD_OPERAND1:
-        NuATCommands.printATResponse("+OP1: (integer)");
+        NuATCommands.printATResponse("+A: (integer)");
         return;
     case CMD_OPERAND2:
-        NuATCommands.printATResponse("+OP2: (integer)");
+        NuATCommands.printATResponse("+B: (integer)");
         return;
     case CMD_OPERANDS:
         NuATCommands.printATResponse("+OP: (integer),(integer)");
@@ -200,7 +222,7 @@ void MyATCommandCallbacks::onTest(int commandId)
 
 void MyATCommandCallbacks::onFinished(int index, NuATParsingResult_t parsingResult)
 {
-    Serial.printf("--Command at index %d was parsed with result code %d--\n",index,parsingResult);
+    Serial.printf("--Command at index %d was parsed with result code %d--\n", index, parsingResult);
 }
 
 //------------------------------------------------------
@@ -211,14 +233,15 @@ void setup()
 {
     // Initialize serial monitor
     Serial.begin(115200);
-    Serial.println("***********************************");
-    Serial.println(" BLE AT command processor demo     ");
-    Serial.println("***********************************");
+    Serial.println("*******************************");
+    Serial.println(" BLE AT command processor demo ");
+    Serial.println("*******************************");
     Serial.println("--Initializing--");
 
     // Initialize BLE and Nordic UART service
     NimBLEDevice::init("AT commands demo");
-    NuATCommandCallbacks.setBufferSize(64);
+    NuATCommands.setBufferSize(64);
+    NuATCommands.lowerCasePreamble(true);
     NuATCommands.setATCallbacks(&myATCallbacks);
     NuATCommands.start();
 
