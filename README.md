@@ -5,14 +5,14 @@ Library for serial communications through Bluetooth Low Energy on ESP32-Arduino 
 In summary, this library provides:
 
 - A BLE serial communications object that can be used as Arduino's [Serial](https://www.arduino.cc/reference/en/language/functions/communication/serial/).
-- A more efficient BLE serial communications object that can handle incoming data in packets, eluding active waiting thanks to blocking semantics.
-- A generic class to implement custom protocols for serial communications through BLE.
+- A BLE serial communications object that can handle incoming data in packets, eluding active waiting thanks to blocking semantics.
 - A customizable and easy to use [AT command](https://www.twilio.com/docs/iot/supersim/introduction-to-modem-at-commands) processor based on NuS.
+- A generic class to implement custom protocols for serial communications through BLE.
 
 ## Supported DevKit boards
 
 Any DevKit supported by [NimBLE-Arduino](https://github.com/h2zero/NimBLE-Arduino) and based on the [Arduino core for Espressif's boards](https://github.com/espressif/arduino-esp32)
-(since [FreeRTOS](https://www.freertos.org/Embedded-RTOS-Binary-Semaphores.html) is required, except for custom protocols).
+(since [FreeRTOS](https://www.freertos.org/Embedded-RTOS-Binary-Semaphores.html) is required).
 
 ## Introduction
 
@@ -23,7 +23,7 @@ However, this is not the case with the [Bluetooth Low Energy (BLE) specification
 As bluetooth classic is being dropped in favor of BLE, an alternative is needed. [Nordic UART Service (NuS)](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/bluetooth_services/services/nus.html) is a popular alternative, if not the *de facto* standard.
 This library implements the Nordic UART service on the *NimBLE-Arduino* stack.
 
-## Client-side terminal application
+## Client-side application
 
 You may need a generic terminal (PC or smartphone) application in order to communicate with your Arduino application through BLE. Such a generic application must support the Nordic UART Service. There are several free alternatives (known to me):
 
@@ -33,12 +33,12 @@ You may need a generic terminal (PC or smartphone) application in order to commu
 - iOS:
   - [nRF connect for mobile](https://apps.apple.com/es/app/nrf-connect-for-mobile/id1054362403)
 
-## API
+## How to use this library
 
 Summary:
 
 - The `NuSerial` object provides non-blocking serial communications through BLE, *Arduino's style*.
-- The `NuPacket` object provides blocking serial communications through BLE (recommended way to go).
+- The `NuPacket` object provides blocking serial communications through BLE.
 - The `NuATCommands` object provides custom processing of AT commands through BLE.
 - Create your own object to provide a custom protocol based on serial communications through BLE, by deriving a new class from `NordicUARTService`.
 

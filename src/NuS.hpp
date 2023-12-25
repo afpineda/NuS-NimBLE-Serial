@@ -59,8 +59,8 @@ public:
   /**
    * @brief Send bytes
    *
-   * @param data Pointer to bytes to be sent.
-   * @param size Count of bytes to be sent.
+   * @param[in] data Pointer to bytes to be sent.
+   * @param[in] size Count of bytes to be sent.
    * @return size_t Zero if no peer is connected, @p size otherwise.
    */
   size_t write(const uint8_t *data, size_t size);
@@ -162,6 +162,7 @@ private:
   NimBLECharacteristic *pTxCharacteristic = nullptr;
   NimBLEServerCallbacks *pOtherServerCallbacks = nullptr;
   SemaphoreHandle_t peerConnected;
+  StaticSemaphore_t peerConnectedBuffer;
   bool autoAdvertising = true;
   bool connected = false;
   bool started = false;

@@ -15,10 +15,8 @@
 
 NordicUARTStream::NordicUARTStream() : NordicUARTService(), Stream()
 {
-    dataConsumed = xSemaphoreCreateBinary();
-    dataAvailable = xSemaphoreCreateBinary();
-    if ((dataConsumed == NULL) || (dataAvailable == NULL))
-        throw std::runtime_error("NordicUARTStream: no system resources");
+    dataConsumed = xSemaphoreCreateBinaryStatic(&dataConsumedBuffer);
+    dataAvailable = xSemaphoreCreateBinaryStatic(&dataAvailableBuffer);
     xSemaphoreGive(dataConsumed);
 }
 

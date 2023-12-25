@@ -74,7 +74,9 @@ public:
 
 private:
     SemaphoreHandle_t dataConsumed;
+    StaticSemaphore_t dataConsumedBuffer;
     SemaphoreHandle_t dataAvailable;
+    StaticSemaphore_t dataAvailableBuffer;
     NimBLEAttValue incomingPacket;
     size_t availableByteCount = 0;
     const uint8_t *incomingBuffer = nullptr;

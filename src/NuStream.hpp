@@ -58,16 +58,18 @@ public:
     /**
      * @brief Read characters from a stream into a buffer.
      *
-     * @note Terminates if the determined length has been read, or it times out.
-     *       Unlike other read methods, no active waiting is used here.
+     * @note Terminates if the determined length has been read, it times out,
+     *       or peer is disconnected. Unlike other read methods, no active waiting is used here.
      *
      * @note Call `setTimeout(ULONG_MAX)` to disable time outs.
      *
-     * @param buffer To store the bytes in
-     * @param size the Number of bytes to read
-     * @return size_t Number of bytes placed in the buffer
+     * @param[out] buffer To store the bytes in
+     * @param[in] size the Number of bytes to read
+     * @return size_t Number of bytes placed in the buffer. This number is in the
+     *                range from 0 to @p size. When this number is less than @p size,
+     *                a timeout or peer disconnection happened. Check isConnected()
+     *                to know the case.
      */
-
     virtual size_t readBytes(uint8_t *buffer, size_t size) override;
     virtual size_t readBytes(char *buffer, size_t length) override
     {
@@ -78,7 +80,7 @@ public:
     /**
      * @brief Write a single byte to the stream
      *
-     * @param byte Byte to write
+     * @param[in] byte Byte to write
      * @return size_t The number of bytes written
      */
     virtual size_t write(uint8_t byte) override
@@ -89,8 +91,8 @@ public:
     /**
      * @brief Write bytes to the stream
      *
-     * @param buffer Pointer to first byte to write
-     * @param size Count of bytes to write
+     * @param[in] buffer Pointer to first byte to write
+     * @param[in] size Count of bytes to write
      * @return size_t Actual count of bytes that were written
      */
     virtual size_t write(const uint8_t *buffer, size_t size) override
@@ -100,7 +102,9 @@ public:
 
 private:
     SemaphoreHandle_t dataConsumed;
+    StaticSemaphore_t dataConsumedBuffer;
     SemaphoreHandle_t dataAvailable;
+    StaticSemaphore_t dataAvailableBuffer;
     NimBLEAttValue incomingPacket;
     bool disconnected = false;
     size_t unreadByteCount = 0;

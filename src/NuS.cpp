@@ -30,13 +30,12 @@
 
 NordicUARTService::NordicUARTService()
 {
-  peerConnected = xSemaphoreCreateBinary();
+  peerConnected = xSemaphoreCreateBinaryStatic(&peerConnectedBuffer);
 }
 
 NordicUARTService::~NordicUARTService()
 {
-  if (peerConnected != NULL)
-    vSemaphoreDelete(peerConnected);
+  vSemaphoreDelete(peerConnected);
 }
 
 void NordicUARTService::init()
@@ -88,13 +87,9 @@ void NordicUARTService::start(void)
 
 bool NordicUARTService::connect(const unsigned int timeoutMillis)
 {
-  if (peerConnected != NULL)
-  {
-    TickType_t waitTicks = (timeoutMillis == 0) ? portMAX_DELAY : pdMS_TO_TICKS(timeoutMillis);
-    return (xSemaphoreTake(peerConnected, waitTicks) == pdTRUE);
-  }
-  else
-    return false;
+  TickType_t waitTicks = (timeoutMillis == 0) ? portMAX_DELAY : pdMS_TO_TICKS(timeoutMillis);
+  xSemaphoreTake(peerConnected, waitTicks);
+  return connected;
 }
 
 void NordicUARTService::disconnect(void)
@@ -113,8 +108,7 @@ void NordicUARTService::onConnect(NimBLEServer *pServer)
   connected = true;
   if (pOtherServerCallbacks)
     pOtherServerCallbacks->onConnect(pServer);
-  if (peerConnected != NULL)
-    xSemaphoreGive(peerConnected);
+  xSemaphoreGive(peerConnected);
 }
 
 void NordicUARTService::onConnect(NimBLEServer *pServer, ble_gap_conn_desc *desc)
@@ -122,6 +116,7 @@ void NordicUARTService::onConnect(NimBLEServer *pServer, ble_gap_conn_desc *desc
   connected = true;
   if (pOtherServerCallbacks)
     pOtherServerCallbacks->onConnect(pServer, desc);
+  xSemaphoreGive(peerConnected);
 }
 
 void NordicUARTService::onDisconnect(NimBLEServer *pServer, ble_gap_conn_desc *desc)
