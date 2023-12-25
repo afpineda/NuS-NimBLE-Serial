@@ -9,26 +9,34 @@
 NordicUARTService	KEYWORD1
 NordicUARTSerial	KEYWORD1
 NordicUARTPacket	KEYWORD1
+NuATCommandCallbacks	KEYWORD1
+NuATCommandResult_t	KEYWORD1
+NuATParsingResult_t	KEYWORD1
+NuATCommandParser	KEYWORD1
+NuATCommandProcessor	KEYWORD1
 
 ############################################
 # Methods and Functions (KEYWORD2)
 ############################################
 
-start	KEYWORD2
-setCallbacks	KEYWORD2
-setATCallbacks	KEYWORD2
-isConnected	KEYWORD2
-write	KEYWORD2
-send	KEYWORD2
-write	KEYWORD2
-disconnect	KEYWORD2
 available	KEYWORD2
-read	KEYWORD2
-peek	KEYWORD2
 begin	KEYWORD2
+connect	KEYWORD2
+disableAutoAdvertising	KEYWORD2
+disconnect	KEYWORD2
+enableAutoAdvertising	KEYWORD2
 end	KEYWORD2
+isConnected	KEYWORD2
+peek	KEYWORD2
 printATResponse	KEYWORD2
+read	KEYWORD2
+readBytes	KEYWORD2
+send	KEYWORD2
+setATCallbacks	KEYWORD2
 setBufferSize	KEYWORD2
+setCallbacks	KEYWORD2
+start	KEYWORD2
+write	KEYWORD2
 
 ############################################
 # Constants (LITERAL1)
