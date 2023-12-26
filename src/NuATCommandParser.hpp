@@ -212,7 +212,7 @@ public:
      * @brief Check this attribute to know why parsing failed (or not)
      *        on the last received command
      *
-     * @note Exposed for testing, mainly.
+     * @note Exposed for testing, mainly. Do not write.
      */
     NuATParsingResult_t lastParsingResult = AT_PR_OK;
 
