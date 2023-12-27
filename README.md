@@ -244,7 +244,7 @@ Command line syntax:
 - Arguments are separated by one or more consecutive blank spaces.
 - Unquoted arguments can not contain a blank space, but can contain any printable character. For example: `this"is"valid`.
 - Quoted arguments can contain blank spaces, but double quotes have to be escaped with another double quote.
-  For example: `"this ""is"" valid"` is parsed to `this "is" valid`.
+  For example: `"this ""is"" valid"` is parsed to `this "is" valid` as a single argument.
 
 As a bonus, you may use class `NuShellCommandParser` to implement a shell that takes data from other sources.
 

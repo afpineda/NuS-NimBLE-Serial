@@ -14,6 +14,8 @@ NuATCommandResult_t	KEYWORD1
 NuATParsingResult_t	KEYWORD1
 NuATCommandParser	KEYWORD1
 NuATCommandProcessor	KEYWORD1
+NuShellCommandParser	KEYWORD1
+NuShellCommandProcessor	KEYWORD1
 
 ############################################
 # Methods and Functions (KEYWORD2)
@@ -45,3 +47,4 @@ write	KEYWORD2
 NuSerial	LITERAL1
 NuPacket	LITERAL1
 NuATCommands	LITERAL1
+NuShellCommands	LITERAL1

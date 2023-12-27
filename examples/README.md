@@ -62,6 +62,21 @@
 
   For example: `AT+OP=14,2;+DIV?`
 
+- [ShellCommandDemo.ino](./ShellCommandDemo/ShellCommandDemo.ino)
+
+  Runs a service that parses shell-like commands from a BLE peer and executes them.
+  The serial monitor is also feed with log messages. The device is advertised as "Shell commands demo".
+  Demonstrates how to serve shell commands on NuS. The service works as a simple calculator.
+
+  Supported commands (one per line):
+
+  - `sum <integer> <integer>`
+  - `sub <integer> <integer>`
+  - `mult <integer> <integer>`
+  - `div <integer> <integer>`
+
+  Replace `<integer>` with an integer number.
+
 ## Testing
 
 In order to test those sketches, you need a serial terminal app compatible with NuS in your smartphone or PC. During development, this one was used (Android):
