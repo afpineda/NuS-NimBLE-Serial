@@ -89,8 +89,23 @@ public:
      *
      * @param[in] size Size in bytes
      */
-    void setBufferSize(size_t size) {
+    void setBufferSize(size_t size)
+    {
         bufferSize = size;
+    };
+
+    /**
+     * @brief Automatically convert command names to upper case
+     *
+     * @note When set to `true`, `commandLine[0]` will be converted
+     *       to upper case before calling onExecute(). This simplifies
+     *       command recognition.
+     *
+     * @param yesOrNo True to convert to upper case, false otherwise.
+     */
+    void forceUpperCaseCommandName(bool yesOrNo = true)
+    {
+        bForceUpperCaseCommandName = yesOrNo;
     };
 
 public:
@@ -105,9 +120,10 @@ public:
 private:
     NuShellCommandCallbacks *pCmdCallbacks = nullptr;
     size_t bufferSize = 64;
+    bool bForceUpperCaseCommandName = false;
 
     const char *ignoreSeparator(const char *in);
-    const char *parseNext(char *dest, const char *in, size_t bufferSize, size_t &usedBytes);
+    const char *parseNext(char *dest, const char *in, size_t bufferSize, size_t &usedBytes, bool forceUpperCase);
 
 protected:
     void parseCommandLine(const char *in);

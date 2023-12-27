@@ -28,6 +28,7 @@ disableAutoAdvertising	KEYWORD2
 disconnect	KEYWORD2
 enableAutoAdvertising	KEYWORD2
 end	KEYWORD2
+forceUpperCaseCommandName	KEYWORD2
 isConnected	KEYWORD2
 peek	KEYWORD2
 printATResponse	KEYWORD2
@@ -37,6 +38,7 @@ send	KEYWORD2
 setATCallbacks	KEYWORD2
 setBufferSize	KEYWORD2
 setCallbacks	KEYWORD2
+setShellCommandCallbacks	KEYWORD2
 start	KEYWORD2
 write	KEYWORD2
 

@@ -43,7 +43,7 @@ private:
 void MyShellCommandCallbacks::printNumberResponse(intmax_t number)
 {
     char buffer[64]; // should be enough for a single integer number
-    snprintf(buffer, 64, "%lld", number);
+    snprintf(buffer, 64, "%lld\n", number);
     buffer[63] = '\0';
     NuShellCommands.send(buffer);
 }
@@ -85,21 +85,23 @@ void MyShellCommandCallbacks::onExecute(NuShellCommand_t &commandLine)
         const char *op1Str = commandLine[1];
         const char *op2Str = commandLine[2];
 
-        int commandId = CMD_UNKNOWN;
-        if ((strcmp(commandName, "ADD") == 0) || (strcmp(commandName, "add") == 0))
+        int commandId;
+        if ((strcmp(commandName, "ADD") == 0))
             commandId = CMD_ADD;
-        else if ((strcmp(commandName, "SUM") == 0) || (strcmp(commandName, "sum") == 0))
+        else if ((strcmp(commandName, "SUM") == 0))
             commandId = CMD_ADD;
-        else if ((strcmp(commandName, "SUBTRACT") == 0) || (strcmp(commandName, "subtract") == 0))
+        else if ((strcmp(commandName, "SUBTRACT") == 0))
             commandId = CMD_SUB;
-        else if ((strcmp(commandName, "SUB") == 0) || (strcmp(commandName, "sub") == 0))
+        else if ((strcmp(commandName, "SUB") == 0))
             commandId = CMD_SUB;
-        else if ((strcmp(commandName, "MULT") == 0) || (strcmp(commandName, "mult") == 0))
+        else if ((strcmp(commandName, "MULT") == 0))
             commandId = CMD_MULT;
-        else if ((strcmp(commandName, "DIVIDE") == 0) || (strcmp(commandName, "divide") == 0))
+        else if ((strcmp(commandName, "DIVIDE") == 0))
             commandId = CMD_DIV;
-        else if ((strcmp(commandName, "DIV") == 0) || (strcmp(commandName, "div") == 0))
+        else if ((strcmp(commandName, "DIV") == 0))
             commandId = CMD_DIV;
+        else
+            commandId = CMD_UNKNOWN;
 
         if (commandId != CMD_UNKNOWN)
         {
@@ -160,15 +162,16 @@ void setup()
 {
     // Initialize serial monitor
     Serial.begin(115200);
-    Serial.println("*******************************");
-    Serial.println(" BLE AT command processor demo ");
-    Serial.println("*******************************");
+    Serial.println("**********************************");
+    Serial.println(" BLE shell command processor demo ");
+    Serial.println("**********************************");
     Serial.println("--Initializing--");
 
     // Initialize BLE and Nordic UART service
     NimBLEDevice::init("Shell commands demo");
     NuShellCommands.setBufferSize(128);
     NuShellCommands.setShellCommandCallbacks(&myShellCallbacks);
+    NuShellCommands.forceUpperCaseCommandName(true); // first item in commandLine at onExecute() is converted to upper case
     NuShellCommands.start();
 
     // Initialization complete

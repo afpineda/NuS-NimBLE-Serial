@@ -35,10 +35,12 @@ void NuShellCommandParser::parseCommandLine(const char *in)
                 lastParsingResult = SIMPLE_PR_OK;
                 size_t usedBytes = 0;
                 NuShellCommand_t commandLine;
+                bool firstToUpperCase = bForceUpperCaseCommandName;
                 do
                 {
                     commandLine.push_back(buffer + usedBytes);
-                    in = parseNext(buffer, in, tmpBufferSize, usedBytes);
+                    in = parseNext(buffer, in, tmpBufferSize, usedBytes, firstToUpperCase);
+                    firstToUpperCase = false;
                 } while (in);
                 if (lastParsingResult == SIMPLE_PR_OK)
                     try
@@ -69,7 +71,7 @@ void NuShellCommandParser::parseCommandLine(const char *in)
     }
 }
 
-const char *NuShellCommandParser::parseNext(char *dest, const char *in, size_t bufferSize, size_t &usedBytes)
+const char *NuShellCommandParser::parseNext(char *dest, const char *in, size_t bufferSize, size_t &usedBytes, bool forceUpperCase)
 {
     if (!in)
     {
@@ -95,14 +97,17 @@ const char *NuShellCommandParser::parseNext(char *dest, const char *in, size_t b
                 if (in[0] == '\"')
                 {
                     in++;
-                    if (in[0] != '\"') {
+                    if (in[0] != '\"')
+                    {
                         // closing double quotes
                         quotes = false;
                         break;
                     }
-
                 }
-                dest[usedBytes++] = in[0];
+                if (forceUpperCase && (in[0] >= 'a') && (in[0] <= 'z'))
+                    dest[usedBytes++] = (in[0]) - 32;
+                else
+                    dest[usedBytes++] = in[0];
                 in++;
             }
             if (quotes || ((in[0] > ' ') && (usedBytes < bufferSize)))
@@ -117,7 +122,10 @@ const char *NuShellCommandParser::parseNext(char *dest, const char *in, size_t b
             // non-quoted input
             while ((usedBytes < bufferSize) && (in[0] > ' '))
             {
-                dest[usedBytes++] = in[0];
+                if (forceUpperCase && (in[0] >= 'a') && (in[0] <= 'z'))
+                    dest[usedBytes++] = (in[0]) - 32;
+                else
+                    dest[usedBytes++] = in[0];
                 in++;
             }
         }
