@@ -7,6 +7,7 @@ In summary, this library provides:
 - A BLE serial communications object that can be used as Arduino's [Serial](https://www.arduino.cc/reference/en/language/functions/communication/serial/).
 - A BLE serial communications object that can handle incoming data in packets, eluding active waiting thanks to blocking semantics.
 - A customizable and easy to use [AT command](https://www.twilio.com/docs/iot/supersim/introduction-to-modem-at-commands) processor based on NuS.
+- A customizable [shell](https://en.wikipedia.org/wiki/Shell_(computing)) command processor based on NuS.
 - A generic class to implement custom protocols for serial communications through BLE.
 
 ## Supported DevKit boards
@@ -40,6 +41,7 @@ Summary:
 - The `NuSerial` object provides non-blocking serial communications through BLE, *Arduino's style*.
 - The `NuPacket` object provides blocking serial communications through BLE.
 - The `NuATCommands` object provides custom processing of AT commands through BLE.
+- The `NuShellCommands` object provides custom processing of shell commands through BLE.
 - Create your own object to provide a custom protocol based on serial communications through BLE, by deriving a new class from `NordicUARTService`.
 
 The **basic rules** are:
@@ -100,7 +102,7 @@ The **basic rules** are:
 
 You may learn from the provided [examples](./examples/README.md). Read code commentaries for more information.
 
-## Non-blocking serial communications
+### Non-blocking serial communications
 
 ```c++
 #include "NuSerial.hpp"
@@ -142,7 +144,7 @@ Take into account:
 - As a bonus, `NuSerial.readBytes()` does not perform active waiting, unlike `Serial.readBytes()`.
 - As you should know, `Stream` read methods are not thread-safe. Do not read from two different OS tasks.
 
-## Blocking serial communications
+### Blocking serial communications
 
 ```c++
 #include "NuPacket.hpp"
@@ -218,6 +220,33 @@ Never found an "official" specification for AT commands. Implementation is based
 - [General Syntax of Extended AT Commands](https://www.developershome.com/sms/atCommandsIntro2.asp)
 
 As a bonus, you may use class `NuATCommandParser` to implement an AT command processor that takes data from other sources.
+
+### Custom shell commands
+
+```c++
+#include "NuShellCommands.hpp"
+
+class MyShellCommands: public NuShellCommandCallbacks {
+    public:
+      virtual void onExecute(NuShellCommand_t &commandLine) override;
+} myShellCommandsObject;
+```
+
+- Derive a new class from `NuShellCommandCallbacks`.
+- Override `OnExecute()` to run commands. Arguments are already parsed as a sequence of strings. The first one should be interpreted as a command name.
+- Create a single instance of your derived class and pass it to `NuShellCommands.setShellCommandCallbacks()`.
+- Set a maximum command line length by calling `NuShellCommands.setBufferSize()`, including the null-terminating character.
+- Call `NuShellCommands.start()`
+
+Command line syntax:
+
+- Any non-printable character is a command line terminator (including LF, CR and NULL).
+- Arguments are separated by one or more consecutive blank spaces.
+- Unquoted arguments can not contain a blank space, but can contain any printable character. For example: `this"is"valid`.
+- Quoted arguments can contain blank spaces, but double quotes have to be escaped with another double quote.
+  For example: `"this ""is"" valid"` is parsed to `this "is" valid`.
+
+As a bonus, you may use class `NuShellCommandParser` to implement a shell that takes data from other sources.
 
 ### Custom serial communications protocol
 

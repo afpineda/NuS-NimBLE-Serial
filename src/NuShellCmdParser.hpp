@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef __NUSIMPLECOMMANDPARSER_HPP__
-#define __NUSIMPLECOMMANDPARSER_HPP__
+#ifndef __NUSHELLCMDPARSER_HPP__
+#define __NUSHELLCMDPARSER_HPP__
 
 #include <vector>
 
@@ -25,16 +25,16 @@ typedef enum
     SIMPLE_PR_BUFFER_OVERFLOW,   /// Buffer overflow (command line too long)
     SIMPLE_PR_ILL_FORMED_STRING, /// A string parameter is not properly enclosed between double quotes
     SIMPLE_PR_NO_HEAP            /// Unable to allocate buffer memory
-} NuSimpleParsingResult_t;
+} NuShellParsingResult_t;
 
-typedef std::vector<const char *> NuSimpleCommand_t;
+typedef std::vector<const char *> NuShellCommand_t;
 
 /**
  * @brief Custom simple command processing for your application
  *
  * @note Derive a new class to implement your own AT commands
  */
-class NuSimpleCommandCallbacks
+class NuShellCommandCallbacks
 {
 public:
     /**
@@ -45,7 +45,7 @@ public:
      *                        This method is never called with an empty command line, however, it may
      *                        contain empty strings typed as "".
      */
-    virtual void onExecute(NuSimpleCommand_t &commandLine) = 0;
+    virtual void onExecute(NuShellCommand_t &commandLine) = 0;
 
     /**
      * @brief Get informed of parsing errors
@@ -55,14 +55,14 @@ public:
      *
      * @param[in] parsingResult  Detailed result of command parsing
      */
-    virtual void onParseError(NuSimpleParsingResult_t parsingResult){};
+    virtual void onParseError(NuShellParsingResult_t parsingResult){};
 };
 
 /**
  * @brief Parse and execute simple commands
  *
  */
-class NuSimpleCommandParser
+class NuShellCommandParser
 {
 public:
     /**
@@ -74,7 +74,7 @@ public:
      *            remain valid forever (do not destroy).
      *
      */
-    void setSimpleCommandCallbacks(NuATCommandCallbacks *pCallbacks)
+    void setShellCommandCallbacks(NuShellCommandCallbacks *pCallbacks)
     {
         pCmdCallbacks = pCallbacks;
     };
@@ -100,10 +100,10 @@ public:
      *
      * @note Exposed for testing, mainly. Do not write.
      */
-    NuATParsingResult_t lastParsingResult = SIMPLE_PR_OK;
+    NuShellParsingResult_t lastParsingResult = SIMPLE_PR_OK;
 
 private:
-    NuATCommandCallbacks *pCmdCallbacks = nullptr;
+    NuShellCommandCallbacks *pCmdCallbacks = nullptr;
     size_t bufferSize = 64;
 
     const char *ignoreSeparator(const char *in);

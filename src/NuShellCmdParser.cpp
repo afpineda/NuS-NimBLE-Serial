@@ -7,13 +7,14 @@
  *
  */
 
-#include "NuSimpleCmdParser.hpp"
+#include <stdlib.h>
+#include "NuShellCmdParser.hpp"
 
 //-----------------------------------------------------------------------------
 // Parsing machinery
 //-----------------------------------------------------------------------------
 
-void NuSimpleCommandParser::parseCommandLine(const char *in)
+void NuShellCommandParser::parseCommandLine(const char *in)
 {
 
     int cmdResult = 0;
@@ -28,12 +29,12 @@ void NuSimpleCommandParser::parseCommandLine(const char *in)
         if (in)
         {
             size_t tmpBufferSize = bufferSize; // Thread safety
-            char *buffer = malloc(tmpBufferSize);
+            char *buffer = (char *)malloc(tmpBufferSize);
             if (buffer)
             {
                 lastParsingResult = SIMPLE_PR_OK;
                 size_t usedBytes = 0;
-                NuSimpleCommand_t commandLine;
+                NuShellCommand_t commandLine;
                 do
                 {
                     commandLine.push_back(buffer + usedBytes);
@@ -68,7 +69,7 @@ void NuSimpleCommandParser::parseCommandLine(const char *in)
     }
 }
 
-const char *NuSimpleCommandParser::parseNext(char *dest, const char *in, size_t bufferSize, size_t &usedBytes)
+const char *NuShellCommandParser::parseNext(char *dest, const char *in, size_t bufferSize, size_t &usedBytes)
 {
     if (!in)
     {
@@ -88,21 +89,26 @@ const char *NuSimpleCommandParser::parseNext(char *dest, const char *in, size_t 
         {
             // quoted input
             in++;
+            bool quotes = true;
             while ((usedBytes < bufferSize) && (in[0] >= ' '))
             {
                 if (in[0] == '\"')
                 {
                     in++;
-                    if (in[0] != '\"')
+                    if (in[0] != '\"') {
+                        // closing double quotes
+                        quotes = false;
                         break;
+                    }
+
                 }
                 dest[usedBytes++] = in[0];
                 in++;
             }
-            if ((in[0] > ' ') && (usedBytes < bufferSize))
+            if (quotes || ((in[0] > ' ') && (usedBytes < bufferSize)))
             {
-                // syntax error: text after closing double quotes
-                result = SIMPLE_PR_ILL_FORMED_STRING;
+                // syntax error: text after closing double quotes or no closing double quotes
+                lastParsingResult = SIMPLE_PR_ILL_FORMED_STRING;
                 return nullptr;
             }
         }
@@ -120,14 +126,14 @@ const char *NuSimpleCommandParser::parseNext(char *dest, const char *in, size_t 
     return ignoreSeparator(in);
 }
 
-const char *NuSimpleCommandParser::ignoreSeparator(const char *in)
+const char *NuShellCommandParser::ignoreSeparator(const char *in)
 {
     if (in)
     {
         while (in[0] == ' ')
             in++;
         if (in[0] < ' ')
-            return nullptr;
+            in = nullptr;
     }
     return in;
 }
