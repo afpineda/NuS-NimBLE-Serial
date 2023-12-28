@@ -62,7 +62,7 @@ void NuATCommandParser::parseCommandLine(const char *in)
         return;
 
     // Detect AT preamble
-    if (isATPreamble(in,bLowerCasePreamble))
+    if (isATPreamble(in, bLowerCasePreamble))
     {
         // skip preamble
         in = in + 2;

@@ -32,6 +32,7 @@ forceUpperCaseCommandName	KEYWORD2
 isConnected	KEYWORD2
 peek	KEYWORD2
 printATResponse	KEYWORD2
+printf	KEYWORD2
 read	KEYWORD2
 readBytes	KEYWORD2
 send	KEYWORD2

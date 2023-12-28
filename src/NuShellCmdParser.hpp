@@ -40,7 +40,7 @@ typedef std::vector<const char *> NuShellCommand_t;
 /**
  * @brief Custom simple command processing for your application
  *
- * @note Derive a new class to implement your own AT commands
+ * @note Derive a new class to implement your own shell commands
  */
 class NuShellCommandCallbacks
 {
@@ -74,7 +74,7 @@ class NuShellCommandParser
 {
 public:
     /**
-     * @brief Set custom AT command processing callbacks
+     * @brief Set custom shell command processing callbacks
      *
      * @note Not thread-safe.
      *

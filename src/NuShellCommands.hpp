@@ -14,7 +14,7 @@
 #include "NuShellCmdParser.hpp"
 
 /**
- * @brief Execute AT commands received thanks to the Nordic UART Service
+ * @brief Execute shell commands received thanks to the Nordic UART Service
  *
  */
 class NuShellCommandProcessor : public NordicUARTService, public NuShellCommandParser

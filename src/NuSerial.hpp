@@ -54,8 +54,8 @@ public:
     };
 
 private:
-    NordicUARTSerial(): NordicUARTStream() {};
-    ~NordicUARTSerial() {};
+    NordicUARTSerial() : NordicUARTStream(){};
+    ~NordicUARTSerial(){};
 };
 
 /**

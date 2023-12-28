@@ -61,7 +61,7 @@ void loop()
         {
             // Dump remaining data
             int i = 0;
-            while (readBytes>0)
+            while (readBytes > 0)
             {
                 Serial.printf("%c", buffer[i++]);
                 readBytes--;

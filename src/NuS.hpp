@@ -82,6 +82,8 @@ public:
   /**
    * @brief Send a formatted string (ANSI encoded)
    *
+   * @note The null terminating character is sent too.
+   *
    * @param[in] format String that follows the same specifications as format in printf()
    * @param[in] ... Depending on the format string, a sequence of additional arguments,
    *            each containing a value to replace a format specifier in the format string.
@@ -89,7 +91,7 @@ public:
    * @return size_t Zero if no peer is connected.
    *                Otherwise, count of bytes sent.
    */
-  size_t printf(const char *format,...);
+  size_t printf(const char *format, ...);
 
   /**
    * @brief Start the Nordic UART Service

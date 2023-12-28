@@ -205,7 +205,7 @@ class MyATCommands: public NuATCommandCallbacks {
 
 - Derive a new class from `NuATCommandCallbacks`.
 - Override `getATCommandId()` to return a positive number on supported commands or a negative number on unsupported commands. This is mandatory.
-- Override `OnExecute()` to run commands with no suffix.
+- Override `onExecute()` to run commands with no suffix.
 - Override `onSet()` to run commands with "=" suffix.
 - Override `onQuery()` to run commands with "?" suffix.
 - Override `onTest()` to run commands with "=?" suffix.
@@ -233,7 +233,7 @@ class MyShellCommands: public NuShellCommandCallbacks {
 ```
 
 - Derive a new class from `NuShellCommandCallbacks`.
-- Override `OnExecute()` to run commands. Arguments are already parsed as a sequence of strings. The first one should be interpreted as a command name.
+- Override `onExecute()` to run commands. Arguments are already parsed as a sequence of strings. The first one should be interpreted as a command name.
 - Create a single instance of your derived class and pass it to `NuShellCommands.setShellCommandCallbacks()`.
 - Set a maximum command line length by calling `NuShellCommands.setBufferSize()`, including the null-terminating character.
 - Call `NuShellCommands.start()`

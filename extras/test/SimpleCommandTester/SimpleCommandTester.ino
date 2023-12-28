@@ -94,14 +94,13 @@ void Test_execution(const char *line)
 {
     tester.reset();
     tester.testExecution = true;
-    Serial.printf("--Executing: %s\n",line);
+    Serial.printf("--Executing: %s\n", line);
     tester.parseCommandLine(line);
     if (tester.lastParsingResult != SIMPLE_PR_OK)
     {
         Serial.printf("Failure. Unexpected parsing result code: %d\n", tester.lastParsingResult);
     }
 }
-
 
 //-----------------------------------------------------------------------------
 // Arduino entry points
@@ -157,7 +156,6 @@ void setup()
 
     tester.setBufferSize(5);
     Test_parsingResult("very long command line", SIMPLE_PR_BUFFER_OVERFLOW);
-
 
     Serial.println("**************************************************");
     Serial.println("END");

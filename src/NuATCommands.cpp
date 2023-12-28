@@ -25,7 +25,7 @@ void NuATCommandProcessor::onWrite(NimBLECharacteristic *pCharacteristic)
 {
     // Incoming data
     NimBLEAttValue incomingPacket = pCharacteristic->getValue();
-    //const char *in = pCharacteristic->getValue().c_str();
+    // const char *in = pCharacteristic->getValue().c_str();
     const char *in = incomingPacket.c_str();
     // Serial.printf("onWrite(): %s\n");
 

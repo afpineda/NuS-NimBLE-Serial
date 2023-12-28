@@ -188,7 +188,7 @@ void CustomCommandProcessor::onSumCommand(char *param1, char *param2)
         {
             // Buffer is too small (t>=BUFFER_SIZE) or encoding error (t<0)
             send(MSG_UNEXPECTED_ERROR);
-            Serial.printf("ERROR at onSumCommand()-->snprintf(): return code %d. Increase buffer size >%d.\n",t,BUFFER_SIZE);
+            Serial.printf("ERROR at onSumCommand()-->snprintf(): return code %d. Increase buffer size >%d.\n", t, BUFFER_SIZE);
         }
     }
 }
