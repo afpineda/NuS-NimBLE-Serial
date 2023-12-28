@@ -1,4 +1,5 @@
 /**
+ * @file NuS.cpp
  * @author Ángel Fernández Pineda. Madrid. Spain.
  * @date 2023-12-18
  * @brief Nordic UART Service implementation on NimBLE stack
@@ -14,6 +15,7 @@
 #include <exception>
 #include <vector>
 #include <string.h>
+#include <cstdio>
 #include "NuS.hpp"
 
 //-----------------------------------------------------------------------------
@@ -163,6 +165,37 @@ size_t NordicUARTService::send(const char *str, bool includeNullTerminatingChar)
     size_t size = includeNullTerminatingChar ? strlen(str) + 1 : strlen(str);
     pTxCharacteristic->notify((uint8_t *)str, size);
     return size;
+  }
+  return 0;
+}
+
+size_t NordicUARTService::printf(const char *format, ...)
+{
+  char dummy;
+  va_list args;
+  va_start(args, format);
+  int requiredSize = vsnprintf(&dummy, 1, format, args);
+  va_end(args);
+  if (requiredSize == 0)
+  {
+    return write((uint8_t *)&dummy, 1);
+  }
+  else if (requiredSize > 0)
+  {
+    char *buffer = (char *)malloc(requiredSize + 1);
+    if (buffer)
+    {
+      va_start(args, format);
+      int result = vsnprintf(buffer, requiredSize + 1, format, args);
+      va_end(args);
+      if ((result >= 0) && (result <= requiredSize))
+      {
+        size_t writtenBytesCount = write((uint8_t *)buffer, result + 1);
+        free(buffer);
+        return writtenBytesCount;
+      }
+      free(buffer);
+    }
   }
   return 0;
 }

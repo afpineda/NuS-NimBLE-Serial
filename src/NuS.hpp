@@ -1,4 +1,5 @@
 /**
+ * @file NuS.hpp
  * @author Ángel Fernández Pineda. Madrid. Spain.
  * @date 2023-12-18
  * @brief Nordic UART Service implementation on NimBLE stack
@@ -77,6 +78,18 @@ public:
    *                Otherwise, count of bytes sent.
    */
   size_t send(const char *str, bool includeNullTerminatingChar = false);
+
+  /**
+   * @brief Send a formatted string (ANSI encoded)
+   *
+   * @param[in] format String that follows the same specifications as format in printf()
+   * @param[in] ... Depending on the format string, a sequence of additional arguments,
+   *            each containing a value to replace a format specifier in the format string.
+   *
+   * @return size_t Zero if no peer is connected.
+   *                Otherwise, count of bytes sent.
+   */
+  size_t printf(const char *format,...);
 
   /**
    * @brief Start the Nordic UART Service

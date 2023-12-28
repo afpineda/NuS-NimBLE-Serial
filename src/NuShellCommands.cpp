@@ -1,4 +1,5 @@
 /**
+ * @file NuShellCommands.cpp
  * @author Ángel Fernández Pineda. Madrid. Spain.
  * @date 2023-12-27
  * @brief Shell command processor using the Nordic UART Service

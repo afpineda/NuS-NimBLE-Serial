@@ -1,4 +1,5 @@
 /**
+ * @file NuATCommands.hpp
  * @author Ángel Fernández Pineda. Madrid. Spain.
  * @date 2023-12-18
  * @brief AT command processor using the Nordic UART Service

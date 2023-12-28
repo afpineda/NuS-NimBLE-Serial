@@ -1,4 +1,5 @@
 /**
+ * @file NuATCommandParser.hpp
  * @author Ángel Fernández Pineda. Madrid. Spain.
  * @date 2023-12-24
  * @brief AT command parser
@@ -20,11 +21,16 @@
  */
 typedef enum
 {
-    AT_RESULT_SEND_FAIL = -3,     /// Failure to send a command to a protocol stack
-    AT_RESULT_INVALID_PARAM = -2, /// Command not executed due to invalid or missing parameter(s)
-    AT_RESULT_ERROR = -1,         /// Command executed with no success
-    AT_RESULT_OK = 0,             /// Command executed with success
-    AT_RESULT_SEND_OK = 1         /// Command send successfully to a protocol stack but execution pending
+    /** Failure to send a command to a protocol stack */
+    AT_RESULT_SEND_FAIL = -3,
+    /** Command not executed due to invalid or missing parameter(s) */
+    AT_RESULT_INVALID_PARAM = -2,
+    /** Command executed with no success */
+    AT_RESULT_ERROR = -1,
+    /** Command executed with success */
+    AT_RESULT_OK = 0,
+    /** Command send successfully to a protocol stack but execution pending */
+    AT_RESULT_SEND_OK = 1
 } NuATCommandResult_t;
 
 /**
@@ -34,18 +40,30 @@ typedef enum
  */
 typedef enum
 {
-    AT_PR_OK = 0,             /// No Parsing error
-    AT_PR_NO_CALLBACKS,       /// Callbacks not set
-    AT_PR_NO_PREAMBLE,        /// Not an AT command line
-    AT_PR_NO_COMMANDS,        /// AT preamble found but no commands
-    AT_PR_INVALID_PREFIX,     /// Prefix token was not found
-    AT_PR_INVALID_CMD1,       /// No command name, buffer overflow or command name has "&" prefix but more than one letter
-    AT_PR_INVALID_CMD2,       /// Command name contains non alphabetic characters
-    AT_PR_UNSUPPORTED_CMD,    /// Command name valid, but not supported by this app
-    AT_PR_END_TOKEN_EXPECTED, /// Command-end token was expected but not found
-    AT_PR_SET_OVERFLOW,       /// Buffer overflow in a SET command (parameters too long)
-    AT_PR_ILL_FORMED_STRING,  /// A string parameter is not properly enclosed between double quotes
-    AT_PR_NO_HEAP             /// Unable to allocate buffer memory
+    /** No Parsing error */
+    AT_PR_OK = 0,
+    /** Callbacks not set */
+    AT_PR_NO_CALLBACKS,
+    /** Not an AT command line  */
+    AT_PR_NO_PREAMBLE,
+    /** AT preamble found but no commands */
+    AT_PR_NO_COMMANDS,
+    /** Prefix token was not found */
+    AT_PR_INVALID_PREFIX,
+    /** No command name,  buffer overflow or command name has "&" prefix but more than one letter */
+    AT_PR_INVALID_CMD1,
+    /** Command name contains non alphabetic characters */
+    AT_PR_INVALID_CMD2,
+    /** Command name valid, but not supported by this app */
+    AT_PR_UNSUPPORTED_CMD,
+    /** Command - end token was expected but not found */
+    AT_PR_END_TOKEN_EXPECTED,
+    /** Buffer overflow in a SET command(parameters too long) */
+    AT_PR_SET_OVERFLOW,
+    /** A string parameter is not properly enclosed between double quotes */
+    AT_PR_ILL_FORMED_STRING,
+    /** Unable to allocate buffer memory */
+    AT_PR_NO_HEAP
 } NuATParsingResult_t;
 
 typedef std::vector<const char *> NuATCommandParameters_t;
@@ -162,6 +180,10 @@ public:
      * @note Error and success messages are already managed by this class.
      *       Do not print those messages to avoid misunderstandings.
      *
+     * @note An AT response is just a text starting with CR+LF and
+     *       ending with CR+LF.
+     *       You may use `NuATCommands.printf("\r\n%s\r\n",...)` instead.
+     *
      * @param message Text to print.
      *                Must not contain the CR+LF sequence of characters.
      */
@@ -203,7 +225,8 @@ public:
      * @param allowOrNot When true, "at" is a valid preamble for a command line.
      * When false, just "AT" is allowed as preamble.
      */
-    void lowerCasePreamble(bool allowOrNot = true) {
+    void lowerCasePreamble(bool allowOrNot = true)
+    {
         bLowerCasePreamble = allowOrNot;
     };
 

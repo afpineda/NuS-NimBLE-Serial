@@ -1,4 +1,5 @@
 /**
+ * @file ShellCommandDemo.ino
  * @author Ángel Fernández Pineda. Madrid. Spain.
  * @date 2023-12-27
  * @brief Example of a shell command processor based on
@@ -30,23 +31,12 @@ public:
     virtual void onParseError(NuShellParsingResult_t parsingResult) override;
 
 private:
-    // macro to print a number into the BLE serial port
-    static void printNumberResponse(intmax_t number);
-
     // macro to parse a string into an integer
     static bool strToIntMax(const char text[], intmax_t &number);
 
 } myShellCallbacks; // just one global instance is needed
 
 //------------------------------------------------------
-
-void MyShellCommandCallbacks::printNumberResponse(intmax_t number)
-{
-    char buffer[64]; // should be enough for a single integer number
-    snprintf(buffer, 64, "%lld\n", number);
-    buffer[63] = '\0';
-    NuShellCommands.send(buffer);
-}
 
 bool MyShellCommandCallbacks::strToIntMax(const char text[], intmax_t &number)
 {
@@ -120,17 +110,17 @@ void MyShellCommandCallbacks::onExecute(NuShellCommand_t &commandLine)
                 switch (commandId)
                 {
                 case CMD_ADD:
-                    printNumberResponse(op1 + op2);
+                    NuShellCommands.printf("%lld\n", (op1 + op2));
                     break;
                 case CMD_SUB:
-                    printNumberResponse(op1 - op2);
+                    NuShellCommands.printf("%lld\n", (op1 - op2));
                     break;
                 case CMD_MULT:
-                    printNumberResponse(op1 * op2);
+                    NuShellCommands.printf("%lld\n", (op1 * op2));
                     break;
                 case CMD_DIV:
                     if (op2 != 0)
-                        printNumberResponse(op1 / op2);
+                        NuShellCommands.printf("%lld\n", (op1 / op2));
                     else
                         NuShellCommands.send("ERROR: divide by zero\n");
                     break;
@@ -150,8 +140,7 @@ void MyShellCommandCallbacks::onExecute(NuShellCommand_t &commandLine)
 
 void MyShellCommandCallbacks::onParseError(NuShellParsingResult_t parsingResult)
 {
-    NuShellCommands.send("SYNTAX ERROR. Code: ");
-    printNumberResponse(parsingResult);
+    NuShellCommands.printf("SYNTAX ERROR. Code: %d\n", parsingResult);
 }
 
 //------------------------------------------------------

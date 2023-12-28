@@ -1,4 +1,5 @@
 /**
+ * @file NuPacket.hpp
  * @author Ángel Fernández Pineda. Madrid. Spain.
  * @date 2023-12-18
  * @brief Communications stream based on the Nordic UART Service

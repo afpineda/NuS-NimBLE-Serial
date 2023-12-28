@@ -1,4 +1,5 @@
 /**
+ * @file NuShellCmdParser.hpp
  * @author Ángel Fernández Pineda. Madrid. Spain.
  * @date 2023-12-26
  * @brief Simple command parser
@@ -19,12 +20,19 @@
  */
 typedef enum
 {
-    SIMPLE_PR_OK = 0,            /// No Parsing error
-    SIMPLE_PR_NO_CALLBACKS,      /// Callbacks not set
-    SIMPLE_PR_NO_COMMAND,        /// Command line is empty
-    SIMPLE_PR_BUFFER_OVERFLOW,   /// Buffer overflow (command line too long)
-    SIMPLE_PR_ILL_FORMED_STRING, /// A string parameter is not properly enclosed between double quotes
-    SIMPLE_PR_NO_HEAP            /// Unable to allocate buffer memory
+    /** No Parsing error */
+    SIMPLE_PR_OK = 0,
+    /** Callbacks not set */
+    SIMPLE_PR_NO_CALLBACKS,
+    /** Command line is empty */
+    SIMPLE_PR_NO_COMMAND,
+    /** Buffer overflow (command line too long) */
+    SIMPLE_PR_BUFFER_OVERFLOW,
+    /** A string parameter is not properly enclosed between double quotes */
+    SIMPLE_PR_ILL_FORMED_STRING,
+    /** Unable to allocate buffer memory */
+    SIMPLE_PR_NO_HEAP
+
 } NuShellParsingResult_t;
 
 typedef std::vector<const char *> NuShellCommand_t;

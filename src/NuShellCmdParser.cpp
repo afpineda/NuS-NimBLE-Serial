@@ -1,4 +1,5 @@
 /**
+ * @file NuShellCmdParser.cpp
  * @author Ángel Fernández Pineda. Madrid. Spain.
  * @date 2023-12-26
  * @brief Simple command parser
