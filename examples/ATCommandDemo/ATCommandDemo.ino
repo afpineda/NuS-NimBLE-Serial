@@ -12,7 +12,7 @@
  */
 
 #include <Arduino.h>
-#include "NuCommands.hpp"
+#include "NuATCommands.hpp"
 #include <NimBLEDevice.h>
 #include <string.h>
 #include <inttypes.h>
@@ -22,7 +22,7 @@
 // AT Commands implementation for a simple calculator
 //------------------------------------------------------
 
-class MyATCommandCallbacks : public NuCommandCallbacks
+class MyATCommandCallbacks : public NuATCommandCallbacks
 {
 public:
     // commands are implemented by overriding the following Methods
@@ -33,7 +33,9 @@ public:
     virtual NuATCommandResult_t onQuery(int commandId) override;
     virtual void onTest(int commandId) override;
 
-    // The following method is overriden for logging purposes
+    // The following methods are overriden for logging purposes
+
+    virtual void onNonATCommand(const char text[]) override;
     virtual void onFinished(int index, NuATParsingResult_t parsingResult) override;
 
 private:
@@ -82,6 +84,12 @@ bool MyATCommandCallbacks::strToIntMax(const char text[], intmax_t &number)
     }
     else
         return false;
+}
+
+void MyATCommandCallbacks::onNonATCommand(const char text[])
+{
+    Serial.println("--Non-AT text received--");
+    Serial.println(text);
 }
 
 int MyATCommandCallbacks::getATCommandId(const char commandName[])
