@@ -130,7 +130,13 @@ const char *NuShellCommandParser::parseNext(char *dest, const char *in, size_t b
                 in++;
             }
         }
-        dest[usedBytes++] = '\0';
+        if (usedBytes < bufferSize)
+            dest[usedBytes++] = '\0';
+        else
+        {
+            lastParsingResult = SIMPLE_PR_BUFFER_OVERFLOW;
+            in = nullptr;
+        }
     }
     return ignoreSeparator(in);
 }
