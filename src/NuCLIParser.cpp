@@ -141,7 +141,7 @@ NuCLIParsingResult_t NuCLIParser::parseNext(const uint8_t *in, size_t size, size
                         current += '\"';
                         index++;
                     }
-                    else if (index < size)
+                    else
                         // Closing double quotes
                         openString = false;
                 }

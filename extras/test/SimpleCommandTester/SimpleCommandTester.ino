@@ -20,13 +20,19 @@ NuCLIParsingResult_t lastParsingResult;
 bool testExecution = false;
 bool testParseCallback = false;
 NuCommandLine_t expectedCmdLine;
+bool testCallbackExecuted = false;
+
+#define TEST_COMMAND "testCmd"
+#define TEST_COMMAND_IGNORE_CASE "TESTcMD"
 
 void initializeTester()
 {
     tester
-        .onUnknown(
-            [](NuCommandLine_t &commandLine)
-            {
+        .on(TEST_COMMAND, [](NuCommandLine_t &commandLine)
+            { testCallbackExecuted = true; })
+        .onUnknown([](NuCommandLine_t &commandLine)
+                   {
+                lastParsingResult = CLI_PR_OK;
                 if (testExecution)
                 {
                     if (commandLine.size() == expectedCmdLine.size())
@@ -35,10 +41,10 @@ void initializeTester()
                         {
                             std::string expected = expectedCmdLine[index];
                             std::string found = commandLine[index];
-                            bool test = (expected == found);
+                            bool test = (expected.compare(found) != 0);
                             if (test)
                             {
-                                Serial.printf(" --Failure at string index #%d. Expected: %s Found: %s\n", index, expected.c_str(), found.c_str());
+                                Serial.printf(" --Failure at string index #%d. Expected: [%s] Found: [%s]\n", index, expected.c_str(), found.c_str());
                             }
                         }
                     }
@@ -46,23 +52,21 @@ void initializeTester()
                     {
                         Serial.printf(" --Failure at strings count. Expected: %d Found: %d\n", expectedCmdLine.size(), commandLine.size());
                     }
-                }
-            })
-        .onParseError(
-            [&lastParsingResult](NuCLIParsingResult_t result, size_t byteIndex)
-            {
+                } })
+        .onParseError([&lastParsingResult](NuCLIParsingResult_t result, size_t byteIndex)
+                      {
                 lastParsingResult = result;
                 if (testParseCallback)
                 {
                     Serial.printf("onParseError(%d)", result);
-                }
-            });
+                } });
 }
 
 void reset()
 {
     testExecution = false;
     testParseCallback = false;
+    testCallbackExecuted = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -75,7 +79,7 @@ void Test_parsingResult(std::string line, NuCLIParsingResult_t parsingResult)
     tester.execute(line);
     if (lastParsingResult != parsingResult)
     {
-        Serial.printf("Parsing failure at %s. Expected code: %d. Found code: %d\n", line, parsingResult, lastParsingResult);
+        Serial.printf("Parsing failure at [%s]. Expected code: %d. Found code: %d\n", line.c_str(), parsingResult, lastParsingResult);
     }
 }
 
@@ -83,11 +87,21 @@ void Test_execution(std::string line)
 {
     reset();
     testExecution = true;
-    Serial.printf("--Executing: %s\n", line.c_str());
+    Serial.printf("--Executing: [%s]\n", line.c_str());
     tester.execute(line);
     if (lastParsingResult != CLI_PR_OK)
     {
         Serial.printf("Failure. Unexpected parsing result code: %d\n", lastParsingResult);
+    }
+}
+
+void Test_callback(std::string line, bool expected)
+{
+    reset();
+    tester.execute(line);
+    if (expected != testCallbackExecuted)
+    {
+        Serial.printf("Callback execution failure at [%s]. Expected: %d. Found: %d\n", line.c_str(), expected, testCallbackExecuted);
     }
 }
 
@@ -127,7 +141,6 @@ void setup()
     Test_execution("abc\n");
     Test_execution("   abc\n");
     Test_execution("   abc   ");
-    Test_execution("abc \n  cde");
 
     expectedCmdLine.push_back("cde");
 
@@ -136,6 +149,7 @@ void setup()
     Test_execution("abc  \"cde\"  ");
     Test_execution("  \"abc\" \"cde\"  ");
     Test_execution("\"abc\" cde");
+    Test_execution("abc\ncde");
 
     expectedCmdLine.push_back("123 456");
 
@@ -144,6 +158,13 @@ void setup()
     expectedCmdLine.push_back(".\"xyz\".");
 
     Test_execution("abc cde \"123 456\" \".\"\"xyz\"\".\"");
+
+    tester.caseSensitive(true);
+    Test_callback(TEST_COMMAND, true);
+    Test_callback(TEST_COMMAND_IGNORE_CASE, false);
+    tester.caseSensitive(false);
+    Test_callback(TEST_COMMAND, true);
+    Test_callback(TEST_COMMAND_IGNORE_CASE, true);
 
     Serial.println("**************************************************");
     Serial.println("END");

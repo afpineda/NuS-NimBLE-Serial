@@ -2,7 +2,7 @@
  * @file NuCLIParser.hpp
  * @author Ángel Fernández Pineda. Madrid. Spain.
  * @date 2023-12-26
- * @brief Simple command parser
+ * @brief Simple command line parser
  *
  * @copyright Creative Commons Attribution 4.0 International (CC BY 4.0)
  *
@@ -35,18 +35,26 @@ typedef enum
 /**
  * @brief Parsed strings in a command line, from left to right
  *
+ * @note First item is always a command name, so this vector
+ *       is never empty. However, it may contain empty strings
+ *       typed as "".
  */
 typedef std::vector<std::string> NuCommandLine_t;
 
 /**
  * @brief Callback to execute for a parsed command line
  *
+ * @param[in] commandLine Parsed command line.
  */
 typedef void (*NuCLICommandCallback_t)(NuCommandLine_t &);
 
 /**
  * @brief Callback to execute in case of parsing errors
  *
+ * @note This callback is never executed with parsing result CLI_PR_OK.
+ *
+ * @param[in] result Parsing result
+ * @param[in] index Byte index where the parsing error was found (0-based).
  */
 typedef void (*NuCLIParseErrorCallback_t)(NuCLIParsingResult_t, size_t);
 
@@ -75,10 +83,20 @@ public:
      * @brief Set a callback for a command name
      *
      * @note If you set two or more callbacks for the same command name,
-     *       just the first will be executed, so don't do that.
+     *       just the first one will be executed, so don't do that.
+     *
+     * @note Example:
+     *       @code {.cpp}
+     *       NuShellCommands
+     *          .on("mycmd", [](NuCommandLine_t &commandLine)
+     *           { ...do something...})
+     *          .onUnknown([](NuCommandLine_t &commandLine)
+     *           { ...do something else...});
+     *
+     *       @endcode
      *
      * @param[in] commandName Command name
-     * @param[in] callback Function to execute
+     * @param[in] callback Function to execute if @p commandName is found
      *
      * @return NuCLIParser& This instance. Used to chain calls.
      */
@@ -87,7 +105,8 @@ public:
     /**
      * @brief Set a callback for unknown commands
      *
-     * @param[in] callback Function to execute
+     * @param[in] callback Function to execute if the parsed command line contains
+     *                     an unknown command name.
      *
      * @return NuCLIParser& This instance. Used to chain calls.
      */
@@ -100,7 +119,7 @@ public:
     /**
      * @brief Set a callback for parsing errors
      *
-     * @param[in] callback Function to execute
+     * @param[in] callback Function to execute if some parsing error is found.
      * @return NuCLIParser& This instance. Used to chain calls.
      */
     NuCLIParser &onParseError(NuCLIParseErrorCallback_t callback)
@@ -112,15 +131,15 @@ public:
     /**
      * @brief Execute the given command line
      *
-     * @param commandLine Text of command line
-     * @param size size of the command line
+     * @param commandLine Pointer to a buffer containing a command line
+     * @param size Size in bytes of @p commandLine
      */
     void execute(const uint8_t *commandLine, size_t size);
 
     /**
      * @brief Execute the given command line
      *
-     * @param commandLine Text of command line
+     * @param commandLine String containing command line
      */
     void execute(std::string commandLine)
     {
@@ -130,7 +149,7 @@ public:
     /**
      * @brief Execute the given command line
      *
-     * @param commandLine Text of command line
+     * @param commandLine Null-terminated string containing a command line
      */
     void execute(const char *commandLine)
     {

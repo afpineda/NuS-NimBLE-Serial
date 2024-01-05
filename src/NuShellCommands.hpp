@@ -7,8 +7,8 @@
  * @copyright Creative Commons Attribution 4.0 International (CC BY 4.0)
  *
  */
-#ifndef __NUSHELLCOMMANDS_HPP__
-#define __NUSHELLCOMMANDS_HPP__
+#ifndef __NU_SHELL_COMMANDS_HPP__
+#define __NU_SHELL_COMMANDS_HPP__
 
 #include "NuS.hpp"
 #include "NuCLIParser.hpp"

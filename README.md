@@ -226,27 +226,52 @@ As a bonus, you may use class `NuATCommandParser` to implement an AT command pro
 ```c++
 #include "NuShellCommands.hpp"
 
-class MyShellCommands: public NuShellCommandCallbacks {
-    public:
-      virtual void onExecute(NuCommandLine_t &commandLine) override;
-} myShellCommandsObject;
+void setup()
+{
+  NuShellCommands
+    .on("cmd1", [](NuCommandLine_t &commandLine)
+    {
+      // Note: commandLine[0] == "cmd1"
+      //       commandLine[1] is the first argument an so on
+      ...
+    }
+    )
+    .on("cmd2", [](NuCommandLine_t &commandLine)
+    {
+      ...
+    }
+    .onUnknown([](NuCommandLine_t &commandLine)
+    {
+      Serial.printf("ERROR: unknown command \"%s\"\n",commandLine[0].c_str());
+    }
+    )
+    .onParseError([](NuCLIParsingResult_t result, size_t index)
+    {
+      if (result == CLI_PR_ILL_FORMED_STRING)
+        Serial.printf("Syntax error at character index %d\n",index);
+    }
+    )
+    .start();
+}
 ```
 
-- Derive a new class from `NuShellCommandCallbacks`.
-- Override `onExecute()` to run commands. Arguments are already parsed as a sequence of strings. The first one should be interpreted as a command name.
-- Create a single instance of your derived class and pass it to `NuShellCommands.setShellCommandCallbacks()`.
-- Set a maximum command line length by calling `NuShellCommands.setBufferSize()`, including the null-terminating character.
-- Call `NuShellCommands.start()`
+- Call `NuShellCommands.caseSensitive()` to your convenience. By default, command names are not case-sensitive.
+- Call `on()` to provide a command name and the callback to be executed if such a command is found.
+- Call `onUnknown()` to provide a callback to be executed if the command line does not contain any command name.
+- Call `onParseError()` to provide a callback to be executed in case of error.
+- You can chain calls to "`on*`" methods.
+- Call `NuShellCommands.start()`.
+- Note that all callbacks will be executed at the NimBLE OS task, so make them thread-safe.
 
 Command line syntax:
 
-- Any non-printable character is a command line terminator (including LF, CR and NULL).
-- Arguments are separated by one or more consecutive blank spaces.
-- Unquoted arguments can not contain a blank space, but can contain any printable character. For example: `this"is"valid`.
-- Quoted arguments can contain blank spaces, but double quotes have to be escaped with another double quote.
+- Blank spaces, LF and CR characters are separators.
+- Command arguments are separated by one or more consecutive separators. For example, the command line `cmd arg1  arg2\narg3  \n` is parsed as the command "cmd" with three arguments: "arg1", "arg2" and "arg3", being `\n` the LF character.
+- Unquoted arguments can not contain a separator, but can contain double quotes. For example: `this"is"valid`.
+- Quoted arguments can contain a separator, but double quotes have to be escaped with another double quote.
   For example: `"this ""is"" valid"` is parsed to `this "is" valid` as a single argument.
 
-As a bonus, you may use class `NuShellCommandParser` to implement a shell that takes data from other sources.
+As a bonus, you may use class `NuCLIParser` to implement a shell that takes data from other sources.
 
 ### Custom serial communications protocol
 
