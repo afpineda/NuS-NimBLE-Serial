@@ -11,13 +11,13 @@
 #define __NUSHELLCOMMANDS_HPP__
 
 #include "NuS.hpp"
-#include "NuShellCmdParser.hpp"
+#include "NuCLIParser.hpp"
 
 /**
  * @brief Execute shell commands received thanks to the Nordic UART Service
  *
  */
-class NuShellCommandProcessor : public NordicUARTService, public NuShellCommandParser
+class NuShellCommandProcessor : public NordicUARTService, public NuCLIParser
 {
 public:
     // Singleton pattern
@@ -42,26 +42,12 @@ public:
     // Overriden Methods
     virtual void onWrite(NimBLECharacteristic *pCharacteristic) override;
 
-    /**
-     * @brief Set custom shell command processing callbacks
-     *
-     * @note This method should be called before start(). Any way,
-     *       you are not allowed to set a new callbacks object while
-     *       a peer is connected.
-     *
-     * @param pCallbacks A pointer to your own callbacks. Must
-     *        remain valid forever (do not destroy).
-     *
-     * @throws std::runtime_error If called while a peer is connected.
-     */
-    void setShellCommandCallbacks(NuShellCommandCallbacks *pCallbacks);
-
 private:
     NuShellCommandProcessor(){};
 };
 
 /**
- * @brief Singleton instance of the NuATCommandProcessor class
+ * @brief Singleton instance of the NuShellCommandProcessor class
  *
  */
 extern NuShellCommandProcessor &NuShellCommands;

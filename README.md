@@ -228,7 +228,7 @@ As a bonus, you may use class `NuATCommandParser` to implement an AT command pro
 
 class MyShellCommands: public NuShellCommandCallbacks {
     public:
-      virtual void onExecute(NuShellCommand_t &commandLine) override;
+      virtual void onExecute(NuCommandLine_t &commandLine) override;
 } myShellCommandsObject;
 ```
 

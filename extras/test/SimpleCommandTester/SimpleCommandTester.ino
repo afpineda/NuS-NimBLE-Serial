@@ -9,96 +9,85 @@
 
 #include <Arduino.h>
 #include <string.h>
-#include "NuShellCmdParser.hpp"
+#include "NuCLIParser.hpp"
 
 //-----------------------------------------------------------------------------
 // MOCK
 //-----------------------------------------------------------------------------
 
-class NuShellCommandTester : public NuShellCommandParser, NuShellCommandCallbacks
+NuCLIParser tester;
+NuCLIParsingResult_t lastParsingResult;
+bool testExecution = false;
+bool testParseCallback = false;
+NuCommandLine_t expectedCmdLine;
+
+void initializeTester()
 {
-public:
-    virtual void onExecute(NuShellCommand_t &commandLine) override;
-    virtual void onParseError(NuShellParsingResult_t parsingResult) override;
-    void parseCommandLine(const char *in)
-    {
-        NuShellCommandParser::parseCommandLine(in);
-    };
+    tester
+        .onUnknown(
+            [](NuCommandLine_t &commandLine)
+            {
+                if (testExecution)
+                {
+                    if (commandLine.size() == expectedCmdLine.size())
+                    {
+                        for (int index = 0; index < commandLine.size(); index++)
+                        {
+                            std::string expected = expectedCmdLine[index];
+                            std::string found = commandLine[index];
+                            bool test = (expected == found);
+                            if (test)
+                            {
+                                Serial.printf(" --Failure at string index #%d. Expected: %s Found: %s\n", index, expected.c_str(), found.c_str());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Serial.printf(" --Failure at strings count. Expected: %d Found: %d\n", expectedCmdLine.size(), commandLine.size());
+                    }
+                }
+            })
+        .onParseError(
+            [&lastParsingResult](NuCLIParsingResult_t result, size_t byteIndex)
+            {
+                lastParsingResult = result;
+                if (testParseCallback)
+                {
+                    Serial.printf("onParseError(%d)", result);
+                }
+            });
+}
 
-public:
-    void reset();
-    NuShellCommand_t expectedCmdLine; // Must contain pointers to static strings
-    bool testExecution = false;
-    bool testParseCallback = false;
-
-    NuShellCommandTester()
-    {
-        setShellCommandCallbacks(this);
-        setBufferSize(128);
-    };
-} tester;
-
-void NuShellCommandTester::reset()
+void reset()
 {
     testExecution = false;
     testParseCallback = false;
-}
-
-void NuShellCommandTester::onExecute(NuShellCommand_t &commandLine)
-{
-    if (testExecution)
-    {
-        if (commandLine.size() == expectedCmdLine.size())
-        {
-            for (int index = 0; index < commandLine.size(); index++)
-            {
-                const char *expected = expectedCmdLine[index];
-                const char *found = commandLine[index];
-                bool test = (strcmp(expected, found) != 0);
-                if (test)
-                {
-                    Serial.printf(" --Failure at string index #%d. Expected: %s Found: %s\n", index, expected, found);
-                }
-            }
-        }
-        else
-        {
-            Serial.printf(" --Failure at strings count. Expected: %d Found: %d\n", expectedCmdLine.size(), commandLine.size());
-        }
-    }
-}
-
-void NuShellCommandTester::onParseError(NuShellParsingResult_t parsingResult)
-{
-    if (testParseCallback)
-    {
-        Serial.printf("onParseError(%d)", parsingResult);
-    }
 }
 
 //-----------------------------------------------------------------------------
 // Test macros
 //-----------------------------------------------------------------------------
 
-void Test_parsingResult(const char *line, NuShellParsingResult_t parsingResult)
+void Test_parsingResult(std::string line, NuCLIParsingResult_t parsingResult)
 {
-    tester.reset();
-    tester.parseCommandLine(line);
-    if (tester.lastParsingResult != parsingResult)
+    reset();
+    tester.execute(line);
+    if (lastParsingResult != parsingResult)
     {
-        Serial.printf("Parsing failure at %s. Expected code: %d. Found code: %d\n", line, parsingResult, tester.lastParsingResult);
+        Serial.printf("Parsing failure at %s. Expected code: %d. Found code: %d\n", line, parsingResult, lastParsingResult);
     }
 }
 
-void Test_execution(const char *line)
+void Test_execution(std::string line)
 {
-    tester.reset();
-    tester.testExecution = true;
-    Serial.printf("--Executing: %s\n", line);
-    tester.parseCommandLine(line);
-    if (tester.lastParsingResult != SIMPLE_PR_OK)
+    reset();
+    testExecution = true;
+    Serial.printf("--Executing: %s\n", line.c_str());
+    tester.execute(line);
+    if (lastParsingResult != CLI_PR_OK)
     {
-        Serial.printf("Failure. Unexpected parsing result code: %d\n", tester.lastParsingResult);
+        Serial.printf("Failure. Unexpected parsing result code: %d\n", lastParsingResult);
     }
 }
 
@@ -113,24 +102,26 @@ void setup()
     Serial.println("**************************************************");
     Serial.println(" Automated test for simple command processor ");
     Serial.println("**************************************************");
+    initializeTester();
 
-    Test_parsingResult("", SIMPLE_PR_NO_COMMAND);
-    Test_parsingResult("   \n", SIMPLE_PR_NO_COMMAND);
-    Test_parsingResult("  abc de", SIMPLE_PR_OK);
-    Test_parsingResult("abc de   \n", SIMPLE_PR_OK);
-    Test_parsingResult("   abc    de   \n", SIMPLE_PR_OK);
-    Test_parsingResult(" \"abc\" ", SIMPLE_PR_OK);
-    Test_parsingResult(" abc\"abc ", SIMPLE_PR_OK);
-    Test_parsingResult("\"abc\"", SIMPLE_PR_OK);
-    Test_parsingResult(" \"abc \"\"def\"\" abc \" ", SIMPLE_PR_OK);
-    Test_parsingResult("\"unterminated string\n", SIMPLE_PR_ILL_FORMED_STRING);
-    Test_parsingResult("\"unterminated \"\" string\n", SIMPLE_PR_ILL_FORMED_STRING);
-    Test_parsingResult("\"text\"after quotes\n", SIMPLE_PR_ILL_FORMED_STRING);
-    Test_parsingResult("\"text\"\"\"after quotes\n", SIMPLE_PR_ILL_FORMED_STRING);
-    Test_parsingResult("\"text \"\"___\"\" \"after quotes\n", SIMPLE_PR_ILL_FORMED_STRING);
+    Test_parsingResult("", CLI_PR_NO_COMMAND);
+    Test_parsingResult("   \n", CLI_PR_NO_COMMAND);
+    Test_parsingResult("  abc de", CLI_PR_OK);
+    Test_parsingResult("abc de   \n", CLI_PR_OK);
+    Test_parsingResult("   abc    de   \n", CLI_PR_OK);
+    Test_parsingResult(" \"abc\" ", CLI_PR_OK);
+    Test_parsingResult(" abc\"abc ", CLI_PR_OK);
+    Test_parsingResult("\"abc\"", CLI_PR_OK);
+    Test_parsingResult("\"abc\"\n", CLI_PR_OK);
+    Test_parsingResult(" \"abc \"\"def\"\" abc \" ", CLI_PR_OK);
+    Test_parsingResult("\"unterminated string\n", CLI_PR_ILL_FORMED_STRING);
+    Test_parsingResult("\"unterminated \"\" string\n", CLI_PR_ILL_FORMED_STRING);
+    Test_parsingResult("\"text\"after quotes\n", CLI_PR_ILL_FORMED_STRING);
+    Test_parsingResult("\"text\"\"\"after quotes\n", CLI_PR_ILL_FORMED_STRING);
+    Test_parsingResult("\"text \"\"___\"\" \"after quotes\n", CLI_PR_ILL_FORMED_STRING);
 
-    tester.expectedCmdLine.clear();
-    tester.expectedCmdLine.push_back("abc");
+    expectedCmdLine.clear();
+    expectedCmdLine.push_back("abc");
 
     Test_execution("abc");
     Test_execution("abc\n");
@@ -138,7 +129,7 @@ void setup()
     Test_execution("   abc   ");
     Test_execution("abc \n  cde");
 
-    tester.expectedCmdLine.push_back("cde");
+    expectedCmdLine.push_back("cde");
 
     Test_execution("abc cde");
     Test_execution("abc     cde    \n");
@@ -146,16 +137,13 @@ void setup()
     Test_execution("  \"abc\" \"cde\"  ");
     Test_execution("\"abc\" cde");
 
-    tester.expectedCmdLine.push_back("123 456");
+    expectedCmdLine.push_back("123 456");
 
     Test_execution("abc cde \"123 456\" \n");
 
-    tester.expectedCmdLine.push_back(".\"xyz\".");
+    expectedCmdLine.push_back(".\"xyz\".");
 
     Test_execution("abc cde \"123 456\" \".\"\"xyz\"\".\"");
-
-    tester.setBufferSize(5);
-    Test_parsingResult("very long command line", SIMPLE_PR_BUFFER_OVERFLOW);
 
     Serial.println("**************************************************");
     Serial.println("END");

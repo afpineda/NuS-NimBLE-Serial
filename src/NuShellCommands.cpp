@@ -8,7 +8,6 @@
  *
  */
 
-#include <exception>
 #include "NuShellCommands.hpp"
 
 //-----------------------------------------------------------------------------
@@ -25,21 +24,7 @@ void NuShellCommandProcessor::onWrite(NimBLECharacteristic *pCharacteristic)
 {
     // Incoming data
     NimBLEAttValue incomingPacket = pCharacteristic->getValue();
-    const char *in = incomingPacket.c_str();
-    // Serial.printf("onWrite(): %s\n");
 
-    // Parse
-    parseCommandLine(in);
-}
-
-//-----------------------------------------------------------------------------
-// Callbacks
-//-----------------------------------------------------------------------------
-
-void NuShellCommandProcessor::setShellCommandCallbacks(NuShellCommandCallbacks *pCallbacks)
-{
-    if (!isConnected())
-        NuShellCommandParser::setShellCommandCallbacks(pCallbacks);
-    else
-        throw std::runtime_error("Unable to set shell command callbacks while connected");
+    // Parse and execute
+    execute((const uint8_t *)incomingPacket.data(), incomingPacket.size());
 }

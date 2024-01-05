@@ -27,8 +27,8 @@ class MyShellCommandCallbacks : public NuShellCommandCallbacks
 public:
     // commands are implemented by overriding the following methods
 
-    virtual void onExecute(NuShellCommand_t &commandLine) override;
-    virtual void onParseError(NuShellParsingResult_t parsingResult) override;
+    virtual void onExecute(NuCommandLine_t &commandLine) override;
+    virtual void onParseError(NuCLIParsingResult_t parsingResult) override;
 
 private:
     // macro to parse a string into an integer
@@ -60,7 +60,7 @@ bool MyShellCommandCallbacks::strToIntMax(const char text[], intmax_t &number)
 #define CMD_MULT 3
 #define CMD_DIV 4
 
-void MyShellCommandCallbacks::onExecute(NuShellCommand_t &commandLine)
+void MyShellCommandCallbacks::onExecute(NuCommandLine_t &commandLine)
 {
     Serial.println("--New command line--");
     for (const char *str : commandLine)
@@ -138,7 +138,7 @@ void MyShellCommandCallbacks::onExecute(NuShellCommand_t &commandLine)
     }
 }
 
-void MyShellCommandCallbacks::onParseError(NuShellParsingResult_t parsingResult)
+void MyShellCommandCallbacks::onParseError(NuCLIParsingResult_t parsingResult)
 {
     NuShellCommands.printf("SYNTAX ERROR. Code: %d\n", parsingResult);
 }
