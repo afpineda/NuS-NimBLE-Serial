@@ -12,7 +12,8 @@
 #define __NU_CLI_PARSER_HPP__
 
 #include <vector>
-#include <cstring>
+#include <string>
+#include <cstring> // Needed for strlen()
 #include <functional>
 
 /**

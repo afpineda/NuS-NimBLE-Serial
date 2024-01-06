@@ -9,10 +9,10 @@
  */
 
 #include <string>
-#include "NuCLIParser.hpp"
 #include <algorithm>
 #include <cctype>
 // #include <cwctype>
+#include "NuCLIParser.hpp"
 
 //-----------------------------------------------------------------------------
 // Set callbacks
@@ -149,7 +149,7 @@ NuCLIParsingResult_t NuCLIParser::parseNext(const uint8_t *in, size_t size, size
                     if ((index < size) && (in[index] == '\"'))
                     {
                         // Escaped double quotes
-                        current += '\"';
+                        current.push_back('\"');
                         index++;
                     }
                     else
@@ -157,7 +157,7 @@ NuCLIParsingResult_t NuCLIParser::parseNext(const uint8_t *in, size_t size, size
                         openString = false;
                 }
                 else
-                    current += in[index++];
+                    current.push_back(in[index++]);
             }
             if (openString || !isSeparator(in, size, index))
             {
@@ -170,7 +170,7 @@ NuCLIParsingResult_t NuCLIParser::parseNext(const uint8_t *in, size_t size, size
             // Unquoted string
             while (!isSeparator(in, size, index))
             {
-                current += in[index++];
+                current.push_back(in[index++]);
             }
         }
         parsedCommandLine.push_back(current);
