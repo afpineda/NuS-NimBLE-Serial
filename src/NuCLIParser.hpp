@@ -13,6 +13,7 @@
 
 #include <vector>
 #include <cstring>
+#include <functional>
 
 /**
  * @brief Parsing state of a received command
@@ -46,7 +47,7 @@ typedef std::vector<std::string> NuCommandLine_t;
  *
  * @param[in] commandLine Parsed command line.
  */
-typedef void (*NuCLICommandCallback_t)(NuCommandLine_t &);
+typedef std::function<void(NuCommandLine_t &)> NuCLICommandCallback_t;
 
 /**
  * @brief Callback to execute in case of parsing errors
