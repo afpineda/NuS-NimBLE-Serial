@@ -135,6 +135,12 @@ void setup()
     Test_parsingResult("\"text \"\"___\"\" \"after quotes\n", CLI_PR_ILL_FORMED_STRING);
 
     expectedCmdLine.clear();
+    expectedCmdLine.push_back(u8"áéí");
+    Test_execution(u8"áéí");
+    expectedCmdLine.push_back(u8"áéí");
+    Test_execution(u8"áéí\náéí\n");
+
+    expectedCmdLine.clear();
     expectedCmdLine.push_back("abc");
 
     Test_execution("abc");

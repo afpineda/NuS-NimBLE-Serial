@@ -72,12 +72,7 @@ public:
      * @return true Previously, case-sensitive.
      * @return false Previously, case-insensitive.
      */
-    bool caseSensitive(bool yesOrNo)
-    {
-        bool result = bCaseSensitive;
-        bCaseSensitive = yesOrNo;
-        return result;
-    };
+    bool caseSensitive(bool yesOrNo);
 
     /**
      * @brief Set a callback for a command name
@@ -163,7 +158,27 @@ protected:
     static void ignoreSeparator(const uint8_t *in, size_t size, size_t &index);
     static bool isSeparator(const uint8_t *in, size_t size, size_t index);
 
-private:
+    /**
+     * @brief Notify successfully parsed command line
+     *
+     * @note Current implementation executes the appropiate callback.
+     *       Override for custom command processing if you don't like callbacks.
+     *
+     * @param[in] commandLine Parsed command line
+     */
+    virtual void onParsingSuccess(NuCommandLine_t &commandLine);
+
+    /**
+     * @brief Notify parsing error
+     *
+     * @note Current implementation executes onParseError() callback.
+     *       Override for custom error processing.
+     *
+     * @param[in] result Parsing result
+     * @param[in] index Byte index where the parsing error was found (0-based).
+     */
+    virtual void onParsingFailure(NuCLIParsingResult_t result, size_t index);
+
 private:
     bool bCaseSensitive = false;
     NuCLIParseErrorCallback_t cbParseError = nullptr;

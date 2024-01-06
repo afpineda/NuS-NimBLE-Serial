@@ -14,7 +14,9 @@ NuATCommandResult_t	KEYWORD1
 NuATParsingResult_t	KEYWORD1
 NuATCommandParser	KEYWORD1
 NuATCommandProcessor	KEYWORD1
-NuShellCommandParser	KEYWORD1
+NuCLIParsingResult_t	KEYWORD1
+NuCommandLine_t	KEYWORD1
+NuCLIParser	KEYWORD1
 NuShellCommandProcessor	KEYWORD1
 
 ############################################
@@ -28,10 +30,15 @@ disableAutoAdvertising	KEYWORD2
 disconnect	KEYWORD2
 enableAutoAdvertising	KEYWORD2
 end	KEYWORD2
+execute	KEYWORD2
 forceUpperCaseCommandName	KEYWORD2
 isConnected	KEYWORD2
+on	KEYWORD2
+onUnknown	KEYWORD2
+onParseError	KEYWORD2
 peek	KEYWORD2
 printATResponse	KEYWORD2
+print	KEYWORD2
 printf	KEYWORD2
 read	KEYWORD2
 readBytes	KEYWORD2

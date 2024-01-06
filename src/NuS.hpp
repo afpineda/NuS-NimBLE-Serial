@@ -16,6 +16,7 @@
 #include <NimBLEServer.h>
 #include <NimBLEService.h>
 #include <NimBLECharacteristic.h>
+#include <cstring>
 
 /**
  * @brief Nordic UART Service (NuS) implementation using the NimBLE stack
@@ -78,6 +79,17 @@ public:
    *                Otherwise, count of bytes sent.
    */
   size_t send(const char *str, bool includeNullTerminatingChar = false);
+
+  /**
+   * @brief Send a string (any encoding)
+   *
+   * @param str String to send
+   * @return size_t Count of bytes sent.
+   */
+  size_t print(std::string str)
+  {
+    return write((const uint8_t *)str.data(), str.length());
+  };
 
   /**
    * @brief Send a formatted string (ANSI encoded)

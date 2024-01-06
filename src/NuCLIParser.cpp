@@ -11,7 +11,7 @@
 // #include <stdlib.h>
 #include <string>
 #include "NuCLIParser.hpp"
-//#include <iostream>
+// #include <iostream>
 #include <algorithm>
 #include <cctype>
 // #include <cwctype>
@@ -64,8 +64,7 @@ void NuCLIParser::execute(const uint8_t *commandLine, size_t size)
 {
     if ((vcbCommand.size() == 0) && (!cbUnknown))
     {
-        if (cbParseError)
-            cbParseError(CLI_PR_NO_CALLBACKS, 0);
+        onParsingFailure(CLI_PR_NO_CALLBACKS, 0);
         return;
     }
 
@@ -76,33 +75,47 @@ void NuCLIParser::execute(const uint8_t *commandLine, size_t size)
     {
         if (parsedCommandLine.size() == 0)
         {
-            if (cbParseError)
-                cbParseError(CLI_PR_NO_COMMAND, 0);
+            onParsingFailure(CLI_PR_NO_COMMAND, 0);
             return;
         }
-        std::string givenCommandName = parsedCommandLine[0];
-        for (size_t index = 0; index < vsCommandName.size(); index++)
-        {
-            std::string candidate = vsCommandName.at(index);
-            bool test;
-            if (bCaseSensitive)
-                test = (candidate.compare(givenCommandName) == 0);
-            else
-                test = caseInsCompare(givenCommandName, candidate);
-            if (test)
-            {
-                NuCLICommandCallback_t cb = vcbCommand.at(index);
-                cb(parsedCommandLine);
-                return;
-            }
-        }
-        if (cbUnknown)
-            cbUnknown(parsedCommandLine);
+        onParsingSuccess(parsedCommandLine);
     }
-    else if (cbParseError)
+    else
     {
-        cbParseError(parsingResult, index);
+        onParsingFailure(parsingResult, index);
     }
+}
+
+//-----------------------------------------------------------------------------
+
+void NuCLIParser::onParsingSuccess(NuCommandLine_t &commandLine)
+{
+    std::string givenCommandName = commandLine[0];
+    for (size_t index = 0; index < vsCommandName.size(); index++)
+    {
+        std::string candidate = vsCommandName.at(index);
+        bool test;
+        if (bCaseSensitive)
+            test = (candidate.compare(givenCommandName) == 0);
+        else
+            test = caseInsCompare(givenCommandName, candidate);
+        if (test)
+        {
+            NuCLICommandCallback_t cb = vcbCommand.at(index);
+            cb(commandLine);
+            return;
+        }
+    }
+    if (cbUnknown)
+        cbUnknown(commandLine);
+}
+
+//-----------------------------------------------------------------------------
+
+void NuCLIParser::onParsingFailure(NuCLIParsingResult_t result, size_t index)
+{
+    if (cbParseError)
+        cbParseError(result, index);
 }
 
 //-----------------------------------------------------------------------------
@@ -180,3 +193,14 @@ void NuCLIParser::ignoreSeparator(const uint8_t *in, size_t size, size_t &index)
     while ((index < size) && ((in[index] == ' ') || (in[index] == '\r') || (in[index] == '\n')))
         index++;
 }
+
+//-----------------------------------------------------------------------------
+// Other
+//-----------------------------------------------------------------------------
+
+bool NuCLIParser::caseSensitive(bool yesOrNo)
+{
+    bool result = bCaseSensitive;
+    bCaseSensitive = yesOrNo;
+    return result;
+};

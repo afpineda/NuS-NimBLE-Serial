@@ -212,13 +212,15 @@ class MyATCommands: public NuATCommandCallbacks {
 - Create a single instance of your derived class and pass it to `NuATCommands.setATCallbacks()`.
 - Call `NuATCommands.start()`
 
-Never found an "official" specification for AT commands. Implementation is based in these sources:
+
+Implementation is based in these sources:
 
 - [Espressif's AT command set](https://docs.espressif.com/projects/esp-at/en/release-v2.2.0.0_esp8266/AT_Command_Set/index.html)
 - [An Introduction to AT Commands](https://www.twilio.com/docs/iot/supersim/introduction-to-modem-at-commands)
 - [GSM AT Commands Tutorial](https://microcontrollerslab.com/at-commands-tutorial/#Response_of_AT_commands)
 - [General Syntax of Extended AT Commands](https://www.developershome.com/sms/atCommandsIntro2.asp)
 
+Current implementation only accepts ASCII/ANSI character encoding.
 As a bonus, you may use class `NuATCommandParser` to implement an AT command processor that takes data from other sources.
 
 ### Custom shell commands
@@ -266,10 +268,11 @@ void setup()
 Command line syntax:
 
 - Blank spaces, LF and CR characters are separators.
-- Command arguments are separated by one or more consecutive separators. For example, the command line `cmd arg1  arg2\narg3  \n` is parsed as the command "cmd" with three arguments: "arg1", "arg2" and "arg3", being `\n` the LF character.
+- Command arguments are separated by one or more consecutive separators. For example, the command line `cmd   arg1  arg2 arg3\n` is parsed as the command "cmd" with three arguments: "arg1", "arg2" and "arg3", being `\n` the LF character. `cmd arg1\narg2\n\narg3` would be parsed just the same. Usually, LF and CR characters are command line terminators, so don't worry about them.
 - Unquoted arguments can not contain a separator, but can contain double quotes. For example: `this"is"valid`.
 - Quoted arguments can contain a separator, but double quotes have to be escaped with another double quote.
   For example: `"this ""is"" valid"` is parsed to `this "is" valid` as a single argument.
+- ASCII, ANSI and UTF-8 character encodings are supported. Take into account that client software must use the same character encoding as your application.
 
 As a bonus, you may use class `NuCLIParser` to implement a shell that takes data from other sources.
 
