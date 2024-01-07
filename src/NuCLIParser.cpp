@@ -29,7 +29,7 @@ NuCLIParser &NuCLIParser::on(const std::string commandName, NuCLICommandCallback
 }
 
 //-----------------------------------------------------------------------------
-// Auxiliary
+// Auxiliary. Taken from an example at O'Really book
 //-----------------------------------------------------------------------------
 
 inline bool caseInsCharCompareN(char a, char b)
@@ -37,6 +37,7 @@ inline bool caseInsCharCompareN(char a, char b)
     return (toupper(a) == toupper(b));
 }
 
+// Future work ?
 // inline bool caseInsCharCompareW(wchar_t a, wchar_t b)
 // {
 //     return (towupper(a) == towupper(b));
@@ -48,6 +49,7 @@ bool caseInsCompare(const std::string &s1, const std::string &s2)
             equal(s1.begin(), s1.end(), s2.begin(), caseInsCharCompareN));
 }
 
+// Future work ?
 // bool caseInsCompare(const wstring &s1, const wstring &s2)
 // {
 //     return ((s1.size() == s2.size()) &&
@@ -72,26 +74,22 @@ void NuCLIParser::execute(const uint8_t *commandLine, size_t size)
     if (parsingResult == CLI_PR_OK)
     {
         if (parsedCommandLine.size() == 0)
-        {
             onParsingFailure(CLI_PR_NO_COMMAND, 0);
-            return;
-        }
-        onParsingSuccess(parsedCommandLine);
+        else
+            onParsingSuccess(parsedCommandLine);
     }
     else
-    {
         onParsingFailure(parsingResult, index);
-    }
 }
 
 //-----------------------------------------------------------------------------
 
 void NuCLIParser::onParsingSuccess(NuCommandLine_t &commandLine)
 {
-    std::string givenCommandName = commandLine[0];
+    std::string &givenCommandName = commandLine[0];
     for (size_t index = 0; index < vsCommandName.size(); index++)
     {
-        std::string candidate = vsCommandName.at(index);
+        std::string &candidate = vsCommandName.at(index);
         bool test;
         if (bCaseSensitive)
             test = (candidate.compare(givenCommandName) == 0);
