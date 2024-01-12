@@ -77,11 +77,11 @@ size_t NordicUARTStream::readBytes(uint8_t *buffer, size_t size)
             unreadByteCount = unreadByteCount - readBytesCount;
             totalReadCount = totalReadCount + readBytesCount;
             size = size - readBytesCount;
-        }
-        if(unreadByteCount == 0)
+        } // note: at this point (unreadByteCount == 0) || (size == 0)
+        if (unreadByteCount == 0)
         {
             xSemaphoreGive(dataConsumed);
-        }        // note: at this point (unreadByteCount == 0) || (size == 0)
+        }
         if (size > 0)
         {
             // wait for more data or timeout or disconnection
