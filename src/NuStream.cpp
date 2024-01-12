@@ -78,11 +78,13 @@ size_t NordicUARTStream::readBytes(uint8_t *buffer, size_t size)
             totalReadCount = totalReadCount + readBytesCount;
             size = size - readBytesCount;
         }
-        // note: at this point (unreadByteCount == 0) || (size == 0)
+        if(unreadByteCount == 0)
+        {
+            xSemaphoreGive(dataConsumed);
+        }        // note: at this point (unreadByteCount == 0) || (size == 0)
         if (size > 0)
         {
             // wait for more data or timeout or disconnection
-            xSemaphoreGive(dataConsumed);
             TickType_t timeoutTicks = (_timeout == ULONG_MAX) ? portMAX_DELAY : pdMS_TO_TICKS(_timeout);
             if ((xSemaphoreTake(dataAvailable, timeoutTicks) == pdFALSE) || disconnected)
                 size = 0; // break;
