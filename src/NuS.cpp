@@ -110,7 +110,7 @@ void NordicUARTService::onConnect(NimBLEServer *pServer)
   connected = true;
   if (pOtherServerCallbacks)
     pOtherServerCallbacks->onConnect(pServer);
-  xSemaphoreGive(peerConnected);
+  // Note: onConnect(*pServer, *desc) gets called after this one
 }
 
 void NordicUARTService::onConnect(NimBLEServer *pServer, ble_gap_conn_desc *desc)
@@ -135,8 +135,7 @@ void NordicUARTService::onDisconnect(NimBLEServer *pServer)
   connected = false;
   if (pOtherServerCallbacks)
     pOtherServerCallbacks->onDisconnect(pServer);
-  if (autoAdvertising)
-    pServer->startAdvertising();
+  // Note: onDisconnect(*pServer, *desc) gets called after this one
 }
 
 void NordicUARTService::setCallbacks(NimBLEServerCallbacks *pServerCallbacks)

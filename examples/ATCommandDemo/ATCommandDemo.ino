@@ -228,6 +228,33 @@ void MyATCommandCallbacks::onFinished(int index, NuATParsingResult_t parsingResu
     Serial.printf("--Command at index %d was parsed with result code %d--\n", index, parsingResult);
 }
 
+void connectionStatusChanged(const bool status)
+{
+    if (status)
+    {
+        Serial.println("-- Client connected");
+    }
+    else
+    {
+        Serial.println("-- Client disconnected");
+    }
+}
+
+class MyServerCallbacks : public NimBLEServerCallbacks
+{
+public:
+    virtual void onConnect(NimBLEServer *pServer) override
+    {
+        Serial.println("-- Client connected");
+    };
+
+    virtual void onDisconnect(NimBLEServer *pServer, ble_gap_conn_desc *desc) override
+    {
+        Serial.println("-- Client disconnected");
+    };
+
+} myServerCallbacks;
+
 //------------------------------------------------------
 // Arduino entry points
 //------------------------------------------------------
@@ -246,6 +273,7 @@ void setup()
     NuATCommands.setBufferSize(64);
     NuATCommands.lowerCasePreamble(true);
     NuATCommands.setATCallbacks(&myATCallbacks);
+    NuATCommands.setCallbacks(&myServerCallbacks);
     NuATCommands.start();
 
     // Initialization complete
