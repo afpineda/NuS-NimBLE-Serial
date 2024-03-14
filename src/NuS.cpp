@@ -57,7 +57,6 @@ void NordicUARTService::init()
         if (pRxCharacteristic)
         {
           pRxCharacteristic->setCallbacks(this);
-          connected = false;
           return;
         }
       }
@@ -87,11 +86,17 @@ void NordicUARTService::start(void)
 // Connection
 //-----------------------------------------------------------------------------
 
+bool NordicUARTService::isConnected()
+{
+  if (pServer)
+    return (pServer->getConnectedCount() > 0);
+  return false;
+}
+
 bool NordicUARTService::connect(const unsigned int timeoutMillis)
 {
   TickType_t waitTicks = (timeoutMillis == 0) ? portMAX_DELAY : pdMS_TO_TICKS(timeoutMillis);
-  xSemaphoreTake(peerConnected, waitTicks);
-  return connected;
+  return (xSemaphoreTake(peerConnected, waitTicks) == pdTRUE);
 }
 
 void NordicUARTService::disconnect(void)
@@ -107,7 +112,6 @@ void NordicUARTService::disconnect(void)
 
 void NordicUARTService::onConnect(NimBLEServer *pServer)
 {
-  connected = true;
   if (pOtherServerCallbacks)
     pOtherServerCallbacks->onConnect(pServer);
   // Note: onConnect(*pServer, *desc) gets called after this one
@@ -115,7 +119,6 @@ void NordicUARTService::onConnect(NimBLEServer *pServer)
 
 void NordicUARTService::onConnect(NimBLEServer *pServer, ble_gap_conn_desc *desc)
 {
-  connected = true;
   if (pOtherServerCallbacks)
     pOtherServerCallbacks->onConnect(pServer, desc);
   xSemaphoreGive(peerConnected);
@@ -123,7 +126,6 @@ void NordicUARTService::onConnect(NimBLEServer *pServer, ble_gap_conn_desc *desc
 
 void NordicUARTService::onDisconnect(NimBLEServer *pServer, ble_gap_conn_desc *desc)
 {
-  connected = false;
   if (pOtherServerCallbacks)
     pOtherServerCallbacks->onDisconnect(pServer, desc);
   if (autoAdvertising)
@@ -132,7 +134,6 @@ void NordicUARTService::onDisconnect(NimBLEServer *pServer, ble_gap_conn_desc *d
 
 void NordicUARTService::onDisconnect(NimBLEServer *pServer)
 {
-  connected = false;
   if (pOtherServerCallbacks)
     pOtherServerCallbacks->onDisconnect(pServer);
   // Note: onDisconnect(*pServer, *desc) gets called after this one
@@ -149,23 +150,15 @@ void NordicUARTService::setCallbacks(NimBLEServerCallbacks *pServerCallbacks)
 
 size_t NordicUARTService::write(const uint8_t *data, size_t size)
 {
-  if (connected)
-  {
-    pTxCharacteristic->notify(data, size);
-    return size;
-  }
-  return 0;
+  pTxCharacteristic->notify(data, size);
+  return size;
 }
 
 size_t NordicUARTService::send(const char *str, bool includeNullTerminatingChar)
 {
-  if (connected)
-  {
-    size_t size = includeNullTerminatingChar ? strlen(str) + 1 : strlen(str);
-    pTxCharacteristic->notify((uint8_t *)str, size);
-    return size;
-  }
-  return 0;
+  size_t size = includeNullTerminatingChar ? strlen(str) + 1 : strlen(str);
+  pTxCharacteristic->notify((uint8_t *)str, size);
+  return size;
 }
 
 size_t NordicUARTService::printf(const char *format, ...)

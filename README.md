@@ -153,7 +153,7 @@ Take into account:
 Use the `NuPacket` object, based on blocking semantics. The advantages are:
 
 - Efficiency in terms of CPU usage, since no active waiting is used.
-- Performance, since incoming bytes are processed in packets, not one bye one.
+- Performance, since incoming bytes are processed in packets, not one by one.
 - Simplicity. Only two methods are strictly needed: `read()` and `write()`.
   You don't need to worry about data being available or not.
   However, you have to handle packet size.

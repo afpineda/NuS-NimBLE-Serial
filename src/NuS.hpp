@@ -34,7 +34,7 @@ public:
    * @return true When a connection is established
    * @return false When no peer is connected
    */
-  bool isConnected() { return connected; };
+  bool isConnected();
 
   /**
    * @brief Wait for a peer connection or a timeout if set (blocking)
@@ -53,7 +53,7 @@ public:
   bool connect(const unsigned int timeoutMillis = 0);
 
   /**
-   * @brief Terminate current peer connection (if any)
+   * @brief Terminate all peer connections (if any)
    *
    */
   void disconnect(void);
@@ -63,7 +63,7 @@ public:
    *
    * @param[in] data Pointer to bytes to be sent.
    * @param[in] size Count of bytes to be sent.
-   * @return size_t Zero if no peer is connected, @p size otherwise.
+   * @return size_t @p size .
    */
   size_t write(const uint8_t *data, size_t size);
 
@@ -75,8 +75,7 @@ public:
    *            When false, such a character is not sent, so @p str should end with another
    *            termination token, like CR (Unix), LF (old MacOS) or CR+LF (Windows).
    *
-   * @return size_t Zero if no peer is connected.
-   *                Otherwise, count of bytes sent.
+   * @return size_t Count of bytes sent.
    */
   size_t send(const char *str, bool includeNullTerminatingChar = false);
 
@@ -100,8 +99,7 @@ public:
    * @param[in] ... Depending on the format string, a sequence of additional arguments,
    *            each containing a value to replace a format specifier in the format string.
    *
-   * @return size_t Zero if no peer is connected.
-   *                Otherwise, count of bytes sent.
+   * @return size_t Count of bytes sent.
    */
   size_t printf(const char *format, ...);
 
@@ -109,8 +107,8 @@ public:
    * @brief Start the Nordic UART Service
    *
    * @note NimBLEDevice::init() **must** be called before.
-   * @note The service is unavailable if start() is not called, thus no peer connections
-   *       are accepted. Do not call start() before initialization is complete in your application.
+   * @note The service is unavailable if start() is not called.
+   *       Do not call start() before initialization is complete in your application.
    *
    * @throws std::runtime_error if the UART service is already created or can not be created
    */
@@ -191,7 +189,6 @@ private:
   SemaphoreHandle_t peerConnected;
   StaticSemaphore_t peerConnectedBuffer;
   bool autoAdvertising = true;
-  bool connected = false;
   bool started = false;
 
   /**
