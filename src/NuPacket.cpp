@@ -10,6 +10,7 @@
  */
 
 #include <exception>
+#include <stdexcept>
 #include "NuPacket.hpp"
 
 //-----------------------------------------------------------------------------
