@@ -13,6 +13,7 @@
 
 #include <NimBLEDevice.h>
 #include <exception>
+#include <stdexcept>
 #include <vector>
 #include <string.h>
 #include <cstdio>

@@ -9,6 +9,7 @@
  */
 
 #include <exception>
+#include <stdexcept>
 #include "NuATCommands.hpp"
 
 //-----------------------------------------------------------------------------
