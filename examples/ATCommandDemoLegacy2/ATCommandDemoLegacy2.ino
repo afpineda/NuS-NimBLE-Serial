@@ -1,5 +1,5 @@
 /**
- * @file ATCommandDemo.ino
+ * @file ATCommandDemoLegacy2.ino
  * @author Ángel Fernández Pineda. Madrid. Spain.
  * @date 2023-12-24
  * @brief Example of an AT command processor based on
@@ -12,7 +12,7 @@
  */
 
 #include <Arduino.h>
-#include "NuATCommands.hpp"
+#include "NuATCommandsLegacy2.hpp"
 #include <NimBLEDevice.h>
 #include <string.h>
 #include <inttypes.h>

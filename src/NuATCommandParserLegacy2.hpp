@@ -1,5 +1,5 @@
 /**
- * @file NuATCommandParser.hpp
+ * @file NuATCommandParserLegacy2.hpp
  * @author Ángel Fernández Pineda. Madrid. Spain.
  * @date 2023-12-24
  * @brief AT command parser
@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef __NUATCOMMANDPARSER_HPP__
-#define __NUATCOMMANDPARSER_HPP__
+#ifndef __NU_AT_COMMAND_PARSER_LEGACY2_HPP__
+#define __NU_AT_COMMAND_PARSER_LEGACY2_HPP__
 
 #include <vector>
 

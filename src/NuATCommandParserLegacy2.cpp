@@ -1,5 +1,5 @@
 /**
- * @file NuATCommandParser.cpp
+ * @file NuATCommandParserLegacy2.cpp
  * @author Ángel Fernández Pineda. Madrid. Spain.
  * @date 2023-12-24
  * @brief AT command parser
@@ -9,7 +9,7 @@
  */
 
 #include <string.h>
-#include "NuATCommandParser.hpp"
+#include "NuATCommandParserLegacy2.hpp"
 
 //-----------------------------------------------------------------------------
 // Parsing macros

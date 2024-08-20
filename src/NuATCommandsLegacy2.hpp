@@ -1,5 +1,5 @@
 /**
- * @file NuATCommands.hpp
+ * @file NuATCommandsLegacy2.hpp
  * @author Ángel Fernández Pineda. Madrid. Spain.
  * @date 2023-12-18
  * @brief AT command processor using the Nordic UART Service
@@ -7,11 +7,11 @@
  * @copyright Creative Commons Attribution 4.0 International (CC BY 4.0)
  *
  */
-#ifndef __NUATCOMMANDS_HPP__
-#define __NUATCOMMANDS_HPP__
+#ifndef __NU_AT_COMMANDS_LEGACY2_HPP__
+#define __NU_AT_COMMANDS_LEGACY2_HPP__
 
 #include "NuS.hpp"
-#include "NuATCommandParser.hpp"
+#include "NuATCommandParserLegacy2.hpp"
 
 /**
  * @brief Execute AT commands received thanks to the Nordic UART Service

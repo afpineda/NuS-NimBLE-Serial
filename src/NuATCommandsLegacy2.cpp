@@ -1,5 +1,5 @@
 /**
- * @file NuATCommands.cpp
+ * @file NuATCommandsLegacy2.cpp
  * @author Ángel Fernández Pineda. Madrid. Spain.
  * @date 2023-12-18
  * @brief AT command processor using the Nordic UART Service
@@ -10,7 +10,7 @@
 
 #include <exception>
 #include <stdexcept>
-#include "NuATCommands.hpp"
+#include "NuATCommandsLegacy2.hpp"
 
 //-----------------------------------------------------------------------------
 // Globals
