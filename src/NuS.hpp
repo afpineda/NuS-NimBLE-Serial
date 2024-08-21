@@ -162,7 +162,9 @@ public:
   virtual uint32_t onPassKeyRequest() override
   {
     if (pOtherServerCallbacks)
-      pOtherServerCallbacks->onPassKeyRequest();
+      return pOtherServerCallbacks->onPassKeyRequest();
+    else
+      return 0;
   };
 
   virtual void onAuthenticationComplete(ble_gap_conn_desc *desc) override
@@ -174,7 +176,9 @@ public:
   virtual bool onConfirmPIN(uint32_t pin) override
   {
     if (pOtherServerCallbacks)
-      pOtherServerCallbacks->onConfirmPIN(pin);
+      return pOtherServerCallbacks->onConfirmPIN(pin);
+    else
+      return false;
   };
 
 protected:
