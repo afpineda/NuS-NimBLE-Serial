@@ -58,7 +58,12 @@ typedef enum
     AT_ERR_ILL_FORMED_STRING,
     /** A numeric parameter (without double quotes) is not properly
      * formatted as binary, decimal or hexadecimal */
-    AT_ERR_ILL_FORMED_NUMBER
+    AT_ERR_ILL_FORMED_NUMBER,
+    /** Command line is too long (not used by class NuATParser) */
+    AT_ERR_TOO_LONG,
+    /** Unspecified error to be used by descendant classes
+     * (not used by class NuATParser) */
+    AT_ERR_UNSPECIFIED
 } NuATSyntaxError_t;
 
 /**
@@ -260,6 +265,8 @@ protected:
 
     virtual void doNotACommandLine(const uint8_t *in, size_t size);
 
+    void printResultResponse(const NuATCommandResult_t response);
+
 private:
     bool bAllowLowerCase = false;
     bool bStopOnFirstFailure = false;
@@ -284,8 +291,6 @@ private:
         const uint8_t *command,
         size_t size,
         NuATSyntaxError_t errorCode);
-
-    void printResultResponse(const NuATCommandResult_t response);
 
     bool executeSingleCommand(const uint8_t *in, size_t size);
 

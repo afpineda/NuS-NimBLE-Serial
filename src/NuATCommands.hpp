@@ -45,7 +45,24 @@ public:
     virtual void onWrite(NimBLECharacteristic *pCharacteristic) override;
     virtual void printATResponse(std::string message) override;
 
+    // New methods
+
+    /**
+     * @brief Set a maximum command line length to prevent overflow
+     *
+     * @note If a command line exceeds this limit, it will be ignored
+     *       and an error response will be sent.
+     *
+     * @note A 256 bytes limit is recommended.
+     *
+     * @param value Zero to disable this feature.
+     *              Otherwise, a maximum line length in bytes.
+     * @return uint32_t previous limit or zero if disabled.
+     */
+    uint32_t maxCommandLineLength(uint32_t value = 0);
+
 private:
+    uint32_t uMaxCommandLineLength = 256;
     NuATCommandProcessor() {};
 };
 

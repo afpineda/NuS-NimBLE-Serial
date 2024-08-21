@@ -144,6 +144,22 @@ NuATCommandResult_t onTestOperands(NuATCommandParameters_t &parameters)
 }
 
 //------------------------------------------------------
+// logging
+//------------------------------------------------------
+
+void logError(const std::string text, NuATSyntaxError_t errorCode)
+{
+    Serial.printf("ERROR LOG. Code %d at \"%s\"\n",errorCode,text.c_str());
+}
+
+void logMessage(const uint8_t *text, size_t size)
+{
+    std::string msg;
+    msg.assign((const char*)text,size);
+    Serial.printf("NON-AT message: %s\n",msg.c_str());
+}
+
+//------------------------------------------------------
 // Arduino entry points
 //------------------------------------------------------
 
@@ -158,6 +174,7 @@ void setup()
 
     // Initialize BLE and Nordic UART service
     NimBLEDevice::init("AT commands demo");
+    NuATCommands.maxCommandLineLength(64);
     NuATCommands.allowLowerCase(true);
     NuATCommands.stopOnFirstFailure(true);
     NuATCommands
@@ -187,6 +204,10 @@ void setup()
         .onTest("a", onTestOp1)
         .onTest("b", onTestOp1)
         .onTest("op", onTestOperands);
+
+    NuATCommands
+        .onError(logError)
+        .onNotACommandLine(logMessage);
 
     NuATCommands.start();
 

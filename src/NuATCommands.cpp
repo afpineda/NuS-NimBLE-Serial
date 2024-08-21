@@ -25,7 +25,14 @@ void NuATCommandProcessor::onWrite(NimBLECharacteristic *pCharacteristic)
     // Incoming data
     NimBLEAttValue incomingPacket = pCharacteristic->getValue();
     const char *in = incomingPacket.c_str();
-    execute((const uint8_t *)in, incomingPacket.size());
+    if ((uMaxCommandLineLength > 0) &&
+        (incomingPacket.size() > uMaxCommandLineLength))
+    {
+        printResultResponse(NuATCommandResult_t::AT_RESULT_ERROR);
+        notifyError("",NuATSyntaxError_t::AT_ERR_TOO_LONG);
+    }
+    else
+        execute((const uint8_t *)in, incomingPacket.size());
 }
 
 //-----------------------------------------------------------------------------
@@ -37,4 +44,15 @@ void NuATCommandProcessor::printATResponse(std::string message)
     print("\r\n");
     print(message);
     print("\r\n");
+}
+
+//-----------------------------------------------------------------------------
+// Other
+//-----------------------------------------------------------------------------
+
+uint32_t NuATCommandProcessor::maxCommandLineLength(uint32_t value)
+{
+    uint32_t result = uMaxCommandLineLength;
+    uMaxCommandLineLength = value;
+    return result;
 }
