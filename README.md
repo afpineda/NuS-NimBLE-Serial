@@ -195,23 +195,25 @@ Take into account:
 
 ```c++
 #include "NuATCommands.hpp"
-
-class MyATCommands: public NuATCommandCallbacks {
-    public:
-        virtual int getATCommandId(const char commandName[]) override;
-    ...
-} myATCommandsObject;
 ```
 
-- Derive a new class from `NuATCommandCallbacks`.
-- Override `getATCommandId()` to return a positive number on supported commands or a negative number on unsupported commands. This is mandatory.
-- Override `onExecute()` to run commands with no suffix.
-- Override `onSet()` to run commands with "=" suffix.
-- Override `onQuery()` to run commands with "?" suffix.
-- Override `onTest()` to run commands with "=?" suffix.
-- Create a single instance of your derived class and pass it to `NuATCommands.setATCallbacks()`.
-- Call `NuATCommands.start()`
+**This API is new to version 3.x**.
+To keep **old** code working, use the following header instead:
 
+```c++
+#include "NuATCommandsLegacy2.hpp"
+using namespace NuSLegacy2;
+```
+
+- Call `NuATCommands.allowLowerCase()` and/or `NuATCommands.stopOnFirstFailure()` to your convenience.
+- Call `NuATCommands.on*()` to provide a command name and the callback to be executed if such a command is found.
+  - `onExecute()`: commands with no suffix.
+  - `onSet()`: commands with "=" suffix.
+  - `onQuery()`: commands with "?" suffix.
+  - `onTest()`: commands with "=?" suffix.
+- Call `NuATCommands.onNotACommandLine()` to provide a callback to be executed if non-AT text is received.
+- You may chain calls to "`on*()`" methods.
+- Call `NuATCommands.start()`
 
 Implementation is based in these sources:
 
@@ -219,9 +221,35 @@ Implementation is based in these sources:
 - [An Introduction to AT Commands](https://www.twilio.com/docs/iot/supersim/introduction-to-modem-at-commands)
 - [GSM AT Commands Tutorial](https://microcontrollerslab.com/at-commands-tutorial/#Response_of_AT_commands)
 - [General Syntax of Extended AT Commands](https://www.developershome.com/sms/atCommandsIntro2.asp)
+- [ITU-T recommendation V.250](./doc/T-REC-V.250-200307.pdf)
+- [AT command set for User Equipment (UE)](./doc/AT%20commands%20spec.docx)
 
-Current implementation only accepts ASCII/ANSI character encoding.
-As a bonus, you may use class `NuATCommandParser` to implement an AT command processor that takes data from other sources.
+The following implementation details may be relevant to you:
+
+- ASCII, ANSI, and UTF8 character encodings are accepted,
+  but note that AT commands are supposed to work in ASCII.
+- Only "extended syntax" is allowed (all commands must have a prefix, either "+" or "&").
+  This is non-standard behavior.
+- In string parameters (between double quotes), the following rules apply:
+  - Write `\\` to insert a single backslash character (`\`). This is standard behavior.
+  - Write `\"` to insert a single double quotes character (`"`). This is standard behavior.
+  - Write `\<hex>` to insert a non-printable character in the ASCII table,
+    where `<hex>` is a **two-digit** hexadecimal number.
+    This is standard behavior.
+  - The escape character (`\`) is ignored in all other cases. For example, `\a` is the same as `a`.
+    This is non-standard behavior.
+  - Any non-printable character is allowed without escaping. This is non-standard behavior.
+- In non-string parameters (without double quotes),
+  a number is expected either in binary, decimal or hexadecimal format.
+  No prefixes or suffixes are allowed to denote format. This is standard behavior.
+- Text after the line terminator (carriage return), if any, will be parsed as another command line.
+  This is non-standard behavior.
+- Any text bigger than 256 bytes will be disregarded and handled as a
+  syntax error in order to prevent denial of service attacks.
+  However, you may disable or adjust this limit to your needs by calling
+  `NuATCommands.maxCommandLineLength()`.
+
+As a bonus, you may use class `NuATParser` to implement an AT command processor that takes data from other sources.
 
 ### Custom shell commands
 
@@ -272,7 +300,7 @@ Command line syntax:
 - Unquoted arguments can not contain a separator, but can contain double quotes. For example: `this"is"valid`.
 - Quoted arguments can contain a separator, but double quotes have to be escaped with another double quote.
   For example: `"this ""is"" valid"` is parsed to `this "is" valid` as a single argument.
-- ASCII, ANSI and UTF-8 character encodings are supported. Take into account that client software must use the same character encoding as your application.
+- ASCII, ANSI and UTF-8 character encodings are supported. Client software must use the same character encoding as your application.
 
 As a bonus, you may use class `NuCLIParser` to implement a shell that takes data from other sources.
 

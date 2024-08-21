@@ -62,6 +62,12 @@
 
   For example: `AT+OP=14,2;+DIV?`
 
+- [ATCommandDemoLegacy2.ino](./ATCommandDemoLegacy2/ATCommandDemoLegacy2.ino)
+
+  Works just the same as the previous demo.
+
+  Uses the legacy API (up to version 2.0.5). You should not base your code in this example anymore.
+
 - [ShellCommandDemo.ino](./ShellCommandDemo/ShellCommandDemo.ino)
 
   Runs a service that parses shell-like commands from a BLE peer and executes them.
@@ -80,6 +86,6 @@
 ## Testing
 
 In order to test those sketches, you need a serial terminal app compatible with NuS in your smartphone or PC. During development, this one was used (Android):
-[Serial bluetooth terminal](https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal).
+[Serial Bluetooth terminal](https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal).
 
 Configure LF (line feed, aka `\n`) as the line-terminating character.
