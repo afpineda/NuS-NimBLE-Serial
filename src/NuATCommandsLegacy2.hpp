@@ -10,8 +10,11 @@
 #ifndef __NU_AT_COMMANDS_LEGACY2_HPP__
 #define __NU_AT_COMMANDS_LEGACY2_HPP__
 
+#ifndef __NU_AT_COMMANDS_HPP__
+
 #include "NuS.hpp"
 #include "NuATCommandParserLegacy2.hpp"
+
 
 namespace NuSLegacy2
 {
@@ -69,5 +72,9 @@ namespace NuSLegacy2
      */
     extern NuATCommandProcessor &NuATCommands;
 }
+
+#else
+#error NuATCommands.hpp is incompatible with NuATCommandsLegacy2.hpp
+#endif
 
 #endif
