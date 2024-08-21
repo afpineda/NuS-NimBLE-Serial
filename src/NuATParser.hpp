@@ -112,6 +112,8 @@ public:
     /**
      * @brief Stop execution on failure of a single command, or not
      *
+     * @note Applies to a single call to execute()
+     *
      * @param yesOrNo True to stop parsing if a single command fails,
      *                false to continue the execution of the following commands.
      * @return true Previously, stop

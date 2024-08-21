@@ -18,6 +18,9 @@
 #include <inttypes.h>
 #include <errno.h>
 
+// Use legacy API
+using namespace NuSLegacy2;
+
 //------------------------------------------------------
 // AT Commands implementation for a simple calculator
 //------------------------------------------------------
@@ -269,7 +272,7 @@ void setup()
     Serial.println("--Initializing--");
 
     // Initialize BLE and Nordic UART service
-    NimBLEDevice::init("AT commands demo");
+    NimBLEDevice::init("AT commands demo (legacy)");
     NuATCommands.setBufferSize(64);
     NuATCommands.lowerCasePreamble(true);
     NuATCommands.setATCallbacks(&myATCallbacks);

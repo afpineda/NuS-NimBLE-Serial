@@ -16,13 +16,14 @@
 // Globals
 //-----------------------------------------------------------------------------
 
-NuATCommandProcessor &NuATCommands = NuATCommandProcessor::getInstance();
+NuSLegacy2::NuATCommandProcessor &NuSLegacy2::NuATCommands =
+    NuSLegacy2::NuATCommandProcessor::getInstance();
 
 //-----------------------------------------------------------------------------
 // NordicUARTService implementation
 //-----------------------------------------------------------------------------
 
-void NuATCommandProcessor::onWrite(NimBLECharacteristic *pCharacteristic)
+void NuSLegacy2::NuATCommandProcessor::onWrite(NimBLECharacteristic *pCharacteristic)
 {
     // Incoming data
     NimBLEAttValue incomingPacket = pCharacteristic->getValue();
@@ -38,7 +39,7 @@ void NuATCommandProcessor::onWrite(NimBLECharacteristic *pCharacteristic)
 // Callbacks
 //-----------------------------------------------------------------------------
 
-void NuATCommandProcessor::setATCallbacks(NuATCommandCallbacks *pCallbacks)
+void NuSLegacy2::NuATCommandProcessor::setATCallbacks(NuATCommandCallbacks *pCallbacks)
 {
     if (!isConnected())
         NuATCommandParser::setATCallbacks(pCallbacks);
@@ -50,7 +51,7 @@ void NuATCommandProcessor::setATCallbacks(NuATCommandCallbacks *pCallbacks)
 // Printing
 //-----------------------------------------------------------------------------
 
-void NuATCommandProcessor::printATResponse(const char message[])
+void NuSLegacy2::NuATCommandProcessor::printATResponse(const char message[])
 {
     send("\r\n");
     send(message);
