@@ -99,8 +99,10 @@ The **basic rules** are:
 
 - The Nordic UART Service can coexist with other GATT services in your application.
 
-- By default, this library will automatically advertise existing GATT services when no peer is connected. This includes the Nordic UART Service and other
-  services (if any). To change this behavior, call `<object>.disableAutoAdvertising()` and handle advertising on your own.
+- By default, this library will automatically advertise existing GATT services when no peer is connected.
+  This includes the Nordic UART Service and other
+  services you configured for advertising (if any).
+  To change this behavior, call `<object>.disableAutoAdvertising()` and handle advertising on your own.
 
 You may learn from the provided [examples](./examples/README.md). Read code commentaries for more information.
 
