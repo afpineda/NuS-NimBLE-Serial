@@ -33,6 +33,8 @@ You may need a generic terminal (PC or smartphone) application in order to commu
   - [Serial bluetooth terminal](https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal)
 - iOS:
   - [nRF connect for mobile](https://apps.apple.com/es/app/nrf-connect-for-mobile/id1054362403)
+- Multi-platform:
+  - [NeutralNUS](https://github.com/KevinJohnMulligan/neutral-nus-terminal/releases)
 
 ## How to use this library
 
