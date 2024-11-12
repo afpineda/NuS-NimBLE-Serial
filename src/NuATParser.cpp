@@ -10,6 +10,7 @@
 
 #include "NuATParser.hpp"
 #include <HardwareSerial.h> // For testing
+#include <algorithm>
 
 //-----------------------------------------------------------------------------
 // Set callbacks

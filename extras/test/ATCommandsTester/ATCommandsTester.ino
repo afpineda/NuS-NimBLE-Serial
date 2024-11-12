@@ -146,7 +146,7 @@ void assert_eq(T expected, T actual, int testID, bool eqOrNot = true)
 
 int testNumber = 1;
 
-void Test_parsing(char commandLine[], NuATSyntaxError_t expectedError)
+void Test_parsing(const char commandLine[], NuATSyntaxError_t expectedError)
 {
     tester.reset();
     Serial.printf("--Test #%d. Parsing command line: %s\n", testNumber, commandLine);
@@ -160,7 +160,7 @@ void Test_parsing(char commandLine[], NuATSyntaxError_t expectedError)
     testNumber++;
 }
 
-void Test_parsing(char commandLine[])
+void Test_parsing(const char commandLine[])
 {
     tester.reset();
     Serial.printf("--Test #%d. Parsing command line: %s\n", testNumber, commandLine);
@@ -172,7 +172,7 @@ void Test_parsing(char commandLine[])
     testNumber++;
 }
 
-void Test_noCommand(char commandLine[])
+void Test_noCommand(const char commandLine[])
 {
     tester.reset();
     Serial.printf("--Test #%d. Parsing command line: %s\n", testNumber, commandLine);
@@ -182,7 +182,7 @@ void Test_noCommand(char commandLine[])
     testNumber++;
 }
 
-void Test_actionFlags(char commandLine[], bool mustExecute, bool mustRead, bool mustWrite, bool mustTest)
+void Test_actionFlags(const char commandLine[], bool mustExecute, bool mustRead, bool mustWrite, bool mustTest)
 {
     Serial.printf("--Test #%d. Callbacks for %s\n", testNumber, commandLine);
     tester.reset();
@@ -204,7 +204,7 @@ void Test_actionFlags(char commandLine[], bool mustExecute, bool mustRead, bool 
     testNumber++;
 }
 
-void Test_setActionParameters(char commandLine[])
+void Test_setActionParameters(const char commandLine[])
 {
     tester.reset();
     tester.bPrintParams = true;
@@ -213,7 +213,7 @@ void Test_setActionParameters(char commandLine[])
     testNumber++;
 }
 
-void Test_callbacks(char commandLine[])
+void Test_callbacks(const char commandLine[])
 {
     Serial.printf("-- Test #%d. Check execution for %s\n", testNumber, commandLine);
     tester2.execute(commandLine);
