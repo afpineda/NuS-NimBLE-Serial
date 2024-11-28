@@ -125,6 +125,8 @@ void NordicUARTService::onSubscribe(
     // unsubscribe
     subscribedCount--;
     onUnsubscribe(subscribedCount);
+    if (autoAdvertising && (subscribedCount == 0))
+      pServer->startAdvertising();
   }
 }
 
