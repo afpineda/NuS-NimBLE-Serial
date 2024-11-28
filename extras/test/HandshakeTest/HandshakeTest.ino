@@ -40,9 +40,6 @@ void loop()
     {
         Serial.println("Device connected!");
         lastConnectionStatus = true;
-        // The following delay is required, but I don't know why.
-        // Otherwise, NuSerial.printf() will print nothing.
-        delay(1000);
         NuSerial.printf("Hello \n");
     }
     else if (lastConnectionStatus && !NuSerial.isConnected())
