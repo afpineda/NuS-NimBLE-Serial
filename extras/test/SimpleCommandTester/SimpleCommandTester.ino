@@ -12,6 +12,28 @@
 #include "NuCLIParser.hpp"
 
 //-----------------------------------------------------------------------------
+// C++20 compatibility
+// See: https://stackoverflow.com/questions/56833000/c20-with-u8-char8-t-and-stdstring
+//-----------------------------------------------------------------------------
+
+std::string from_u8string(const std::string &s)
+{
+    return s;
+}
+
+std::string from_u8string(std::string &&s)
+{
+    return std::move(s);
+}
+
+#if defined(__cpp_lib_char8_t)
+std::string from_u8string(const std::u8string &s)
+{
+    return std::string(s.begin(), s.end());
+}
+#endif
+
+//-----------------------------------------------------------------------------
 // MOCK
 //-----------------------------------------------------------------------------
 
@@ -53,7 +75,7 @@ void initializeTester()
                         Serial.printf(" --Failure at strings count. Expected: %d Found: %d\n", expectedCmdLine.size(), commandLine.size());
                     }
                 } })
-        .onParseError([&lastParsingResult](NuCLIParsingResult_t result, size_t byteIndex)
+        .onParseError([](NuCLIParsingResult_t result, size_t byteIndex)
                       {
                 lastParsingResult = result;
                 if (testParseCallback)
@@ -135,10 +157,10 @@ void setup()
     Test_parsingResult("\"text \"\"___\"\" \"after quotes\n", CLI_PR_ILL_FORMED_STRING);
 
     expectedCmdLine.clear();
-    expectedCmdLine.push_back(u8"áéí");
-    Test_execution(u8"áéí");
-    expectedCmdLine.push_back(u8"áéí");
-    Test_execution(u8"áéí\náéí\n");
+    expectedCmdLine.push_back(from_u8string(u8"áéí"));
+    Test_execution(from_u8string(u8"áéí"));
+    expectedCmdLine.push_back(from_u8string(u8"áéí"));
+    Test_execution(from_u8string(u8"áéí\náéí\n"));
 
     expectedCmdLine.clear();
     expectedCmdLine.push_back("abc");
