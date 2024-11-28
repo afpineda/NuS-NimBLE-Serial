@@ -23,7 +23,7 @@
  */
 class CustomCommandProcessor : public NordicUARTService
 {
-public:
+protected:
     // Do not get confused by this method's name.
     // Data is received here.
     void onWrite(NimBLECharacteristic *pCharacteristic) override;
@@ -161,7 +161,8 @@ void CustomCommandProcessor::onSumCommand(char *param1, char *param2)
     // "errno" is used to detect non-integer data
     // errno==0 means no error
     errno = 0;
-    intmax_t n1, n2;
+    intmax_t n1 = 0;
+    intmax_t n2 = 0;
     n1 = strtoimax(param1, NULL, 10); // convert first parameter
     if (!errno)
         n2 = strtoimax(param2, NULL, 10); // convert second parameter
@@ -175,7 +176,7 @@ void CustomCommandProcessor::onSumCommand(char *param1, char *param2)
         // Execute command and send result to the BLE peer
 
         auto sum = n1 + n2; // command result
-        Serial.printf("(sum is %ld)\n", sum);
+        Serial.printf("(sum is %lld)\n", sum);
         // convert command result to string in a private buffer
         char output[BUFFER_SIZE];
         int t = snprintf(output, BUFFER_SIZE, "Sum is %lld\n", sum);

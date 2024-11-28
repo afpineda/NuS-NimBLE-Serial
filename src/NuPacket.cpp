@@ -39,17 +39,18 @@ NordicUARTPacket::~NordicUARTPacket()
 }
 
 //-----------------------------------------------------------------------------
-// GATT server events
+// Event callback
 //-----------------------------------------------------------------------------
 
-void NordicUARTPacket::onDisconnect(NimBLEServer *pServer)
+void NordicUARTPacket::onUnsubscribe(uint8_t subscriberCount)
 {
-    NordicUARTService::onDisconnect(pServer);
-
-    // Awake task at read()
-    availableByteCount = 0;
-    incomingBuffer = nullptr;
-    xSemaphoreGive(dataAvailable);
+    if (subscriberCount == 0)
+    {
+        // Awake task at read()
+        availableByteCount = 0;
+        incomingBuffer = nullptr;
+        xSemaphoreGive(dataAvailable);
+    }
 };
 
 //-----------------------------------------------------------------------------

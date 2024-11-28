@@ -19,22 +19,36 @@
 #include <cstring>
 
 /**
+ * @brief UUID for the Nordic UART Service
+ *
+ * @note You may need this to handle advertising on your own
+ */
+#define NORDIC_UART_SERVICE_UUID "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
+
+/**
  * @brief Nordic UART Service (NuS) implementation using the NimBLE stack
  *
  * @note This is an abstract class.
  *       Override NimBLECharacteristicCallbacks::onWrite(NimBLECharacteristic *pCharacteristic)
  *       to process incoming data. A singleton pattern is suggested.
  */
-class NordicUARTService : public NimBLEServerCallbacks, public NimBLECharacteristicCallbacks
+class NordicUARTService : protected NimBLECharacteristicCallbacks
 {
 public:
   /**
-   * @brief Check if a peer is connected
+   * @brief Check if a peer is connected and subscribed to this service
    *
    * @return true When a connection is established
    * @return false When no peer is connected
    */
   bool isConnected();
+
+  /**
+   * @brief Get the count of clients subscribed
+   *
+   * @return uint8_t Number of clients subscribed to the service
+   */
+  uint8_t subscriberCount() { return subscribedCount; }
 
   /**
    * @brief Wait for a peer connection or a timeout if set (blocking)
@@ -47,13 +61,14 @@ public:
    * @note Just one task can go beyond connect(), except in case of timeout,
    *       if more than one exists.
    *
-   * @return true on peer connection
+   * @return true on peer connection and service subscription
    * @return false on timeout
    */
   bool connect(const unsigned int timeoutMillis = 0);
 
   /**
-   * @brief Terminate all peer connections (if any)
+   * @brief Terminate all peer connections (if any),
+   *        subscribed or not.
    *
    */
   void disconnect(void);
@@ -117,8 +132,7 @@ public:
   /**
    * @brief Set your own server callbacks
    *
-   * @note Use this method to chain your own server callbacks to NuS
-   *       server callbacks
+   * @deprecated Use NimBLEDevice::createServer()->setCallbacks()
    *
    * @param pServerCallbacks The callbacks to be invoked. Must remain
    *                         valid forever (do not destroy).
@@ -147,39 +161,28 @@ public:
     autoAdvertising = false;
   };
 
-public:
-  virtual void onConnect(NimBLEServer *pServer) override;
-  virtual void onDisconnect(NimBLEServer *pServer) override;
-  virtual void onConnect(NimBLEServer *pServer, ble_gap_conn_desc *desc) override;
-  virtual void onDisconnect(NimBLEServer *pServer, ble_gap_conn_desc *desc) override;
+protected:
+  virtual void onSubscribe(
+      NimBLECharacteristic *pCharacteristic,
+      ble_gap_conn_desc *desc,
+      uint16_t subValue) override;
 
-  virtual void onMTUChange(uint16_t MTU, ble_gap_conn_desc *desc) override
-  {
-    if (pOtherServerCallbacks)
-      pOtherServerCallbacks->onMTUChange(MTU, desc);
-  };
+protected:
+  /**
+   * @brief Event callback for client subscription to the TX characteristic
+   *
+   * @note Called before the semaphore is released.
+   *
+   * @param subscriberCount Number of subscribed clients
+   */
+  virtual void onSubscribe(uint8_t subscriberCount) {};
 
-  virtual uint32_t onPassKeyRequest() override
-  {
-    if (pOtherServerCallbacks)
-      return pOtherServerCallbacks->onPassKeyRequest();
-    else
-      return 0;
-  };
-
-  virtual void onAuthenticationComplete(ble_gap_conn_desc *desc) override
-  {
-    if (pOtherServerCallbacks)
-      pOtherServerCallbacks->onAuthenticationComplete(desc);
-  };
-
-  virtual bool onConfirmPIN(uint32_t pin) override
-  {
-    if (pOtherServerCallbacks)
-      return pOtherServerCallbacks->onConfirmPIN(pin);
-    else
-      return false;
-  };
+  /**
+   * @brief Event callback for client unsubscription to the TX characteristic
+   *
+   * @param subscriberCount Number of subscribed clients
+   */
+  virtual void onUnsubscribe(uint8_t subscriberCount) {};
 
 protected:
   NordicUARTService();
@@ -189,11 +192,11 @@ private:
   NimBLEServer *pServer = nullptr;
   NimBLEService *pNuS = nullptr;
   NimBLECharacteristic *pTxCharacteristic = nullptr;
-  NimBLEServerCallbacks *pOtherServerCallbacks = nullptr;
   SemaphoreHandle_t peerConnected;
   StaticSemaphore_t peerConnectedBuffer;
   bool autoAdvertising = true;
   bool started = false;
+  uint8_t subscribedCount = 0;
 
   /**
    * @brief Create the NuS service in a new GATT server

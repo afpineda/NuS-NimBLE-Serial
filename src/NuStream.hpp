@@ -22,11 +22,12 @@
 class NordicUARTStream : public NordicUARTService, public Stream
 {
 public:
-    // Overriden Methods
-
-    using NordicUARTService::printf;
     using NordicUARTService::print;
-    void onDisconnect(NimBLEServer *pServer) override;
+    using NordicUARTService::printf;
+
+protected:
+    // Overriden Methods
+    virtual void onUnsubscribe(uint8_t subscriberCount) override;
     void onWrite(NimBLECharacteristic *pCharacteristic) override;
 
 public:

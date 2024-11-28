@@ -45,10 +45,9 @@ public:
         return instance;
     };
 
-public:
+protected:
     // Overriden Methods
-
-    void onDisconnect(NimBLEServer *pServer) override;
+    virtual void onUnsubscribe(uint8_t subscriberCount) override;
     void onWrite(NimBLECharacteristic *pCharacteristic) override;
 
 public:

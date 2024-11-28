@@ -31,13 +31,14 @@ NordicUARTStream::~NordicUARTStream()
 // GATT server events
 //-----------------------------------------------------------------------------
 
-void NordicUARTStream::onDisconnect(NimBLEServer *pServer)
+void NordicUARTStream::onUnsubscribe(uint8_t subscriberCount)
 {
-    NordicUARTService::onDisconnect(pServer);
-
-    // Awake task at readBytes()
-    disconnected = true;
-    xSemaphoreGive(dataAvailable);
+    if (subscriberCount == 0)
+    {
+        // Awake task at readBytes()
+        disconnected = true;
+        xSemaphoreGive(dataAvailable);
+    }
 };
 
 //-----------------------------------------------------------------------------

@@ -23,7 +23,6 @@
 // Globals
 //-----------------------------------------------------------------------------
 
-#define NORDIC_UART_SERVICE_UUID "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
 #define RX_CHARACTERISTIC_UUID "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
 #define TX_CHARACTERISTIC_UUID "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
 
@@ -46,7 +45,6 @@ void NordicUARTService::init()
   pServer = NimBLEDevice::createServer();
   if (pServer)
   {
-    pServer->setCallbacks(this);
     pServer->getAdvertising()->addServiceUUID(NORDIC_UART_SERVICE_UUID);
     pNuS = pServer->createService(NORDIC_UART_SERVICE_UUID);
     if (pNuS)
@@ -54,10 +52,11 @@ void NordicUARTService::init()
       pTxCharacteristic = pNuS->createCharacteristic(TX_CHARACTERISTIC_UUID, NIMBLE_PROPERTY::NOTIFY);
       if (pTxCharacteristic)
       {
+        pTxCharacteristic->setCallbacks(this); // uses onSubscribe
         NimBLECharacteristic *pRxCharacteristic = pNuS->createCharacteristic(RX_CHARACTERISTIC_UUID, NIMBLE_PROPERTY::WRITE);
         if (pRxCharacteristic)
         {
-          pRxCharacteristic->setCallbacks(this);
+          pRxCharacteristic->setCallbacks(this); // uses onWrite
           return;
         }
       }
@@ -89,9 +88,7 @@ void NordicUARTService::start(void)
 
 bool NordicUARTService::isConnected()
 {
-  if (pServer)
-    return (pServer->getConnectedCount() > 0);
-  return false;
+  return (subscribedCount > 0);
 }
 
 bool NordicUARTService::connect(const unsigned int timeoutMillis)
@@ -108,41 +105,36 @@ void NordicUARTService::disconnect(void)
 }
 
 //-----------------------------------------------------------------------------
-// GATT server events
+// TX events
 //-----------------------------------------------------------------------------
 
-void NordicUARTService::onConnect(NimBLEServer *pServer)
+void NordicUARTService::onSubscribe(
+    NimBLECharacteristic *pCharacteristic,
+    ble_gap_conn_desc *desc,
+    uint16_t subValue)
 {
-  if (pOtherServerCallbacks)
-    pOtherServerCallbacks->onConnect(pServer);
-  // Note: onConnect(*pServer, *desc) gets called after this one
+  if (subValue && (subscribedCount < 255))
+  {
+    // subscribe
+    subscribedCount++;
+    onSubscribe(subscribedCount);
+    xSemaphoreGive(peerConnected);
+  }
+  else if (!subValue && (subscribedCount > 0))
+  {
+    // unsubscribe
+    subscribedCount--;
+    onUnsubscribe(subscribedCount);
+  }
 }
 
-void NordicUARTService::onConnect(NimBLEServer *pServer, ble_gap_conn_desc *desc)
-{
-  if (pOtherServerCallbacks)
-    pOtherServerCallbacks->onConnect(pServer, desc);
-  xSemaphoreGive(peerConnected);
-}
-
-void NordicUARTService::onDisconnect(NimBLEServer *pServer, ble_gap_conn_desc *desc)
-{
-  if (pOtherServerCallbacks)
-    pOtherServerCallbacks->onDisconnect(pServer, desc);
-  if (autoAdvertising)
-    pServer->startAdvertising();
-}
-
-void NordicUARTService::onDisconnect(NimBLEServer *pServer)
-{
-  if (pOtherServerCallbacks)
-    pOtherServerCallbacks->onDisconnect(pServer);
-  // Note: onDisconnect(*pServer, *desc) gets called after this one
-}
+//-----------------------------------------------------------------------------
+// For backward-compatibility
+//-----------------------------------------------------------------------------
 
 void NordicUARTService::setCallbacks(NimBLEServerCallbacks *pServerCallbacks)
 {
-  pOtherServerCallbacks = pServerCallbacks;
+  NimBLEDevice::createServer()->setCallbacks(pServerCallbacks);
 }
 
 //-----------------------------------------------------------------------------
