@@ -60,44 +60,30 @@ The **basic rules** are:
   }
   ```
 
-- This library sets their own [server callbacks](https://h2zero.github.io/esp-nimble-cpp/class_nim_b_l_e_server_callbacks.html), so **don't overwrite them**. For example, this code **does not work**:
-
-  ```c++
-  void setup() {
-    ...
-    NimBLEDevice::init("MyDevice");
-    NuSerial.start();
-    // NuSerial callbacks are overwritten
-    NimBLEDevice::createServer()->setCallbacks(myOwnCallbacks);
-  }
-  ```
-
-  **Nor this one**:
-
-  ```c++
-  void setup() {
-    ...
-    NimBLEDevice::init("MyDevice");
-    NimBLEDevice::createServer()->setCallbacks(myOwnCallbacks);
-    // Your own callbacks are overwritten
-    NuSerial.start();
-  }
-  ```
-
-- Nevertheless, you can have your own server callbacks. Use `<object>.setCallbacks()` instead of `NimBLEServer::setCallbacks()`.
+- Since version 3.1.0, you can have your own
+  [server callbacks](https://h2zero.github.io/esp-nimble-cpp/class_nim_b_l_e_server_callbacks.html).
   For example:
 
   ```c++
   void setup() {
     ...
     NimBLEDevice::init("MyDevice");
-    // Your own callbacks are NOT overwritten in this way
-    NuSerial.setCallbacks(myOwnCallbacks);
+    NimBLEDevice::createServer()->setCallbacks(myOwnCallbacks);
     NuSerial.start();
   }
   ```
 
+  `<object>.setCallbacks()` is available for backwards-compatibility.
+
 - The Nordic UART Service can coexist with other GATT services in your application.
+
+- Since version 3.1.0, `<object>.isConnected()` and `<object>.connect()`
+  refer to connected devices **subscribed** to the NuS transmission characteristic.
+  If you have other services,
+  a client may be connected but not using the Nordic UART Service.
+  In this case, `<object>.isConnected()` will return `false`
+  but [NimBLEServer::getConnectedCount()](https://h2zero.github.io/NimBLE-Arduino/class_nim_b_l_e_server.html#a98ea12f57c10c0477b0c1c5efab23ee5)
+  will return `1`.
 
 - By default, this library will automatically advertise existing GATT services when no peer is connected.
   This includes the Nordic UART Service and other
