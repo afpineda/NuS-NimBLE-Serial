@@ -27,7 +27,7 @@ public:
 
 protected:
     // Overriden Methods
-    virtual void onUnsubscribe(uint8_t subscriberCount) override;
+    virtual void onUnsubscribe(size_t subscriberCount) override;
     void onWrite(NimBLECharacteristic *pCharacteristic) override;
 
 public:

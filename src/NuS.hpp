@@ -48,7 +48,7 @@ public:
    *
    * @return uint8_t Number of clients subscribed to the service
    */
-  uint8_t subscriberCount() { return subscribedCount; }
+  size_t subscriberCount() { return pTxCharacteristic->getSubscribedCount(); };
 
   /**
    * @brief Wait for a peer connection or a timeout if set (blocking)
@@ -175,14 +175,14 @@ protected:
    *
    * @param subscriberCount Number of subscribed clients
    */
-  virtual void onSubscribe(uint8_t subscriberCount) {};
+  virtual void onSubscribe(size_t subscriberCount) {};
 
   /**
    * @brief Event callback for client unsubscription to the TX characteristic
    *
    * @param subscriberCount Number of subscribed clients
    */
-  virtual void onUnsubscribe(uint8_t subscriberCount) {};
+  virtual void onUnsubscribe(size_t subscriberCount) {};
 
 protected:
   NordicUARTService();
@@ -196,7 +196,6 @@ private:
   StaticSemaphore_t peerConnectedBuffer;
   bool autoAdvertising = true;
   bool started = false;
-  uint8_t subscribedCount = 0;
 
   /**
    * @brief Create the NuS service in a new GATT server

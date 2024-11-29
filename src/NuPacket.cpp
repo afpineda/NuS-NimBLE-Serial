@@ -42,7 +42,7 @@ NordicUARTPacket::~NordicUARTPacket()
 // Event callback
 //-----------------------------------------------------------------------------
 
-void NordicUARTPacket::onUnsubscribe(uint8_t subscriberCount)
+void NordicUARTPacket::onUnsubscribe(size_t subscriberCount)
 {
     if (subscriberCount == 0)
     {

@@ -31,7 +31,7 @@ NordicUARTStream::~NordicUARTStream()
 // GATT server events
 //-----------------------------------------------------------------------------
 
-void NordicUARTStream::onUnsubscribe(uint8_t subscriberCount)
+void NordicUARTStream::onUnsubscribe(size_t subscriberCount)
 {
     if (subscriberCount == 0)
     {
