@@ -90,7 +90,8 @@ The **basic rules** are:
   services you configured for advertising (if any).
   To change this behavior, call `<object>.disableAutoAdvertising()` and handle advertising on your own.
 
-You may learn from the provided [examples](./examples/README.md). Read code commentaries for more information.
+You may learn from the provided [examples](./examples/README.md).
+Read the [API documentation](https://afpineda.github.io/NuS-NimBLE-Serial/) for more information.
 
 ### Non-blocking serial communications
 
