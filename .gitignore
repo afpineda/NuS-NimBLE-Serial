@@ -40,3 +40,6 @@ debug_custom.json
 #other
 .vscode
 .~*
+
+# Doxygen
+doc/html/
