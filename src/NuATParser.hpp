@@ -220,8 +220,6 @@ public:
      *
      * @param commandLine Pointer to a buffer containing a command line
      * @param size Size in bytes of @p commandLine
-     *
-     * @return NuATCmdLineStatus_t Command line status after execution
      */
     void execute(const uint8_t *commandLine, size_t size);
 
@@ -229,8 +227,6 @@ public:
      * @brief Execute the given AT command line
      *
      * @param commandLine String containing command line
-     *
-     * @return NuATCmdLineStatus_t Command line status after execution
      */
     void execute(std::string commandLine)
     {
@@ -241,8 +237,6 @@ public:
      * @brief Execute the given AT command line
      *
      * @param commandLine Null-terminated string containing a command line
-     *
-     * @return NuATCmdLineStatus_t Command line status after execution
      */
     void execute(const char *commandLine)
     {

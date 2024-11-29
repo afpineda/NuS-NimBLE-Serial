@@ -48,7 +48,7 @@ jobs:
         id: deployment
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '${{ github.workspace }}/doc/html'
+          path: '${{ github.workspace }}/doc/html/'
 
   deploy:
     name: Deploy to GitHub Pages
