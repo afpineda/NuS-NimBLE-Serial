@@ -20,7 +20,9 @@ NuATCommandProcessor &NuATCommands = NuATCommandProcessor::getInstance();
 // NordicUARTService implementation
 //-----------------------------------------------------------------------------
 
-void NuATCommandProcessor::onWrite(NimBLECharacteristic *pCharacteristic)
+void NuATCommandProcessor::onWrite(
+    NimBLECharacteristic *pCharacteristic,
+    NimBLEConnInfo &connInfo)
 {
     // Incoming data
     NimBLEAttValue incomingPacket = pCharacteristic->getValue();
@@ -29,7 +31,7 @@ void NuATCommandProcessor::onWrite(NimBLECharacteristic *pCharacteristic)
         (incomingPacket.size() > uMaxCommandLineLength))
     {
         printResultResponse(NuATCommandResult_t::AT_RESULT_ERROR);
-        notifyError("",NuATSyntaxError_t::AT_ERR_TOO_LONG);
+        notifyError("", NuATSyntaxError_t::AT_ERR_TOO_LONG);
     }
     else
         execute((const uint8_t *)in, incomingPacket.size());

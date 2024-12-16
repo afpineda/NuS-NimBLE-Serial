@@ -15,7 +15,6 @@
 #include "NuS.hpp"
 #include "NuATCommandParserLegacy2.hpp"
 
-
 namespace NuSLegacy2
 {
     /**
@@ -45,7 +44,9 @@ namespace NuSLegacy2
 
     public:
         // Overriden Methods
-        virtual void onWrite(NimBLECharacteristic *pCharacteristic) override;
+        virtual void onWrite(
+            NimBLECharacteristic *pCharacteristic,
+            NimBLEConnInfo &connInfo) override;
         virtual void printATResponse(const char message[]) override;
 
         /**

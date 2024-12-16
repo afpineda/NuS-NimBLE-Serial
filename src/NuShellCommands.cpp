@@ -20,7 +20,9 @@ NuShellCommandProcessor &NuShellCommands = NuShellCommandProcessor::getInstance(
 // NordicUARTService implementation
 //-----------------------------------------------------------------------------
 
-void NuShellCommandProcessor::onWrite(NimBLECharacteristic *pCharacteristic)
+void NuShellCommandProcessor::onWrite(
+    NimBLECharacteristic *pCharacteristic,
+    NimBLEConnInfo &connInfo)
 {
     // Incoming data
     NimBLEAttValue incomingPacket = pCharacteristic->getValue();

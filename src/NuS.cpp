@@ -88,7 +88,7 @@ void NordicUARTService::start(void)
 
 bool NordicUARTService::isConnected()
 {
-  return (pTxCharacteristic->getSubscribedCount() > 0);
+  return (_subscriberCount > 0);
 }
 
 bool NordicUARTService::connect(const unsigned int timeoutMillis)
@@ -110,21 +110,22 @@ void NordicUARTService::disconnect(void)
 
 void NordicUARTService::onSubscribe(
     NimBLECharacteristic *pCharacteristic,
-    ble_gap_conn_desc *desc,
+    NimBLEConnInfo &connInfo,
     uint16_t subValue)
 {
-  size_t subscribedCount =  pCharacteristic->getSubscribedCount();
   if (subValue)
   {
     // subscribe
-    onSubscribe(subscribedCount);
+    _subscriberCount++;
+    onSubscribe(_subscriberCount);
     xSemaphoreGive(peerConnected);
   }
   else
   {
     // unsubscribe
-    onUnsubscribe(subscribedCount);
-    if (autoAdvertising && (subscribedCount == 0))
+    _subscriberCount--;
+    onUnsubscribe(_subscriberCount);
+    if (autoAdvertising && (_subscriberCount == 0))
       pServer->startAdvertising();
   }
 }

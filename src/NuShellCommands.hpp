@@ -38,9 +38,11 @@ public:
         return instance;
     };
 
-public:
+protected:
     // Overriden Methods
-    virtual void onWrite(NimBLECharacteristic *pCharacteristic) override;
+    virtual void onWrite(
+        NimBLECharacteristic *pCharacteristic,
+        NimBLEConnInfo &connInfo) override;
 
 private:
     NuShellCommandProcessor(){};

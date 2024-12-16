@@ -48,7 +48,7 @@ public:
    *
    * @return uint8_t Number of clients subscribed to the service
    */
-  size_t subscriberCount() { return pTxCharacteristic->getSubscribedCount(); };
+  size_t subscriberCount() { return _subscriberCount; };
 
   /**
    * @brief Wait for a peer connection or a timeout if set (blocking)
@@ -164,7 +164,7 @@ public:
 protected:
   virtual void onSubscribe(
       NimBLECharacteristic *pCharacteristic,
-      ble_gap_conn_desc *desc,
+      NimBLEConnInfo &connInfo,
       uint16_t subValue) override;
 
 protected:
@@ -196,6 +196,7 @@ private:
   StaticSemaphore_t peerConnectedBuffer;
   bool autoAdvertising = true;
   bool started = false;
+  uint32_t _subscriberCount = 0;
 
   /**
    * @brief Create the NuS service in a new GATT server

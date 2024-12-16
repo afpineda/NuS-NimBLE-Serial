@@ -28,7 +28,9 @@ public:
 protected:
     // Overriden Methods
     virtual void onUnsubscribe(size_t subscriberCount) override;
-    void onWrite(NimBLECharacteristic *pCharacteristic) override;
+    void onWrite(
+        NimBLECharacteristic *pCharacteristic,
+        NimBLEConnInfo &connInfo) override;
 
 public:
     NordicUARTStream();

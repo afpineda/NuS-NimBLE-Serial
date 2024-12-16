@@ -23,7 +23,9 @@ NuSLegacy2::NuATCommandProcessor &NuSLegacy2::NuATCommands =
 // NordicUARTService implementation
 //-----------------------------------------------------------------------------
 
-void NuSLegacy2::NuATCommandProcessor::onWrite(NimBLECharacteristic *pCharacteristic)
+void NuSLegacy2::NuATCommandProcessor::onWrite(
+    NimBLECharacteristic *pCharacteristic,
+    NimBLEConnInfo &connInfo)
 {
     // Incoming data
     NimBLEAttValue incomingPacket = pCharacteristic->getValue();

@@ -42,7 +42,9 @@ public:
 
 public:
     // Overriden Methods
-    virtual void onWrite(NimBLECharacteristic *pCharacteristic) override;
+    virtual void onWrite(
+        NimBLECharacteristic *pCharacteristic,
+        NimBLEConnInfo &connInfo) override;
     virtual void printATResponse(std::string message) override;
 
     // New methods

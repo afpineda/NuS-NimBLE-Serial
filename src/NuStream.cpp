@@ -45,7 +45,9 @@ void NordicUARTStream::onUnsubscribe(size_t subscriberCount)
 // NordicUARTService implementation
 //-----------------------------------------------------------------------------
 
-void NordicUARTStream::onWrite(NimBLECharacteristic *pCharacteristic)
+void NordicUARTStream::onWrite(
+        NimBLECharacteristic *pCharacteristic,
+        NimBLEConnInfo &connInfo)
 {
     // Wait for previous data to get consumed
     xSemaphoreTake(dataConsumed, portMAX_DELAY);
