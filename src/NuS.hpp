@@ -29,7 +29,7 @@
  * @brief Nordic UART Service (NuS) implementation using the NimBLE stack
  *
  * @note This is an abstract class.
- *       Override NimBLECharacteristicCallbacks::onWrite(NimBLECharacteristic *pCharacteristic)
+ *       Override NimBLECharacteristicCallbacks::onWrite()
  *       to process incoming data. A singleton pattern is suggested.
  */
 class NordicUARTService : protected NimBLECharacteristicCallbacks
