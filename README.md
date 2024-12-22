@@ -302,15 +302,21 @@ As a bonus, you may use class `NuCLIParser` to implement a shell that takes data
 
 class MyCustomSerialProtocol: public NordicUARTService {
     public:
-        void onWrite(NimBLECharacteristic *pCharacteristic) override;
+        void onWrite(
+          NimBLECharacteristic *pCharacteristic,
+          NimBLEConnInfo &connInfo) override;
     ...
 }
 ```
 
-Derive a new class and override `onWrite(NimBLECharacteristic *pCharacteristic)` (see [NimBLECharacteristicCallbacks::onWrite](https://h2zero.github.io/NimBLE-Arduino/class_nim_b_l_e_characteristic_callbacks.html)). Then, use `pCharacteristic` to read incoming data. For example:
+Derive a new class and override
+[onWrite()](https://h2zero.github.io/NimBLE-Arduino/class_nim_b_l_e_characteristic_callbacks.html).
+Then, use `pCharacteristic` to read incoming data. For example:
 
 ```c++
-void MyCustomSerialProtocol::onWrite(NimBLECharacteristic *pCharacteristic)
+void MyCustomSerialProtocol::onWrite(
+        NimBLECharacteristic *pCharacteristic,
+        NimBLEConnInfo &connInfo)
 {
     // Retrieve a pointer to received data and its size
     NimBLEAttValue val = pCharacteristic->getValue();
