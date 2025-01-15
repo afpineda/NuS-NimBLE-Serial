@@ -12,8 +12,10 @@ In summary, this library provides:
 
 ## Supported DevKit boards
 
-Any DevKit supported by [NimBLE-Arduino](https://github.com/h2zero/NimBLE-Arduino) and based on the [Arduino core for Espressif's boards](https://github.com/espressif/arduino-esp32)
-(since [FreeRTOS](https://www.freertos.org/Embedded-RTOS-Binary-Semaphores.html) is required).
+Any DevKit supported by [NimBLE-Arduino](https://github.com/h2zero/NimBLE-Arduino).
+
+> [!NOTE]
+> Since version 3.3.0, *FreeRTOS* is no longer required.
 
 ## Introduction
 
@@ -48,7 +50,14 @@ Summary:
 
 The **basic rules** are:
 
-- You must initialize the *NimBLE stack* **before** using this library. See [NimBLEDevice::init()](https://h2zero.github.io/NimBLE-Arduino/class_nim_b_l_e_device.html).
+- You must initialize the *NimBLE stack* **before** using this library.
+  See [NimBLEDevice::init()](https://h2zero.github.io/NimBLE-Arduino/class_nim_b_l_e_device.html).
+
+   > [!NOTE]
+   > Due to changes in *NimBLE-Arduino* version 2.1.0+
+   > you may need to manually add the device name to the advertised data:
+   > `NimBLEDevice::getAdvertising()->setName(DEVICE_NAME);`
+
 - You must also call `<object>.start()` **after** all code initialization is complete.
 - Just one object can use the Nordic UART Service. For example, this code **fails** at run time:
 
