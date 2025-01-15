@@ -16,7 +16,7 @@
 #include "NuS.hpp"
 
 /**
- * @brief Communications stream through BLE and Nordic UART Service
+ * @brief Communication stream via BLE and Nordic UART service
  *
  */
 class NordicUARTStream : public NordicUARTService, public Stream
@@ -33,8 +33,8 @@ protected:
         NimBLEConnInfo &connInfo) override;
 
 public:
-    NordicUARTStream();
-    virtual ~NordicUARTStream();
+    NordicUARTStream() : NordicUARTService(), Stream() {};
+    virtual ~NordicUARTStream() {};
 
 public:
     /**
@@ -107,10 +107,8 @@ public:
     };
 
 private:
-    SemaphoreHandle_t dataConsumed;
-    StaticSemaphore_t dataConsumedBuffer;
-    SemaphoreHandle_t dataAvailable;
-    StaticSemaphore_t dataAvailableBuffer;
+    std::counting_semaphore<1> dataConsumed{std::counting_semaphore<1>(1)};
+    std::counting_semaphore<1> dataAvailable{std::counting_semaphore<1>(0)};
     NimBLEAttValue incomingPacket;
     bool disconnected = false;
     size_t unreadByteCount = 0;

@@ -9,23 +9,7 @@
  */
 
 #include "NuStream.hpp"
-
-//-----------------------------------------------------------------------------
-// Constructor and destructor
-//-----------------------------------------------------------------------------
-
-NordicUARTStream::NordicUARTStream() : NordicUARTService(), Stream()
-{
-    dataConsumed = xSemaphoreCreateBinaryStatic(&dataConsumedBuffer);
-    dataAvailable = xSemaphoreCreateBinaryStatic(&dataAvailableBuffer);
-    xSemaphoreGive(dataConsumed);
-}
-
-NordicUARTStream::~NordicUARTStream()
-{
-    vSemaphoreDelete(dataConsumed);
-    vSemaphoreDelete(dataAvailable);
-}
+#include <chrono>
 
 //-----------------------------------------------------------------------------
 // GATT server events
@@ -37,7 +21,7 @@ void NordicUARTStream::onUnsubscribe(size_t subscriberCount)
     {
         // Awake task at readBytes()
         disconnected = true;
-        xSemaphoreGive(dataAvailable);
+        dataAvailable.release();
     }
 };
 
@@ -46,11 +30,11 @@ void NordicUARTStream::onUnsubscribe(size_t subscriberCount)
 //-----------------------------------------------------------------------------
 
 void NordicUARTStream::onWrite(
-        NimBLECharacteristic *pCharacteristic,
-        NimBLEConnInfo &connInfo)
+    NimBLECharacteristic *pCharacteristic,
+    NimBLEConnInfo &connInfo)
 {
     // Wait for previous data to get consumed
-    xSemaphoreTake(dataConsumed, portMAX_DELAY);
+    dataConsumed.acquire();
 
     // Hold data until next read
     incomingPacket = pCharacteristic->getValue();
@@ -58,7 +42,7 @@ void NordicUARTStream::onWrite(
     disconnected = false;
 
     // signal available data
-    xSemaphoreGive(dataAvailable);
+    dataAvailable.release();
 }
 
 //-----------------------------------------------------------------------------
@@ -83,13 +67,18 @@ size_t NordicUARTStream::readBytes(uint8_t *buffer, size_t size)
         } // note: at this point (unreadByteCount == 0) || (size == 0)
         if (unreadByteCount == 0)
         {
-            xSemaphoreGive(dataConsumed);
+            dataConsumed.release();
+            // xSemaphoreGive(dataConsumed);
         }
         if (size > 0)
         {
             // wait for more data or timeout or disconnection
-            TickType_t timeoutTicks = (_timeout == ULONG_MAX) ? portMAX_DELAY : pdMS_TO_TICKS(_timeout);
-            if ((xSemaphoreTake(dataAvailable, timeoutTicks) == pdFALSE) || disconnected)
+            bool waitResult = true;
+            if (_timeout == ULONG_MAX)
+                dataAvailable.acquire();
+            else
+                waitResult = dataAvailable.try_acquire_for(std::chrono::milliseconds(_timeout));
+            if (!waitResult || disconnected)
                 size = 0; // break;
             // Note: at this point, readBuffer and unreadByteCount were updated thanks to onWrite()
         }
@@ -126,7 +115,7 @@ int NordicUARTStream::read()
         int result = readBuffer[index];
         unreadByteCount--;
         if (unreadByteCount == 0)
-            xSemaphoreGive(dataConsumed);
+            dataConsumed.release();
         return result;
     }
     return -1;

@@ -11,6 +11,7 @@
 
 #include <exception>
 #include <stdexcept>
+#include <semaphore>
 #include "NuPacket.hpp"
 
 //-----------------------------------------------------------------------------
@@ -18,25 +19,6 @@
 //-----------------------------------------------------------------------------
 
 NordicUARTPacket &NuPacket = NordicUARTPacket::getInstance();
-
-//-----------------------------------------------------------------------------
-// Constructor / destructor
-//-----------------------------------------------------------------------------
-
-NordicUARTPacket::NordicUARTPacket() : NordicUARTService()
-{
-    availableByteCount = 0;
-    incomingBuffer = nullptr;
-    dataConsumed = xSemaphoreCreateBinaryStatic(&dataConsumedBuffer);
-    dataAvailable = xSemaphoreCreateBinaryStatic(&dataAvailableBuffer);
-    xSemaphoreGive(dataConsumed);
-}
-
-NordicUARTPacket::~NordicUARTPacket()
-{
-    vSemaphoreDelete(dataConsumed);
-    vSemaphoreDelete(dataAvailable);
-}
 
 //-----------------------------------------------------------------------------
 // Event callback
@@ -49,7 +31,7 @@ void NordicUARTPacket::onUnsubscribe(size_t subscriberCount)
         // Awake task at read()
         availableByteCount = 0;
         incomingBuffer = nullptr;
-        xSemaphoreGive(dataAvailable);
+        dataAvailable.release();
     }
 };
 
@@ -62,7 +44,7 @@ void NordicUARTPacket::onWrite(
     NimBLEConnInfo &connInfo)
 {
     // Wait for previous data to get consumed
-    xSemaphoreTake(dataConsumed, portMAX_DELAY);
+    dataConsumed.acquire();
 
     // Hold data until next read
     incomingPacket = pCharacteristic->getValue();
@@ -70,7 +52,7 @@ void NordicUARTPacket::onWrite(
     availableByteCount = incomingPacket.size();
 
     // signal available data
-    xSemaphoreGive(dataAvailable);
+    dataAvailable.release();
 }
 
 //-----------------------------------------------------------------------------
@@ -79,8 +61,8 @@ void NordicUARTPacket::onWrite(
 
 const uint8_t *NordicUARTPacket::read(size_t &size)
 {
-    xSemaphoreGive(dataConsumed);
-    xSemaphoreTake(dataAvailable, portMAX_DELAY);
+    dataConsumed.release();
+    dataAvailable.acquire();
     size = availableByteCount;
     return incomingBuffer;
 }

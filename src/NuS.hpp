@@ -16,6 +16,7 @@
 #include <NimBLEServer.h>
 #include <NimBLEService.h>
 #include <NimBLECharacteristic.h>
+#include <Semaphore>
 #include <cstring>
 
 /**
@@ -185,15 +186,14 @@ protected:
   virtual void onUnsubscribe(size_t subscriberCount) {};
 
 protected:
-  NordicUARTService();
-  virtual ~NordicUARTService();
+  NordicUARTService() {};
+  virtual ~NordicUARTService() {};
 
 private:
   NimBLEServer *pServer = nullptr;
   NimBLEService *pNuS = nullptr;
   NimBLECharacteristic *pTxCharacteristic = nullptr;
-  SemaphoreHandle_t peerConnected;
-  StaticSemaphore_t peerConnectedBuffer;
+  std::counting_semaphore<1> peerConnected{std::counting_semaphore<1>(0)};
   bool autoAdvertising = true;
   bool started = false;
   uint32_t _subscriberCount = 0;

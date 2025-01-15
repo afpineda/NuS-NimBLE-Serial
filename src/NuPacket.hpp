@@ -75,15 +75,13 @@ public:
     const uint8_t *read(size_t &size);
 
 private:
-    SemaphoreHandle_t dataConsumed;
-    StaticSemaphore_t dataConsumedBuffer;
-    SemaphoreHandle_t dataAvailable;
-    StaticSemaphore_t dataAvailableBuffer;
+    std::counting_semaphore<1> dataConsumed{std::counting_semaphore<1>(1)};
+    std::counting_semaphore<1> dataAvailable{std::counting_semaphore<1>(0)};
     NimBLEAttValue incomingPacket;
     size_t availableByteCount = 0;
     const uint8_t *incomingBuffer = nullptr;
-    NordicUARTPacket();
-    ~NordicUARTPacket();
+    NordicUARTPacket() {};
+    ~NordicUARTPacket() {};
 };
 
 /**

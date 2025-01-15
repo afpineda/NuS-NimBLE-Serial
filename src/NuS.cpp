@@ -17,6 +17,7 @@
 #include <vector>
 #include <string.h>
 #include <cstdio>
+#include <chrono>
 #include "NuS.hpp"
 
 //-----------------------------------------------------------------------------
@@ -29,16 +30,6 @@
 //-----------------------------------------------------------------------------
 // Constructor / Initialization
 //-----------------------------------------------------------------------------
-
-NordicUARTService::NordicUARTService()
-{
-  peerConnected = xSemaphoreCreateBinaryStatic(&peerConnectedBuffer);
-}
-
-NordicUARTService::~NordicUARTService()
-{
-  vSemaphoreDelete(peerConnected);
-}
 
 void NordicUARTService::init()
 {
@@ -93,8 +84,15 @@ bool NordicUARTService::isConnected()
 
 bool NordicUARTService::connect(const unsigned int timeoutMillis)
 {
-  TickType_t waitTicks = (timeoutMillis == 0) ? portMAX_DELAY : pdMS_TO_TICKS(timeoutMillis);
-  return (xSemaphoreTake(peerConnected, waitTicks) == pdTRUE);
+  if (timeoutMillis == 0)
+  {
+    peerConnected.acquire();
+    return true;
+  }
+  else
+  {
+    return peerConnected.try_acquire_for(std::chrono::milliseconds(timeoutMillis));
+  }
 }
 
 void NordicUARTService::disconnect(void)
@@ -118,7 +116,7 @@ void NordicUARTService::onSubscribe(
     // subscribe
     _subscriberCount++;
     onSubscribe(_subscriberCount);
-    xSemaphoreGive(peerConnected);
+    peerConnected.release();
   }
   else
   {
