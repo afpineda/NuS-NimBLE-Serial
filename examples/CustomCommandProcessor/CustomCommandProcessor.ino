@@ -17,6 +17,7 @@
 #include <inttypes.h>
 #include <errno.h>
 
+#define DEVICE_NAME "Custom commands demo"
 /**
  * @brief Custom command processor class
  *
@@ -26,7 +27,9 @@ class CustomCommandProcessor : public NordicUARTService
 protected:
     // Do not get confused by this method's name.
     // Data is received here.
-    void onWrite(NimBLECharacteristic *pCharacteristic) override;
+    void onWrite(
+        NimBLECharacteristic *pCharacteristic,
+        NimBLEConnInfo &connInfo) override;
 
 private:
     // Methods that execute received commands
@@ -84,7 +87,9 @@ char *split(char *string)
  * @brief Parse incoming data
  *
  */
-void CustomCommandProcessor::onWrite(NimBLECharacteristic *pCharacteristic)
+void CustomCommandProcessor::onWrite(
+    NimBLECharacteristic *pCharacteristic,
+    NimBLEConnInfo &connInfo)
 {
     // convert data to a null-terminated string
     const char *data = pCharacteristic->getValue().c_str();
@@ -208,7 +213,8 @@ void setup()
     Serial.println("--Initializing--");
 
     // Initialize BLE and Nordic UART service
-    NimBLEDevice::init("Custom commands demo");
+    NimBLEDevice::init(DEVICE_NAME);
+    NimBLEDevice::getAdvertising()->setName(DEVICE_NAME);
     server.start();
 
     // Initialization complete

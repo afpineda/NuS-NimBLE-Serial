@@ -17,6 +17,8 @@
 #include <string.h>
 #include <exception>
 
+#define DEVICE_NAME "AT commands demo"
+
 //------------------------------------------------------
 // Auxiliary
 //------------------------------------------------------
@@ -149,14 +151,14 @@ NuATCommandResult_t onTestOperands(NuATCommandParameters_t &parameters)
 
 void logError(const std::string text, NuATSyntaxError_t errorCode)
 {
-    Serial.printf("ERROR LOG. Code %d at \"%s\"\n",errorCode,text.c_str());
+    Serial.printf("ERROR LOG. Code %d at \"%s\"\n", errorCode, text.c_str());
 }
 
 void logMessage(const uint8_t *text, size_t size)
 {
     std::string msg;
-    msg.assign((const char*)text,size);
-    Serial.printf("NON-AT message: %s\n",msg.c_str());
+    msg.assign((const char *)text, size);
+    Serial.printf("NON-AT message: %s\n", msg.c_str());
 }
 
 //------------------------------------------------------
@@ -173,7 +175,8 @@ void setup()
     Serial.println("--Initializing--");
 
     // Initialize BLE and Nordic UART service
-    NimBLEDevice::init("AT commands demo");
+    NimBLEDevice::init(DEVICE_NAME);
+    NimBLEDevice::getAdvertising()->setName(DEVICE_NAME);
     NuATCommands.maxCommandLineLength(64);
     NuATCommands.allowLowerCase(true);
     NuATCommands.stopOnFirstFailure(true);

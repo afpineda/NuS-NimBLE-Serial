@@ -14,6 +14,8 @@
 #include <NimBLEDevice.h>
 #include "NuSerial.hpp"
 
+#define DEVICE_NAME "ReadBytes demo"
+
 void setup()
 {
     // Initialize serial monitor
@@ -24,7 +26,8 @@ void setup()
     Serial.println("--Initializing--");
 
     // Initialize BLE stack and Nordic UART service
-    NimBLEDevice::init("ReadBytes demo");
+    NimBLEDevice::init(DEVICE_NAME);
+    NimBLEDevice::getAdvertising()->setName(DEVICE_NAME);
     NuSerial.setTimeout(ULONG_MAX); // no timeout at readBytes()
     NuSerial.start();
 

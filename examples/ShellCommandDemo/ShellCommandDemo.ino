@@ -18,6 +18,8 @@
 #include <inttypes.h>
 #include <errno.h>
 
+#define DEVICE_NAME "Shell commands demo"
+
 //------------------------------------------------------
 // Auxiliary functions
 //------------------------------------------------------
@@ -149,22 +151,21 @@ void setup()
 
     // Set callbacks
     NuShellCommands
-        .on("add",onAdd)
-        .on("sum",onAdd)
-        .on("sub",onSubtract)
-        .on("subtract",onSubtract)
-        .on("mult",onMultiply)
-        .on("multiply",onMultiply)
-        .on("div",onDivide)
-        .on("divide",onDivide)
+        .on("add", onAdd)
+        .on("sum", onAdd)
+        .on("sub", onSubtract)
+        .on("subtract", onSubtract)
+        .on("mult", onMultiply)
+        .on("multiply", onMultiply)
+        .on("div", onDivide)
+        .on("divide", onDivide)
         .onUnknown([](NuCommandLine_t &commandLine)
-        {
-            NuShellCommands.printf("ERROR: Unknown command \"%s\"\n",commandLine[0].c_str());
-        })
+                   { NuShellCommands.printf("ERROR: Unknown command \"%s\"\n", commandLine[0].c_str()); })
         .onParseError(onParseError);
 
     // Initialize BLE and Nordic UART service
-    NimBLEDevice::init("Shell commands demo");
+    NimBLEDevice::init(DEVICE_NAME);
+    NimBLEDevice::getAdvertising()->setName(DEVICE_NAME);
     NuShellCommands.caseSensitive(false);
     NuShellCommands.start();
 

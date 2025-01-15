@@ -21,6 +21,8 @@
 // Use legacy API
 using namespace NuSLegacy2;
 
+#define DEVICE_NAME "AT commands demo (legacy)"
+
 //------------------------------------------------------
 // AT Commands implementation for a simple calculator
 //------------------------------------------------------
@@ -246,12 +248,17 @@ void connectionStatusChanged(const bool status)
 class MyServerCallbacks : public NimBLEServerCallbacks
 {
 public:
-    virtual void onConnect(NimBLEServer *pServer) override
+    virtual void onConnect(
+        NimBLEServer *pServer,
+        NimBLEConnInfo &connInfo) override
     {
         Serial.println("-- Client connected");
     };
 
-    virtual void onDisconnect(NimBLEServer *pServer, ble_gap_conn_desc *desc) override
+    virtual void onDisconnect(
+        NimBLEServer *pServer,
+        NimBLEConnInfo &connInfo,
+        int reason) override
     {
         Serial.println("-- Client disconnected");
     };
@@ -272,7 +279,8 @@ void setup()
     Serial.println("--Initializing--");
 
     // Initialize BLE and Nordic UART service
-    NimBLEDevice::init("AT commands demo (legacy)");
+    NimBLEDevice::init(DEVICE_NAME);
+    NimBLEDevice::getAdvertising()->setName(DEVICE_NAME);
     NuATCommands.setBufferSize(64);
     NuATCommands.lowerCasePreamble(true);
     NuATCommands.setATCallbacks(&myATCallbacks);

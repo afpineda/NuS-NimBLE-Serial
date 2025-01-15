@@ -16,6 +16,8 @@
 #include <NimBLEDevice.h>
 #include "NuPacket.hpp"
 
+#define DEVICE_NAME "NuPacket demo"
+
 void setup()
 {
     // Initialize serial monitor
@@ -26,7 +28,8 @@ void setup()
     Serial.println("--Initializing--");
 
     // Initialize BLE stack and Nordic UART service
-    NimBLEDevice::init("NuPacket demo");
+    NimBLEDevice::init(DEVICE_NAME);
+    NimBLEDevice::getAdvertising()->setName(DEVICE_NAME);
     NuPacket.start();
 
     // Initialization complete

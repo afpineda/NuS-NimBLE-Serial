@@ -16,6 +16,8 @@
 #include "NuSerial.hpp"
 #include "NimBLEDevice.h"
 
+#define DEVICE_NAME "NuSerial Echo"
+
 void setup()
 {
     // Initialize serial monitor
@@ -26,7 +28,8 @@ void setup()
     Serial.println("--Initializing--");
 
     // Initialize BLE stack and Nordic UART service
-    NimBLEDevice::init("NuSerial Echo");
+    NimBLEDevice::init(DEVICE_NAME);
+    NimBLEDevice::getAdvertising()->setName(DEVICE_NAME);
     NuSerial.begin(115200);
 
     // Initialization complete
