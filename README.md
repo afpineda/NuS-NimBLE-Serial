@@ -64,10 +64,11 @@ The **basic rules** are:
 - You must initialize the *NimBLE stack* **before** using this library.
   See [NimBLEDevice::init()](https://h2zero.github.io/NimBLE-Arduino/class_nim_b_l_e_device.html).
 
-   > [!NOTE]
-   > Due to changes in *NimBLE-Arduino* version 2.1.0+
-   > you may need to manually add the device name to the advertised data:
-   > `NimBLEDevice::getAdvertising()->setName(DEVICE_NAME);`
+> [!TIP]
+> Due to changes in *NimBLE-Arduino* version 2.1.0+
+> you may need to manually add the device name to the advertised data:
+>
+> `NimBLEDevice::getAdvertising()->setName(DEVICE_NAME);`
 
 - You must also call `<object>.start()` **after** all code initialization is complete.
 - Just one object can use the Nordic UART Service. For example, this code **fails** at run time:
