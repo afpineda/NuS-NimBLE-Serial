@@ -17,6 +17,17 @@ Any DevKit supported by [NimBLE-Arduino](https://github.com/h2zero/NimBLE-Arduin
 > [!NOTE]
 > Since version 3.3.0, *FreeRTOS* is no longer required.
 
+## Installing and upgrading to a newer version
+
+The Arduino IDE should list this library in all available versions,
+but sometimes the *library indexer* **fails to catch updates**.
+In this  case, download the ZIP file from the
+[releases section](https://github.com/afpineda/NuS-NimBLE-Serial/releases)
+or the `CODE` drop-down button found on this GitHub page (see above).
+Then, import the ZIP file into the Arduino IDE or install manually.
+For instructions, see the
+[official guide](https://docs.arduino.cc/software/ide-v1/tutorials/installing-libraries/).
+
 ## Introduction
 
 Serial communications are already available through the old [Bluetooth classic](https://www.argenox.com/library/bluetooth-classic/introduction-to-bluetooth-classic/) specification (see [this tutorial](https://circuitdigest.com/microcontroller-projects/using-classic-bluetooth-in-esp32-and-toogle-an-led)), [Serial Port Profile (SPP)](https://www.bluetooth.com/specifications/specs/serial-port-profile-1-2/).
