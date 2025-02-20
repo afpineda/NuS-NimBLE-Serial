@@ -16,8 +16,16 @@
 #include <NimBLEServer.h>
 #include <NimBLEService.h>
 #include <NimBLECharacteristic.h>
-#include <Semaphore>
 #include <cstring>
+
+#if __cplusplus < 202002L
+#include "cyan_semaphore.h"
+using namespace cyan;
+#else
+#include <semaphore>
+using namespace std;
+#endif
+
 
 /**
  * @brief UUID for the Nordic UART Service
@@ -193,7 +201,7 @@ private:
   NimBLEServer *pServer = nullptr;
   NimBLEService *pNuS = nullptr;
   NimBLECharacteristic *pTxCharacteristic = nullptr;
-  std::counting_semaphore<1> peerConnected{std::counting_semaphore<1>(0)};
+  counting_semaphore<1> peerConnected{counting_semaphore<1>(0)};
   bool autoAdvertising = true;
   bool started = false;
   uint32_t _subscriberCount = 0;

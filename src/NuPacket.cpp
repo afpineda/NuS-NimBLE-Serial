@@ -11,7 +11,6 @@
 
 #include <exception>
 #include <stdexcept>
-#include <semaphore>
 #include "NuPacket.hpp"
 
 //-----------------------------------------------------------------------------

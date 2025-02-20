@@ -353,3 +353,7 @@ In the previous example, the data pointed by `*receivedData` will **not remain v
 
 Since just one object can use the Nordic UART Service, you should also implement a
 [singleton pattern](https://www.geeksforgeeks.org/implementation-of-singleton-class-in-cpp/) (not mandatory).
+
+## Licensed work
+
+[cyanhill/semaphore](https://github.com/cyanhill/semaphore) under MIT License.
