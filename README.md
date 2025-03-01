@@ -49,6 +49,10 @@ You may need a generic terminal (PC or smartphone) application in order to commu
 - Multi-platform:
   - [NeutralNUS](https://github.com/KevinJohnMulligan/neutral-nus-terminal/releases)
 
+> [!NOTE]
+> In Android, you have to enable both bluetooth and geolocalization,
+> otherwise, your device will not be discovered.
+
 ## How to use this library
 
 Summary:
