@@ -75,8 +75,8 @@ public:
     const uint8_t *read(size_t &size);
 
 private:
-    counting_semaphore<1> dataConsumed{counting_semaphore<1>(1)};
-    counting_semaphore<1> dataAvailable{counting_semaphore<1>(0)};
+    binary_semaphore dataConsumed{1};
+    binary_semaphore dataAvailable{0};
     NimBLEAttValue incomingPacket;
     size_t availableByteCount = 0;
     const uint8_t *incomingBuffer = nullptr;

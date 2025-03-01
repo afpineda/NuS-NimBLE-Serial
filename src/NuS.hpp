@@ -201,7 +201,7 @@ private:
   NimBLEServer *pServer = nullptr;
   NimBLEService *pNuS = nullptr;
   NimBLECharacteristic *pTxCharacteristic = nullptr;
-  counting_semaphore<1> peerConnected{counting_semaphore<1>(0)};
+  binary_semaphore peerConnected{0};
   bool autoAdvertising = true;
   bool started = false;
   uint32_t _subscriberCount = 0;
