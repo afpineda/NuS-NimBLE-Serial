@@ -111,21 +111,28 @@ void NordicUARTService::onSubscribe(
     NimBLEConnInfo &connInfo,
     uint16_t subValue)
 {
-  if (subValue)
+  // Note: for robustness, we assume this callback could be called
+  // even if no subscription event exists.
+
+  if (subValue == 0)
+  {
+    // unsubscribe
+    if (_subscriberCount > 0)
+    {
+      _subscriberCount--;
+      onUnsubscribe(_subscriberCount);
+    }
+    if (autoAdvertising && (_subscriberCount == 0))
+      pServer->startAdvertising();
+  }
+  else if (subValue < 4)
   {
     // subscribe
     _subscriberCount++;
     onSubscribe(_subscriberCount);
     peerConnected.release();
   }
-  else
-  {
-    // unsubscribe
-    _subscriberCount--;
-    onUnsubscribe(_subscriberCount);
-    if (autoAdvertising && (_subscriberCount == 0))
-      pServer->startAdvertising();
-  }
+  // else: Invalid subscription value, ignore
 }
 
 //-----------------------------------------------------------------------------
