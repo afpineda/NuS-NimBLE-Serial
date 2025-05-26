@@ -128,6 +128,8 @@ void NordicUARTService::onSubscribe(
   else if (subValue < 4)
   {
     // subscribe
+    if (autoAdvertising)
+      NimBLEDevice::stopAdvertising();
     _subscriberCount++;
     onSubscribe(_subscriberCount);
     peerConnected.release();
