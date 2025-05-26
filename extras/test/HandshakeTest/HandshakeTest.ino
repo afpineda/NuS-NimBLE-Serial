@@ -25,7 +25,6 @@ void setup()
     Serial.println("--READY--");
 
     NimBLEDevice::init("Handshake");
-    NuSerial.enableAutoAdvertising();
     NuSerial.begin(115200); // Note: Parameter is ignored.
 
     Serial.println("--GO--");

@@ -90,24 +90,12 @@ void loop()
     else
     {
         Serial.println("--Waiting for connection and subscription--");
-        // Wait for BLE connection
-        while (pServer->getConnectedCount() == 0)
+        // Wait for subscription to the Nordic UART TX characteristic
+        while (!NuSerial.isConnected())
         {
             delay(500);
         }
-        // A client is connected but not subscribed yet
-        // (NimBLE automatically stops advertising on connection).
-        while (!NuSerial.isConnected() && (pServer->getConnectedCount() > 0))
-        {
-            // Wait for disconnection OR subscription to the Nordic UART TX characteristic
-            delay(500);
-        }
-        if (NuSerial.isConnected())
-            // A client is connected and subscribed
-            Serial.println("--Connected and subscribed--");
-        else
-            // Restart advertising, since the client connected and disconnected
-            // without subscription
-            NimBLEDevice::startAdvertising();
+        // A client is connected and subscribed
+        Serial.println("--Connected and subscribed--");
     }
 }

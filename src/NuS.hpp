@@ -26,7 +26,6 @@ using namespace cyan;
 using namespace std;
 #endif
 
-
 /**
  * @brief UUID for the Nordic UART Service
  *
@@ -47,8 +46,10 @@ public:
   /**
    * @brief Check if a peer is connected and subscribed to this service
    *
-   * @return true When a connection is established
-   * @return false When no peer is connected
+   * @return true When a connection is established and
+   *              the peer is subscribed to the Nordic UART TX characteristic
+   * @return false When no peer is connected or a peer is connected but not subscribed yet.
+   *               Call `NimBLEServer::getConnectedCount()` to know the case.
    */
   bool isConnected();
 
@@ -134,41 +135,12 @@ public:
    * @note The service is unavailable if start() is not called.
    *       Do not call start() before initialization is complete in your application.
    *
+   * @param autoAdvertising True to automatically handle BLE advertising.
+   *                        When false, you have to handle advertising on your own.
+   *
    * @throws std::runtime_error if the UART service is already created or can not be created
    */
-  void start(void);
-
-  /**
-   * @brief Set your own server callbacks
-   *
-   * @deprecated Use NimBLEDevice::createServer()->setCallbacks()
-   *
-   * @param pServerCallbacks The callbacks to be invoked. Must remain
-   *                         valid forever (do not destroy).
-   */
-  void setCallbacks(NimBLEServerCallbacks *pServerCallbacks);
-
-  /**
-   * @brief Automatically advertise BLE services when no peer is connected
-   *
-   * @note This is the default behavior.
-   *
-   */
-  void enableAutoAdvertising()
-  {
-    autoAdvertising = true;
-  };
-
-  /**
-   * @brief Do not advertise BLE services when no peer is connected
-   *
-   * @note You should handle advertising on your own if you call this method.
-   *
-   */
-  void disableAutoAdvertising()
-  {
-    autoAdvertising = false;
-  };
+  void start(bool autoAdvertising = true);
 
 protected:
   virtual void onSubscribe(
@@ -202,16 +174,17 @@ private:
   NimBLEService *pNuS = nullptr;
   NimBLECharacteristic *pTxCharacteristic = nullptr;
   binary_semaphore peerConnected{0};
-  bool autoAdvertising = true;
   bool started = false;
   uint32_t _subscriberCount = 0;
 
   /**
    * @brief Create the NuS service in a new GATT server
    *
+   * @param advertise True to add the NuS UUID to the advertised data, false otherwise.
+   *
    * @throws std::runtime_error if the UART service is already created or can not be created
    */
-  void init();
+  void init(bool advertise);
 };
 
 #endif

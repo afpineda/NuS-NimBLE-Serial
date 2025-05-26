@@ -49,7 +49,6 @@ void setup()
     NimBLEDevice::init("Issue8");
 
     NuSerial.setCallbacks(new ServerCallbacks());
-    NuSerial.enableAutoAdvertising();
     NuSerial.start();
     Serial.println("--GO--");
 }

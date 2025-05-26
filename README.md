@@ -74,7 +74,7 @@ The **basic rules** are:
 >
 > `NimBLEDevice::getAdvertising()->setName(DEVICE_NAME);`
 
-- You must also call `<object>.start()` **after** all code initialization is complete.
+- You must also call `<object>.start()` **after** all BLE initialization is complete.
 - Just one object can use the Nordic UART Service. For example, this code **fails** at run time:
 
   ```c++
@@ -85,25 +85,13 @@ The **basic rules** are:
   }
   ```
 
-- Since version 3.1.0, you can have your own
-  [server callbacks](https://h2zero.github.io/esp-nimble-cpp/class_nim_b_l_e_server_callbacks.html).
-  For example:
-
-  ```c++
-  void setup() {
-    ...
-    NimBLEDevice::init("MyDevice");
-    NimBLEDevice::createServer()->setCallbacks(myOwnCallbacks);
-    NuSerial.start();
-  }
-  ```
-
-  `<object>.setCallbacks()` is available for backwards-compatibility.
-
 - The Nordic UART Service can coexist with other GATT services in your application.
+  This library does not require specific code for this.
+  Just ignore the fact that *NuS-NimBLE-Serial* is there and
+  register other services with *NimBLE-Arduino*.
 
 - Since version 3.1.0, `<object>.isConnected()` and `<object>.connect()`
-  refer to connected devices **subscribed** to the NuS transmission characteristic.
+  refer to devices connected **and subscribed** to the NuS transmission characteristic.
   If you have other services,
   a client may be connected but not using the Nordic UART Service.
   In this case, `<object>.isConnected()` will return `false`
@@ -113,7 +101,11 @@ The **basic rules** are:
 - By default, this library will automatically advertise existing GATT services when no peer is connected.
   This includes the Nordic UART Service and other
   services you configured for advertising (if any).
-  To change this behavior, call `<object>.disableAutoAdvertising()` and handle advertising on your own.
+  To change this behavior, call `<object>.start(false)` instead of `<object>.start()`
+  and handle advertising on your own.
+  To disable automatic advertising once NuS is started,
+  call `NimBLEDevice::getServer()->advertiseOnDisconnect(false)` and
+  remove the service UUID (constant `NORDIC_UART_SERVICE_UUID`) from the advertised data (if required).
 
 You may learn from the provided [examples](./examples/README.md).
 Read the [API documentation](https://afpineda.github.io/NuS-NimBLE-Serial/) for more information.

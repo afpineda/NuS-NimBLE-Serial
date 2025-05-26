@@ -33,9 +33,7 @@ allowLowerCase	KEYWORD2
 available	KEYWORD2
 begin	KEYWORD2
 connect	KEYWORD2
-disableAutoAdvertising	KEYWORD2
 disconnect	KEYWORD2
-enableAutoAdvertising	KEYWORD2
 end	KEYWORD2
 execute	KEYWORD2
 forceUpperCaseCommandName	KEYWORD2

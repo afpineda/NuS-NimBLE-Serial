@@ -18,17 +18,6 @@
 
 #define DEVICE_NAME "NuPacket demo"
 
-class ServerCallbacks : public NimBLEServerCallbacks
-{
-    virtual void onDisconnect(
-        NimBLEServer *pServer,
-        NimBLEConnInfo &connInfo,
-        int reason) override
-    {
-        NimBLEDevice::startAdvertising();
-    }
-} serverCallbacks;
-
 void setup()
 {
     // Initialize serial monitor
@@ -41,7 +30,6 @@ void setup()
     // Initialize BLE stack and Nordic UART service
     NimBLEDevice::init(DEVICE_NAME);
     NimBLEDevice::getAdvertising()->setName(DEVICE_NAME);
-    NimBLEDevice::createServer()->setCallbacks(&serverCallbacks);
     NuPacket.start();
 
     // Initialization complete
