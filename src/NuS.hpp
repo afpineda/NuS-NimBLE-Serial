@@ -131,9 +131,9 @@ public:
   /**
    * @brief Start the Nordic UART Service
    *
-   * @note NimBLEDevice::init() **must** be called before.
+   * @note NimBLEDevice::init() **must** be called in advance.
    * @note The service is unavailable if start() is not called.
-   *       Do not call start() before initialization is complete in your application.
+   *       Do not call start() before BLE initialization is complete in your application.
    *
    * @param autoAdvertising True to automatically handle BLE advertising.
    *                        When false, you have to handle advertising on your own.
