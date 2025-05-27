@@ -48,8 +48,8 @@ void setup()
     Serial.println("--READY--");
     NimBLEDevice::init("Issue8");
 
-    NuSerial.setCallbacks(new ServerCallbacks());
     NuSerial.start();
+    NimBLEDevice::getServer()->setCallbacks(new ServerCallbacks());
     Serial.println("--GO--");
 }
 
