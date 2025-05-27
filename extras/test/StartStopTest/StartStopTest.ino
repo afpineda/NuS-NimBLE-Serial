@@ -22,19 +22,13 @@ void setup()
     Serial.println("*****************************");
     Serial.println(" Start / Stop test           ");
     Serial.println("*****************************");
-    Serial.println("--Initializing--");
-
-    // Initialize BLE stack
-    NimBLEDevice::init(DEVICE_NAME);
-    NimBLEDevice::getAdvertising()->setName(DEVICE_NAME);
-
-    // Initialization complete
     Serial.println("--Ready--");
 }
 
 void loop()
 {
     // Print service state
+    Serial.println();
     if (NuPacket.isStarted())
         Serial.println("NuS is started");
     else
@@ -50,7 +44,17 @@ void loop()
 
     // Change service state
     if (NuPacket.isStarted())
+    {
+        Serial.println("Stoping NuS...");
         NuPacket.stop();
-    else
-        NuPacket.start(true);
+        Serial.println("Deinitializing BLE...");
+        NimBLEDevice::deinit(true);
+    } else
+    {
+        Serial.println("Initializing BLE...");
+        NimBLEDevice::init(DEVICE_NAME);
+        NimBLEDevice::getAdvertising()->setName(DEVICE_NAME);
+        Serial.println("Starting Nus...");
+        NuPacket.start();
+    }
 }
