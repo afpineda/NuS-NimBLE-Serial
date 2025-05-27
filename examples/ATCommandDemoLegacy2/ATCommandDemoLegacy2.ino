@@ -284,8 +284,12 @@ void setup()
     NuATCommands.setBufferSize(64);
     NuATCommands.lowerCasePreamble(true);
     NuATCommands.setATCallbacks(&myATCallbacks);
-    NuATCommands.setCallbacks(&myServerCallbacks);
     NuATCommands.start();
+    NimBLEServer *pServer = NimBLEDevice::getServer();
+    if (pServer)
+        pServer->setCallbacks(&myServerCallbacks);
+    else
+        Serial.println("ERROR: unable to set server callbacks");
 
     // Initialization complete
     Serial.println("--Ready--");
