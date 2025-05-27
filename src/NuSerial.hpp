@@ -43,11 +43,22 @@ public:
 public:
     // Methods not strictly needed. Provided to mimic `Serial`
 
+    /**
+     * @brief Start the Nordic UART Service
+     *
+     * @param baud Ignored parameter
+     * @param ...  Ignored parameters
+     */
     void begin(unsigned long baud, ...)
     {
         start();
     };
 
+    /**
+     * @brief
+     *
+     * @param dummy
+     */
     void end(bool dummy = true)
     {
         disconnect();

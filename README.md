@@ -75,7 +75,8 @@ The **basic rules** are:
 > `NimBLEDevice::getAdvertising()->setName(DEVICE_NAME);`
 
 - You must also call `<object>.start()` **after** all BLE initialization is complete.
-- Just one object can use the Nordic UART Service. For example, this code **fails** at run time:
+- By default, just one object can use the Nordic UART Service.
+  For example, this code **fails** at run time:
 
   ```c++
   void setup() {
@@ -84,6 +85,11 @@ The **basic rules** are:
     NuPacket.start(); // raises an exception (runtime_error)
   }
   ```
+
+  Most client applications expect a single Nordic UART service in your device.
+  However, at your own risk, you can start multiple objects by setting
+  the static field `NordicUARTService::allowMultipleInstances` to `true` before
+  calling `<object>.start()`.
 
 - The Nordic UART Service can coexist with other GATT services in your application.
   This library does not require specific code for this.
@@ -106,6 +112,13 @@ The **basic rules** are:
   To disable automatic advertising once NuS is started,
   call `NimBLEDevice::getServer()->advertiseOnDisconnect(false)` and
   remove the service UUID (constant `NORDIC_UART_SERVICE_UUID`) from the advertised data (if required).
+
+- You can stop the service by calling `<object>.stop()`.
+  However, **this is discouraged** as there are **side effects**:
+  all peer connections will be closed,
+  advertising needs to be restarted and
+  there is no thread safety.
+  Design your application in a way that *NuS* does not need to be stopped.
 
 You may learn from the provided [examples](./examples/README.md).
 Read the [API documentation](https://afpineda.github.io/NuS-NimBLE-Serial/) for more information.

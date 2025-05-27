@@ -28,55 +28,97 @@
 #define TX_CHARACTERISTIC_UUID "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
 
 //-----------------------------------------------------------------------------
-// Constructor / Initialization
+// Initialization / Deinitialization
 //-----------------------------------------------------------------------------
+
+bool NordicUARTService::allowMultipleInstances = false;
 
 void NordicUARTService::init(bool advertise)
 {
-   pServer = NimBLEDevice::getServer();
+   // Get the server instance or create one
+   NimBLEServer *pServer = NimBLEDevice::getServer();
    if (pServer == nullptr)
       pServer = NimBLEDevice::createServer();
    if (pServer)
    {
+      // Add the service UUID to the advertised data
       if (advertise)
          pServer->getAdvertising()->addServiceUUID(NORDIC_UART_SERVICE_UUID);
-      pNuS = pServer->createService(NORDIC_UART_SERVICE_UUID);
-      if (pNuS)
+
+      // Check if there is another service instance
+      if ((!pServer->getServiceByUUID(NORDIC_UART_SERVICE_UUID) || allowMultipleInstances))
       {
-         pTxCharacteristic = pNuS->createCharacteristic(TX_CHARACTERISTIC_UUID, NIMBLE_PROPERTY::NOTIFY);
-         if (pTxCharacteristic)
+         // Create an instance of the service.
+         // Note that a server can have many instances of the same service
+         // if `allowMultipleInstances` is true.
+         pNus = pServer->createService(NORDIC_UART_SERVICE_UUID);
+         if (pNus)
          {
-            pTxCharacteristic->setCallbacks(this); // uses onSubscribe
-            NimBLECharacteristic *pRxCharacteristic = pNuS->createCharacteristic(RX_CHARACTERISTIC_UUID, NIMBLE_PROPERTY::WRITE);
-            if (pRxCharacteristic)
+            // Create the transmission characteristic
+            pTxCharacteristic = pNus->createCharacteristic(TX_CHARACTERISTIC_UUID, NIMBLE_PROPERTY::NOTIFY);
+            if (pTxCharacteristic)
             {
-               pRxCharacteristic->setCallbacks(this); // uses onWrite
-               return;
+               pTxCharacteristic->setCallbacks(this); // uses onSubscribe
+
+               // Create the receive characteristic
+               NimBLECharacteristic *pRxCharacteristic =
+                   pNus->createCharacteristic(RX_CHARACTERISTIC_UUID, NIMBLE_PROPERTY::WRITE);
+               if (pRxCharacteristic)
+               {
+                  pRxCharacteristic->setCallbacks(this); // uses onWrite
+                  return;
+               }
             }
          }
       }
    }
-   // Unable to initialize server
+   // Unable to initialize the service
    throw std::runtime_error("Unable to create BLE server and/or Nordic UART Service");
 }
 
+void NordicUARTService::deinit()
+{
+   NimBLEServer *pServer = pNus->getServer();
+   bool wasAdvertising = pServer->getAdvertising()->isAdvertising();
+   pServer->removeService(pNus, true);
+   // At this point, the pNus pointer is invalid
+   pNus = nullptr;
+   pTxCharacteristic = nullptr;
+   _subscriberCount = 0;
+   if (wasAdvertising)
+      pServer->startAdvertising();
+}
+
 //-----------------------------------------------------------------------------
-// Start service
+// Start/Stop service
 //-----------------------------------------------------------------------------
 
 void NordicUARTService::start(bool autoAdvertising)
 {
-   if (!started)
+   if (!pNus)
    {
       init(autoAdvertising);
-      pNuS->start();
-      started = true;
+      pNus->start();
       if (autoAdvertising)
       {
-         pServer->advertiseOnDisconnect(true);
-         pServer->startAdvertising();
+         pNus->getServer()->advertiseOnDisconnect(true);
+         pNus->getServer()->startAdvertising();
       }
    }
+}
+
+void NordicUARTService::stop()
+{
+   if (pNus)
+   {
+      disconnect();
+      deinit();
+   }
+}
+
+bool NordicUARTService::isStarted()
+{
+   return (pNus != nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -103,9 +145,13 @@ bool NordicUARTService::connect(const unsigned int timeoutMillis)
 
 void NordicUARTService::disconnect(void)
 {
-   std::vector<uint16_t> devices = pServer->getPeerDevices();
-   for (uint16_t id : devices)
-      pServer->disconnect(id);
+   NimBLEServer *pServer = NimBLEDevice::getServer();
+   if (pServer)
+   {
+      std::vector<uint16_t> devices = pServer->getPeerDevices();
+      for (uint16_t id : devices)
+         pServer->disconnect(id);
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -145,15 +191,25 @@ void NordicUARTService::onSubscribe(
 
 size_t NordicUARTService::write(const uint8_t *data, size_t size)
 {
-   pTxCharacteristic->notify(data, size);
-   return size;
+   if (pTxCharacteristic)
+   {
+      pTxCharacteristic->notify(data, size);
+      return size;
+   }
+   else
+      return 0;
 }
 
 size_t NordicUARTService::send(const char *str, bool includeNullTerminatingChar)
 {
-   size_t size = includeNullTerminatingChar ? strlen(str) + 1 : strlen(str);
-   pTxCharacteristic->notify((uint8_t *)str, size);
-   return size;
+   if (pTxCharacteristic)
+   {
+      size_t size = includeNullTerminatingChar ? strlen(str) + 1 : strlen(str);
+      pTxCharacteristic->notify((uint8_t *)str, size);
+      return size;
+   }
+   else
+      return 0;
 }
 
 size_t NordicUARTService::printf(const char *format, ...)

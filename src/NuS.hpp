@@ -44,6 +44,17 @@ class NordicUARTService : protected NimBLECharacteristicCallbacks
 {
 public:
   /**
+   * @brief When true, allow multiple instances of the Nordic UART Service
+   *
+   * @note False by default.
+   *       When false, your application can not start two or more instances
+   *       of the Nordic UART service.
+   *       This is what most client applications expect.
+   *
+   */
+  static bool allowMultipleInstances;
+
+  /**
    * @brief Check if a peer is connected and subscribed to this service
    *
    * @return true When a connection is established and
@@ -142,6 +153,31 @@ public:
    */
   void start(bool autoAdvertising = true);
 
+  /**
+   * @brief Stop and remove the Nordic UART Service
+   *
+   * @note Advertising will be temporarily disabled.
+   *       If you handle advertising on your own,
+   *       you should stop it first and then restart it with your own parameters.
+   *       Otherwise, this function will restart advertising with default parameters.
+   *
+   * @warning This will terminate all open connections,
+   *          including peers not using the Nordic UART Service.
+   *          This funcion is discouraged.
+   *          Design your application so that it is not necessary to stop the service.
+   *
+   * @warning This method is not thread-safe
+   */
+  void stop();
+
+  /**
+   * @brief Check if the Nordic UART Service is started
+   *
+   * @return true If started
+   * @return false If not started
+   */
+  bool isStarted();
+
 protected:
   virtual void onSubscribe(
       NimBLECharacteristic *pCharacteristic,
@@ -170,21 +206,33 @@ protected:
   virtual ~NordicUARTService() {};
 
 private:
-  NimBLEServer *pServer = nullptr;
-  NimBLEService *pNuS = nullptr;
+  NimBLEService *pNus = nullptr;
   NimBLECharacteristic *pTxCharacteristic = nullptr;
   binary_semaphore peerConnected{0};
-  bool started = false;
   uint32_t _subscriberCount = 0;
 
   /**
-   * @brief Create the NuS service in a new GATT server
+   * @brief Create the NuS service in a new or existing GATT server
    *
    * @param advertise True to add the NuS UUID to the advertised data, false otherwise.
    *
-   * @throws std::runtime_error if the UART service is already created or can not be created
+   * @return NimBLEService internal instance of the NuS
+   * @throws std::runtime_error if the UART service can not be created
    */
+
   void init(bool advertise);
+
+  /**
+   * @brief Remove the NuS service
+   *
+   * @note Advertising will be temporarily disabled
+   *
+   * @warning The service will not be removed until all open connections are closed.
+   *          In the meantime the service will have it's visibility disabled.
+   *
+   * @warning This method is not thread-safe
+   */
+  void deinit();
 };
 
 #endif
