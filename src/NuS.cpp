@@ -193,7 +193,14 @@ size_t NordicUARTService::write(const uint8_t *data, size_t size)
 {
    if (pTxCharacteristic)
    {
-      pTxCharacteristic->notify(data, size);
+      uint32_t chunkSize = NimBLEDevice::getMTU();
+      uint32_t offset = 0;
+      while (offset < size)
+      {
+         uint32_t len = (size - offset > chunkSize) ? chunkSize : (size - offset);
+         pTxCharacteristic->notify(data + offset, len);
+         offset += len;
+      }
       return size;
    }
    else
@@ -205,7 +212,7 @@ size_t NordicUARTService::send(const char *str, bool includeNullTerminatingChar)
    if (pTxCharacteristic)
    {
       size_t size = includeNullTerminatingChar ? strlen(str) + 1 : strlen(str);
-      pTxCharacteristic->notify((uint8_t *)str, size);
+      write((uint8_t *)str, size);
       return size;
    }
    else
