@@ -193,14 +193,20 @@ size_t NordicUARTService::write(const uint8_t *data, size_t size)
 {
    if (pTxCharacteristic)
    {
-      uint32_t chunkSize = NimBLEDevice::getMTU();
-      uint32_t offset = 0;
-      while (offset < size)
+      // Data is sent in chunks of MTU size to avoid data loss
+      // as each chunk is notified separately
+      size_t chunkSize = NimBLEDevice::getMTU();
+      size_t remainingByteCount = size;
+      while (remainingByteCount >= chunkSize)
       {
-         uint32_t len = (size - offset > chunkSize) ? chunkSize : (size - offset);
-         pTxCharacteristic->notify(data + offset, len);
-         offset += len;
+         pTxCharacteristic->notify(data, chunkSize);
+         data += chunkSize;
+         remainingByteCount -= chunkSize;
       }
+      // Note: remainingByteCount < chunkSize at this point
+      if (remainingByteCount > 0)
+         pTxCharacteristic->notify(data, remainingByteCount);
+
       return size;
    }
    else
