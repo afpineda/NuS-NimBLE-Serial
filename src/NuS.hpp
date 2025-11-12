@@ -18,12 +18,22 @@
 #include <NimBLECharacteristic.h>
 #include <cstring>
 
+#include <set>
+#include <stdexcept>
+#include <string>
+
+// Specific std imports to avoid conflicts
+using std::runtime_error;
+using std::set;
+using std::string;
+
 #if __cplusplus < 202002L
 #include "cyan_semaphore.h"
 using namespace cyan;
 #else
 #include <semaphore>
-using namespace std;
+
+using std::binary_semaphore;
 #endif
 
 /**
