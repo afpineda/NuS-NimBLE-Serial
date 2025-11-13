@@ -41,7 +41,7 @@ void NuATCommandProcessor::onWrite(
 // Printing
 //-----------------------------------------------------------------------------
 
-void NuATCommandProcessor::printATResponse(std::string message)
+void NuATCommandProcessor::printATResponse(::std::string message)
 {
     print("\r\n");
     print(message);

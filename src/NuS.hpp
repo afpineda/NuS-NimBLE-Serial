@@ -16,24 +16,16 @@
 #include <NimBLEServer.h>
 #include <NimBLEService.h>
 #include <NimBLECharacteristic.h>
-#include <cstring>
-
-#include <set>
-#include <stdexcept>
 #include <string>
 
-// Specific std imports to avoid conflicts
-using std::runtime_error;
-using std::set;
-using std::string;
-
 #if __cplusplus < 202002L
+// NOTE: ::std::binary_semaphore is not available in c++17.
+// This is a workaround
 #include "cyan_semaphore.h"
-using namespace cyan;
+typedef ::cyan::binary_semaphore nus_semaphore;
 #else
 #include <semaphore>
-
-using std::binary_semaphore;
+typedef ::std::binary_semaphore nus_semaphore;
 #endif
 
 /**
@@ -131,7 +123,7 @@ public:
    * @param str String to send
    * @return size_t Count of bytes sent.
    */
-  size_t print(std::string str)
+  size_t print(::std::string str)
   {
     return write((const uint8_t *)str.data(), str.length());
   };
@@ -159,7 +151,7 @@ public:
    * @param autoAdvertising True to automatically handle BLE advertising.
    *                        When false, you have to handle advertising on your own.
    *
-   * @throws std::runtime_error if the UART service is already created or can not be created
+   * @throws ::std::runtime_error if the UART service is already created or can not be created
    */
   void start(bool autoAdvertising = true);
 
@@ -173,7 +165,7 @@ public:
    *
    * @warning This will terminate all open connections,
    *          including peers not using the Nordic UART Service.
-   *          This funcion is discouraged.
+   *          This function is discouraged.
    *          Design your application so that it is not necessary to stop the service.
    *
    * @warning This method is not thread-safe
@@ -218,7 +210,7 @@ protected:
 private:
   NimBLEService *pNus = nullptr;
   NimBLECharacteristic *pTxCharacteristic = nullptr;
-  binary_semaphore peerConnected{0};
+  mutable nus_semaphore peerConnected{0};
   uint32_t _subscriberCount = 0;
 
   /**
@@ -227,7 +219,7 @@ private:
    * @param advertise True to add the NuS UUID to the advertised data, false otherwise.
    *
    * @return NimBLEService internal instance of the NuS
-   * @throws std::runtime_error if the UART service can not be created
+   * @throws ::std::runtime_error if the UART service can not be created
    */
 
   void init(bool advertise);

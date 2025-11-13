@@ -77,7 +77,7 @@ size_t NordicUARTStream::readBytes(uint8_t *buffer, size_t size)
             if (_timeout == ULONG_MAX)
                 dataAvailable.acquire();
             else
-                waitResult = dataAvailable.try_acquire_for(std::chrono::milliseconds(_timeout));
+                waitResult = dataAvailable.try_acquire_for(::std::chrono::milliseconds(_timeout));
             if (!waitResult || disconnected)
                 size = 0; // break;
             // Note: at this point, readBuffer and unreadByteCount were updated thanks to onWrite()

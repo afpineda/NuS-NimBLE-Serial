@@ -70,7 +70,7 @@ typedef enum
  * @brief AT command parameters
  *
  */
-typedef std::vector<std::string> NuATCommandParameters_t;
+typedef ::std::vector<::std::string> NuATCommandParameters_t;
 
 /**
  * @brief Callback to execute for AT commands
@@ -78,7 +78,7 @@ typedef std::vector<std::string> NuATCommandParameters_t;
  * @param[in] params Parameters as a string vector.
  *                   Empty if there are no parameters or parameters are not allowed.
  */
-typedef std::function<NuATCommandResult_t(NuATCommandParameters_t &)> NuATCommandCallback_t;
+typedef ::std::function<NuATCommandResult_t(NuATCommandParameters_t &)> NuATCommandCallback_t;
 
 /**
  * @brief Callback to execute for parsing/execution errors
@@ -86,7 +86,7 @@ typedef std::function<NuATCommandResult_t(NuATCommandParameters_t &)> NuATComman
  * @param[in] text The text causing an error
  * @param[in] errorCode Code of error
  */
-typedef std::function<void(const std::string text, NuATSyntaxError_t errorCode)> NuATErrorCallback_t;
+typedef ::std::function<void(const ::std::string text, NuATSyntaxError_t errorCode)> NuATErrorCallback_t;
 
 /**
  * @brief Callback to execute for non-AT commands
@@ -94,7 +94,7 @@ typedef std::function<void(const std::string text, NuATSyntaxError_t errorCode)>
  * @param[in] text Pointer to buffer containing text
  * @param[in] errorCode Size of the buffer
  */
-typedef std::function<void(const uint8_t *text, size_t size)> NuATNotACommandLineCallback_t;
+typedef ::std::function<void(const uint8_t *text, size_t size)> NuATNotACommandLineCallback_t;
 
 /**
  * @brief Parse and execute AT commands
@@ -138,7 +138,7 @@ public:
      *
      * @return NuATParser& This instance. Used to chain calls.
      */
-    NuATParser &onExecute(const std::string commandName, NuATCommandCallback_t callback);
+    NuATParser &onExecute(const ::std::string commandName, NuATCommandCallback_t callback);
 
     /**
      * @brief Set a callback for a command with "=" suffix
@@ -152,7 +152,7 @@ public:
      *
      * @return NuATParser& This instance. Used to chain calls.
      */
-    NuATParser &onSet(const std::string commandName, NuATCommandCallback_t callback);
+    NuATParser &onSet(const ::std::string commandName, NuATCommandCallback_t callback);
 
     /**
      * @brief Set a callback for a command with "?" suffix
@@ -166,7 +166,7 @@ public:
      *
      * @return NuATParser& This instance. Used to chain calls.
      */
-    NuATParser &onQuery(const std::string commandName, NuATCommandCallback_t callback);
+    NuATParser &onQuery(const ::std::string commandName, NuATCommandCallback_t callback);
 
     /**
      * @brief Set a callback for a command with "=?" suffix
@@ -180,7 +180,7 @@ public:
      *
      * @return NuATParser& This instance. Used to chain calls.
      */
-    NuATParser &onTest(const std::string commandName, NuATCommandCallback_t callback);
+    NuATParser &onTest(const ::std::string commandName, NuATCommandCallback_t callback);
 
     /**
      * @brief Set a callback for command errors
@@ -213,7 +213,7 @@ public:
      * @param message Text to print.
      *                Must not contain the CR+LF sequence of characters.
      */
-    virtual void printATResponse(std::string message) = 0;
+    virtual void printATResponse(::std::string message) = 0;
 
     /**
      * @brief Execute the given AT command line
@@ -228,7 +228,7 @@ public:
      *
      * @param commandLine String containing command line
      */
-    void execute(std::string commandLine)
+    void execute(::std::string commandLine)
     {
         execute((const uint8_t *)commandLine.data(), commandLine.length());
     };
@@ -246,7 +246,7 @@ public:
 
 protected:
     virtual void notifyError(
-        std::string command,
+        ::std::string command,
         NuATSyntaxError_t errorCode);
 
     virtual void doExecute(const uint8_t *in, size_t size);
@@ -255,7 +255,7 @@ protected:
 
     virtual void doTest(const uint8_t *in, size_t size);
 
-    virtual void doSet(std::string command, NuATCommandParameters_t &params);
+    virtual void doSet(::std::string command, NuATCommandParameters_t &params);
 
     virtual void doNotACommandLine(const uint8_t *in, size_t size);
 
@@ -264,21 +264,21 @@ protected:
 private:
     bool bAllowLowerCase = false;
     bool bStopOnFirstFailure = false;
-    std::vector<std::string> vsOnExecuteCN;
-    std::vector<std::string> vsOnSetCN;
-    std::vector<std::string> vsOnQueryCN;
-    std::vector<std::string> vsOnTestCN;
-    std::vector<NuATCommandCallback_t> vcbOnExecuteCallback;
-    std::vector<NuATCommandCallback_t> vcbOnSetCallback;
-    std::vector<NuATCommandCallback_t> vcbOnQueryCallback;
-    std::vector<NuATCommandCallback_t> vcbOnTestCallback;
+    ::std::vector<::std::string> vsOnExecuteCN;
+    ::std::vector<::std::string> vsOnSetCN;
+    ::std::vector<::std::string> vsOnQueryCN;
+    ::std::vector<::std::string> vsOnTestCN;
+    ::std::vector<NuATCommandCallback_t> vcbOnExecuteCallback;
+    ::std::vector<NuATCommandCallback_t> vcbOnSetCallback;
+    ::std::vector<NuATCommandCallback_t> vcbOnQueryCallback;
+    ::std::vector<NuATCommandCallback_t> vcbOnTestCallback;
     NuATErrorCallback_t cbErrorCallback = nullptr;
     NuATNotACommandLineCallback_t cbNoCommandsCallback = nullptr;
 
     bool findCallback(
-        std::string name,
-        std::vector<std::string> nameList,
-        std::vector<NuATCommandCallback_t> callbackList,
+        ::std::string name,
+        ::std::vector<::std::string> nameList,
+        ::std::vector<NuATCommandCallback_t> callbackList,
         NuATCommandCallback_t &callback);
 
     void notifyError(
@@ -288,7 +288,7 @@ private:
 
     bool executeSingleCommand(const uint8_t *in, size_t size);
 
-    bool parseParameter(const uint8_t *in, size_t size, std::string &text);
+    bool parseParameter(const uint8_t *in, size_t size, ::std::string &text);
 };
 
 #endif

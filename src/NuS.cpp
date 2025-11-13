@@ -12,11 +12,12 @@
  */
 
 #include <NimBLEDevice.h>
-#include <exception>
-#include <stdexcept>
+#include <exception> // For runtime_error
+#include <stdexcept> // For runtime_error
 #include <vector>
-#include <string.h>
-#include <cstdio>
+#include <cstring> // For strlen()
+#include <cstdio> // For formatted output
+#include <cstdarg> // for variadric arguments
 #include <chrono>
 #include "NuS.hpp"
 
@@ -73,7 +74,7 @@ void NordicUARTService::init(bool advertise)
       }
    }
    // Unable to initialize the service
-   throw std::runtime_error("Unable to create BLE server and/or Nordic UART Service");
+   throw ::std::runtime_error("Unable to create BLE server and/or Nordic UART Service");
 }
 
 void NordicUARTService::deinit()
@@ -139,7 +140,7 @@ bool NordicUARTService::connect(const unsigned int timeoutMillis)
    }
    else
    {
-      return peerConnected.try_acquire_for(std::chrono::milliseconds(timeoutMillis));
+      return peerConnected.try_acquire_for(::std::chrono::milliseconds(timeoutMillis));
    }
 }
 
@@ -148,7 +149,7 @@ void NordicUARTService::disconnect(void)
    NimBLEServer *pServer = NimBLEDevice::getServer();
    if (pServer)
    {
-      std::vector<uint16_t> devices = pServer->getPeerDevices();
+      ::std::vector<uint16_t> devices = pServer->getPeerDevices();
       for (uint16_t id : devices)
          pServer->disconnect(id);
    }

@@ -18,7 +18,7 @@
 // Set callbacks
 //-----------------------------------------------------------------------------
 
-NuCLIParser &NuCLIParser::on(const std::string commandName, NuCLICommandCallback_t callback)
+NuCLIParser &NuCLIParser::on(const ::std::string commandName, NuCLICommandCallback_t callback)
 {
     if (callback && (commandName.length() > 0))
     {
@@ -43,7 +43,7 @@ inline bool caseInsCharCompareN(char a, char b)
 //     return (towupper(a) == towupper(b));
 // }
 
-bool caseInsCompare(const std::string &s1, const std::string &s2)
+bool caseInsCompare(const ::std::string &s1, const ::std::string &s2)
 {
     return ((s1.size() == s2.size()) &&
             equal(s1.begin(), s1.end(), s2.begin(), caseInsCharCompareN));
@@ -86,10 +86,10 @@ void NuCLIParser::execute(const uint8_t *commandLine, size_t size)
 
 void NuCLIParser::onParsingSuccess(NuCommandLine_t &commandLine)
 {
-    std::string &givenCommandName = commandLine[0];
+    ::std::string &givenCommandName = commandLine[0];
     for (size_t index = 0; index < vsCommandName.size(); index++)
     {
-        std::string &candidate = vsCommandName.at(index);
+        ::std::string &candidate = vsCommandName.at(index);
         bool test;
         if (bCaseSensitive)
             test = (candidate.compare(givenCommandName) == 0);
@@ -133,7 +133,7 @@ NuCLIParsingResult_t NuCLIParser::parseNext(const uint8_t *in, size_t size, size
 {
     if (index < size)
     {
-        std::string current = "";
+        ::std::string current = "";
         if (in[index] == '\"')
         {
             // Quoted string

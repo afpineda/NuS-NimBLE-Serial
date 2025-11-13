@@ -17,7 +17,7 @@
 //-----------------------------------------------------------------------------
 
 NuATParser &NuATParser::onExecute(
-    const std::string commandName,
+    const ::std::string commandName,
     NuATCommandCallback_t callback)
 {
     if (callback && (commandName.length() > 0))
@@ -33,7 +33,7 @@ NuATParser &NuATParser::onExecute(
 //-----------------------------------------------------------------------------
 
 NuATParser &NuATParser::onSet(
-    const std::string commandName,
+    const ::std::string commandName,
     NuATCommandCallback_t callback)
 {
     if (callback && (commandName.length() > 0))
@@ -49,7 +49,7 @@ NuATParser &NuATParser::onSet(
 //-----------------------------------------------------------------------------
 
 NuATParser &NuATParser::onQuery(
-    const std::string commandName,
+    const ::std::string commandName,
     NuATCommandCallback_t callback)
 {
     if (callback && (commandName.length() > 0))
@@ -65,7 +65,7 @@ NuATParser &NuATParser::onQuery(
 //-----------------------------------------------------------------------------
 
 NuATParser &NuATParser::onTest(
-    const std::string commandName,
+    const ::std::string commandName,
     NuATCommandCallback_t callback)
 {
     if (callback && (commandName.length() > 0))
@@ -126,14 +126,14 @@ void NuATParser::notifyError(
     size_t size,
     NuATSyntaxError_t errorCode)
 {
-    std::string sCommandCopy((const char *)command, size);
+    ::std::string sCommandCopy((const char *)command, size);
     notifyError(sCommandCopy, errorCode);
 }
 
 //-----------------------------------------------------------------------------
 
 void NuATParser::notifyError(
-    std::string command,
+    ::std::string command,
     NuATSyntaxError_t errorCode)
 {
     if (cbErrorCallback)
@@ -167,9 +167,9 @@ void NuATParser::printResultResponse(const NuATCommandResult_t response)
 //-----------------------------------------------------------------------------
 
 bool NuATParser::findCallback(
-    std::string name,
-    std::vector<std::string> nameList,
-    std::vector<NuATCommandCallback_t> callbackList,
+    ::std::string name,
+    ::std::vector<::std::string> nameList,
+    ::std::vector<NuATCommandCallback_t> callbackList,
     NuATCommandCallback_t &callback)
 {
     if (bAllowLowerCase)
@@ -421,7 +421,7 @@ bool NuATParser::executeSingleCommand(const uint8_t *in, size_t size)
             {
                 // Suffix is "=" (but not "=?")
                 // Parameters are allowed, but not mandatory
-                std::string commandName((const char *)in, cmdNameLength);
+                ::std::string commandName((const char *)in, cmdNameLength);
                 NuATCommandParameters_t params;
 
                 // jump to the first parameter
@@ -431,7 +431,7 @@ bool NuATParser::executeSingleCommand(const uint8_t *in, size_t size)
                 {
                     // Parse next parameter
                     size_t paramLength = findParamSeparator(in, size);
-                    std::string aParameter;
+                    ::std::string aParameter;
                     if (!parseParameter(in, paramLength, aParameter))
                         // Syntax error. Do not execute.
                         return false;
@@ -471,7 +471,7 @@ bool NuATParser::executeSingleCommand(const uint8_t *in, size_t size)
 
 //-----------------------------------------------------------------------------
 
-bool NuATParser::parseParameter(const uint8_t *in, size_t size, std::string &text)
+bool NuATParser::parseParameter(const uint8_t *in, size_t size, ::std::string &text)
 {
     if (size == 0)
         return true;
@@ -548,7 +548,7 @@ bool NuATParser::parseParameter(const uint8_t *in, size_t size, std::string &tex
 
 void NuATParser::doExecute(const uint8_t *in, size_t size)
 {
-    std::string name((const char *)in, size);
+    ::std::string name((const char *)in, size);
     NuATCommandCallback_t callback;
     if (findCallback(name, vsOnExecuteCN, vcbOnExecuteCallback, callback))
     {
@@ -567,7 +567,7 @@ void NuATParser::doExecute(const uint8_t *in, size_t size)
 
 void NuATParser::doQuery(const uint8_t *in, size_t size)
 {
-    std::string name((const char *)in, size);
+    ::std::string name((const char *)in, size);
     NuATCommandCallback_t callback;
     if (findCallback(name, vsOnQueryCN, vcbOnQueryCallback, callback))
     {
@@ -586,7 +586,7 @@ void NuATParser::doQuery(const uint8_t *in, size_t size)
 
 void NuATParser::doTest(const uint8_t *in, size_t size)
 {
-    std::string name((const char *)in, size);
+    ::std::string name((const char *)in, size);
     NuATCommandCallback_t callback;
     if (findCallback(name, vsOnTestCN, vcbOnTestCallback, callback))
     {
@@ -603,7 +603,7 @@ void NuATParser::doTest(const uint8_t *in, size_t size)
 
 //-----------------------------------------------------------------------------
 
-void NuATParser::doSet(std::string command, NuATCommandParameters_t &params)
+void NuATParser::doSet(::std::string command, NuATCommandParameters_t &params)
 {
     NuATCommandCallback_t callback;
     if (findCallback(command, vsOnSetCN, vcbOnSetCallback, callback))

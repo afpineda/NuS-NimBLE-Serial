@@ -46,7 +46,7 @@ void NuSLegacy2::NuATCommandProcessor::setATCallbacks(NuATCommandCallbacks *pCal
     if (!isConnected())
         NuATCommandParser::setATCallbacks(pCallbacks);
     else
-        throw std::runtime_error("Unable to set AT command callbacks while connected");
+        throw ::std::runtime_error("Unable to set AT command callbacks while connected");
 }
 
 //-----------------------------------------------------------------------------
