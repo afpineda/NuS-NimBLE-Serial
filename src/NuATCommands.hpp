@@ -25,7 +25,9 @@ public:
     // Singleton pattern
 
     NuATCommandProcessor(const NuATCommandProcessor &) = delete;
-    void operator=(NuATCommandProcessor const &) = delete;
+    NuATCommandProcessor(NuATCommandProcessor &&) = delete;
+    NuATCommandProcessor &operator=(const NuATCommandProcessor &) = delete;
+    NuATCommandProcessor &operator=(NuATCommandProcessor &&) = delete;
 
     /**
      * @brief Get the instance of the NuATCommandProcessor
@@ -65,6 +67,8 @@ public:
 
 private:
     uint32_t uMaxCommandLineLength = 256;
+
+    // Singleton pattern
     NuATCommandProcessor() {};
 };
 

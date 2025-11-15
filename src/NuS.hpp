@@ -205,6 +205,10 @@ protected:
 
 protected:
   NordicUARTService() {};
+  NordicUARTService(const NordicUARTService &) = delete;
+  NordicUARTService(NordicUARTService &&) = delete;
+  NordicUARTService &operator=(const NordicUARTService &) = delete;
+  NordicUARTService &operator=(NordicUARTService &&) = delete;
   virtual ~NordicUARTService() {};
 
 private:

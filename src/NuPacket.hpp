@@ -27,10 +27,12 @@
 class NordicUARTPacket : public NordicUARTService
 {
 public:
-    // Singleton pattern
+    // Singleton pattern and Rule of Five
 
     NordicUARTPacket(const NordicUARTPacket &) = delete;
-    void operator=(NordicUARTPacket const &) = delete;
+    NordicUARTPacket(NordicUARTPacket &&) = delete;
+    NordicUARTPacket &operator=(const NordicUARTPacket &) = delete;
+    NordicUARTPacket &operator=(NordicUARTPacket &&) = delete;
 
     /**
      * @brief Get the instance of the BLE stream
@@ -80,6 +82,8 @@ private:
     NimBLEAttValue incomingPacket;
     size_t availableByteCount = 0;
     const uint8_t *incomingBuffer = nullptr;
+
+    // Singleton pattern
     NordicUARTPacket() {};
     ~NordicUARTPacket() {};
 };

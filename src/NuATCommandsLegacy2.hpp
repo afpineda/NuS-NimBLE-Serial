@@ -27,7 +27,9 @@ namespace NuSLegacy2
         // Singleton pattern
 
         NuATCommandProcessor(const NuATCommandProcessor &) = delete;
-        void operator=(NuATCommandProcessor const &) = delete;
+        NuATCommandProcessor(NuATCommandProcessor &&) = delete;
+        NuATCommandProcessor &operator=(const NuATCommandProcessor &) = delete;
+        NuATCommandProcessor &operator=( NuATCommandProcessor &&) = delete;
 
         /**
          * @brief Get the instance of the NuATCommandProcessor
@@ -64,6 +66,7 @@ namespace NuSLegacy2
         void setATCallbacks(NuATCommandCallbacks *pCallbacks);
 
     private:
+        // Singleton pattern
         NuATCommandProcessor() {};
     };
 

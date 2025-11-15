@@ -22,10 +22,12 @@
 class NordicUARTSerial : public NordicUARTStream
 {
 public:
-    // Singleton pattern
+    // Singleton pattern and Rule of Five
 
     NordicUARTSerial(const NordicUARTSerial &) = delete;
-    void operator=(NordicUARTSerial const &) = delete;
+    NordicUARTSerial(NordicUARTSerial &&) = delete;
+    NordicUARTSerial &operator=(const NordicUARTSerial &) = delete;
+    NordicUARTSerial &operator=(NordicUARTSerial &&) = delete;
 
     /**
      * @brief Get the instance of the BLE stream
@@ -65,8 +67,9 @@ public:
     };
 
 private:
-    NordicUARTSerial() : NordicUARTStream(){};
-    ~NordicUARTSerial(){};
+    // Singleton pattern
+    NordicUARTSerial() : NordicUARTStream() {};
+    ~NordicUARTSerial() {};
 };
 
 /**

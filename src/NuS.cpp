@@ -16,7 +16,7 @@
 #include <stdexcept> // For runtime_error
 #include <vector>
 #include <cstring> // For strlen()
-#include <cstdio> // For formatted output
+#include <cstdio>  // For formatted output
 #include <cstdarg> // for variadric arguments
 #include <chrono>
 #include "NuS.hpp"

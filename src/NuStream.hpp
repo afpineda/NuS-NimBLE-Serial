@@ -11,7 +11,7 @@
 #ifndef __NUSTREAM_HPP__
 #define __NUSTREAM_HPP__
 
-#include <climits>
+#include <climits> // For ULONG_MAX
 #include <Stream.h>
 #include "NuS.hpp"
 
@@ -34,6 +34,10 @@ protected:
 
 public:
     NordicUARTStream() : NordicUARTService(), Stream() {};
+    NordicUARTStream(const NordicUARTStream &) = delete;
+    NordicUARTStream(NordicUARTStream &&) = delete;
+    NordicUARTStream &operator=(const NordicUARTStream &) = delete;
+    NordicUARTStream &operator=(NordicUARTStream &&) = delete;
     virtual ~NordicUARTStream() {};
 
 public:
