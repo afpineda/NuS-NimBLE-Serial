@@ -198,17 +198,24 @@ size_t NordicUARTService::write(const uint8_t *data, size_t size)
       // as each chunk is notified separately
       size_t chunkSize = NimBLEDevice::getMTU();
       size_t remainingByteCount = size;
+      size_t totalSent = 0;
+
       while (remainingByteCount >= chunkSize)
       {
-         pTxCharacteristic->notify(data, chunkSize);
+         if (!pTxCharacteristic->notify(data, chunkSize))
+         {
+            // Notify failed - return how much we've sent so far
+            return totalSent;
+         }
          data += chunkSize;
          remainingByteCount -= chunkSize;
+         totalSent += chunkSize;
       }
       // Note: remainingByteCount < chunkSize at this point
-      if (remainingByteCount > 0)
-         pTxCharacteristic->notify(data, remainingByteCount);
+      if ((remainingByteCount > 0) && pTxCharacteristic->notify(data, remainingByteCount))
+         totalSent += remainingByteCount;
 
-      return size;
+      return totalSent;
    }
    else
       return 0;
@@ -219,8 +226,7 @@ size_t NordicUARTService::send(const char *str, bool includeNullTerminatingChar)
    if (pTxCharacteristic)
    {
       size_t size = includeNullTerminatingChar ? strlen(str) + 1 : strlen(str);
-      write((uint8_t *)str, size);
-      return size;
+      return write((uint8_t *)str, size);
    }
    else
       return 0;
@@ -235,6 +241,7 @@ size_t NordicUARTService::printf(const char *format, ...)
    va_end(args);
    if (requiredSize == 0)
    {
+      // Write the terminating null character as we have an empty string
       return write((uint8_t *)&dummy, 1);
    }
    else if (requiredSize > 0)
