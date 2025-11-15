@@ -59,7 +59,7 @@ namespace NuSLegacy2
          * @param pCallbacks A pointer to your own callbacks. Must
          *        remain valid forever (do not destroy).
          *
-         * @throws std::runtime_error If called while a peer is connected.
+         * @throws ::std::runtime_error If called while a peer is connected.
          */
         void setATCallbacks(NuATCommandCallbacks *pCallbacks);
 

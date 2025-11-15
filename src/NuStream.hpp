@@ -107,8 +107,8 @@ public:
     };
 
 private:
-    binary_semaphore dataConsumed{1};
-    binary_semaphore dataAvailable{0};
+    nus_semaphore dataConsumed{1};
+    nus_semaphore dataAvailable{0};
     NimBLEAttValue incomingPacket;
     bool disconnected = false;
     size_t unreadByteCount = 0;

@@ -66,7 +66,7 @@ typedef enum
     AT_PR_NO_HEAP
 } NuATParsingResult_t;
 
-typedef std::vector<const char *> NuATCommandParameters_t;
+typedef ::std::vector<const char *> NuATCommandParameters_t;
 
 /**
  * @brief Custom AT command processing for your application

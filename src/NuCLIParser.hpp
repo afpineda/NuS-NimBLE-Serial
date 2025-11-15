@@ -41,14 +41,14 @@ typedef enum
  *       is never empty. However, it may contain empty strings
  *       typed as "".
  */
-typedef std::vector<std::string> NuCommandLine_t;
+typedef ::std::vector<::std::string> NuCommandLine_t;
 
 /**
  * @brief Callback to execute for a parsed command line
  *
  * @param[in] commandLine Parsed command line.
  */
-typedef std::function<void(NuCommandLine_t &)> NuCLICommandCallback_t;
+typedef ::std::function<void(NuCommandLine_t &)> NuCLICommandCallback_t;
 
 /**
  * @brief Callback to execute in case of parsing errors
@@ -97,7 +97,7 @@ public:
      *
      * @return NuCLIParser& This instance. Used to chain calls.
      */
-    NuCLIParser &on(const std::string commandName, NuCLICommandCallback_t callback);
+    NuCLIParser &on(const ::std::string commandName, NuCLICommandCallback_t callback);
 
     /**
      * @brief Set a callback for unknown commands
@@ -138,7 +138,7 @@ public:
      *
      * @param commandLine String containing command line
      */
-    void execute(std::string commandLine)
+    void execute(::std::string commandLine)
     {
         execute((const uint8_t *)commandLine.data(), commandLine.length());
     };
@@ -185,8 +185,8 @@ private:
     bool bCaseSensitive = false;
     NuCLIParseErrorCallback_t cbParseError = nullptr;
     NuCLICommandCallback_t cbUnknown = nullptr;
-    std::vector<std::string> vsCommandName;
-    std::vector<NuCLICommandCallback_t> vcbCommand;
+    ::std::vector<::std::string> vsCommandName;
+    ::std::vector<NuCLICommandCallback_t> vcbCommand;
 };
 
 #endif
