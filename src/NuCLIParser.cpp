@@ -18,7 +18,7 @@
 // Set callbacks
 //-----------------------------------------------------------------------------
 
-NuCLIParser &NuCLIParser::on(const ::std::string commandName, NuCLICommandCallback_t callback)
+NuCLIParser &NuCLIParser::on(const ::std::string commandName, NuCLICommandCallback_t callback) noexcept
 {
     if (callback && (commandName.length() > 0))
     {
@@ -84,7 +84,7 @@ void NuCLIParser::execute(const uint8_t *commandLine, size_t size)
 
 //-----------------------------------------------------------------------------
 
-void NuCLIParser::onParsingSuccess(NuCommandLine_t &commandLine)
+void NuCLIParser::onParsingSuccess(NuCommandLine_t &commandLine) noexcept
 {
     ::std::string &givenCommandName = commandLine[0];
     for (size_t index = 0; index < vsCommandName.size(); index++)
@@ -108,7 +108,7 @@ void NuCLIParser::onParsingSuccess(NuCommandLine_t &commandLine)
 
 //-----------------------------------------------------------------------------
 
-void NuCLIParser::onParsingFailure(NuCLIParsingResult_t result, size_t index)
+void NuCLIParser::onParsingFailure(NuCLIParsingResult_t result, size_t index) noexcept
 {
     if (cbParseError)
         cbParseError(result, index);
@@ -194,7 +194,7 @@ void NuCLIParser::ignoreSeparator(const uint8_t *in, size_t size, size_t &index)
 // Other
 //-----------------------------------------------------------------------------
 
-bool NuCLIParser::caseSensitive(bool yesOrNo)
+bool NuCLIParser::caseSensitive(bool yesOrNo) noexcept
 {
     bool result = bCaseSensitive;
     bCaseSensitive = yesOrNo;

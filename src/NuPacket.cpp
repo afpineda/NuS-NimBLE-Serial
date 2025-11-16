@@ -58,7 +58,7 @@ void NordicUARTPacket::onWrite(
 // Reading
 //-----------------------------------------------------------------------------
 
-const uint8_t *NordicUARTPacket::read(size_t &size)
+const uint8_t *NordicUARTPacket::read(size_t &size) const noexcept
 {
     dataConsumed.release();
     dataAvailable.acquire();

@@ -112,7 +112,7 @@ public:
      * @return true Previously, allowed.
      * @return false Previously, disallowed.
      */
-    bool allowLowerCase(bool yesOrNo);
+    bool allowLowerCase(bool yesOrNo) noexcept;
 
     /**
      * @brief Stop execution on failure of a single command, or not
@@ -124,7 +124,7 @@ public:
      * @return true Previously, stop
      * @return false Previously, continue
      */
-    bool stopOnFirstFailure(bool yesOrNo);
+    bool stopOnFirstFailure(bool yesOrNo) noexcept;
 
     /**
      * @brief Set a callback for a command with no suffix
@@ -138,7 +138,9 @@ public:
      *
      * @return NuATParser& This instance. Used to chain calls.
      */
-    NuATParser &onExecute(const ::std::string commandName, NuATCommandCallback_t callback);
+    NuATParser &onExecute(
+        const ::std::string commandName,
+        NuATCommandCallback_t callback) noexcept;
 
     /**
      * @brief Set a callback for a command with "=" suffix
@@ -152,7 +154,9 @@ public:
      *
      * @return NuATParser& This instance. Used to chain calls.
      */
-    NuATParser &onSet(const ::std::string commandName, NuATCommandCallback_t callback);
+    NuATParser &onSet(
+        const ::std::string commandName,
+        NuATCommandCallback_t callback) noexcept;
 
     /**
      * @brief Set a callback for a command with "?" suffix
@@ -166,7 +170,9 @@ public:
      *
      * @return NuATParser& This instance. Used to chain calls.
      */
-    NuATParser &onQuery(const ::std::string commandName, NuATCommandCallback_t callback);
+    NuATParser &onQuery(
+        const ::std::string commandName,
+        NuATCommandCallback_t callback) noexcept;
 
     /**
      * @brief Set a callback for a command with "=?" suffix
@@ -180,7 +186,9 @@ public:
      *
      * @return NuATParser& This instance. Used to chain calls.
      */
-    NuATParser &onTest(const ::std::string commandName, NuATCommandCallback_t callback);
+    NuATParser &onTest(
+        const ::std::string commandName,
+        NuATCommandCallback_t callback) noexcept;
 
     /**
      * @brief Set a callback for command errors
@@ -189,7 +197,7 @@ public:
      *
      * @return NuATParser& This instance. Used to chain calls.
      */
-    NuATParser &onError(NuATErrorCallback_t callback);
+    NuATParser &onError(NuATErrorCallback_t callback) noexcept;
 
     /**
      * @brief Set a callback for non-AT commands
@@ -198,7 +206,8 @@ public:
      *
      * @return NuATParser& This instance. Used to chain calls
      */
-    NuATParser &onNotACommandLine(NuATNotACommandLineCallback_t callback);
+    NuATParser &onNotACommandLine(
+        NuATNotACommandLineCallback_t callback) noexcept;
 
     /**
      * @brief Print a message properly formatted as an AT response

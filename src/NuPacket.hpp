@@ -74,11 +74,11 @@ public:
      *                  Do not access more bytes than available as given in
      *                  @p size. Otherwise, a segmentation fault may occur.
      */
-    const uint8_t *read(size_t &size);
+    const uint8_t *read(size_t &size) const noexcept;
 
 private:
-    nus_semaphore dataConsumed{1};
-    nus_semaphore dataAvailable{0};
+    mutable nus_semaphore dataConsumed{1};
+    mutable nus_semaphore dataAvailable{0};
     NimBLEAttValue incomingPacket;
     size_t availableByteCount = 0;
     const uint8_t *incomingBuffer = nullptr;

@@ -74,7 +74,7 @@ public:
      * @return true Previously, case-sensitive.
      * @return false Previously, case-insensitive.
      */
-    bool caseSensitive(bool yesOrNo);
+    bool caseSensitive(bool yesOrNo) noexcept;
 
     /**
      * @brief Set a callback for a command name
@@ -97,7 +97,7 @@ public:
      *
      * @return NuCLIParser& This instance. Used to chain calls.
      */
-    NuCLIParser &on(const ::std::string commandName, NuCLICommandCallback_t callback);
+    NuCLIParser &on(const ::std::string commandName, NuCLICommandCallback_t callback) noexcept;
 
     /**
      * @brief Set a callback for unknown commands
@@ -107,7 +107,7 @@ public:
      *
      * @return NuCLIParser& This instance. Used to chain calls.
      */
-    NuCLIParser &onUnknown(NuCLICommandCallback_t callback)
+    NuCLIParser &onUnknown(NuCLICommandCallback_t callback) noexcept
     {
         cbUnknown = callback;
         return *this;
@@ -119,7 +119,7 @@ public:
      * @param[in] callback Function to execute if some parsing error is found.
      * @return NuCLIParser& This instance. Used to chain calls.
      */
-    NuCLIParser &onParseError(NuCLIParseErrorCallback_t callback)
+    NuCLIParser &onParseError(NuCLIParseErrorCallback_t callback) noexcept
     {
         cbParseError = callback;
         return *this;
@@ -168,7 +168,7 @@ protected:
      *
      * @param[in] commandLine Parsed command line
      */
-    virtual void onParsingSuccess(NuCommandLine_t &commandLine);
+    virtual void onParsingSuccess(NuCommandLine_t &commandLine) noexcept;
 
     /**
      * @brief Notify parsing error
@@ -179,7 +179,7 @@ protected:
      * @param[in] result Parsing result
      * @param[in] index Byte index where the parsing error was found (0-based).
      */
-    virtual void onParsingFailure(NuCLIParsingResult_t result, size_t index);
+    virtual void onParsingFailure(NuCLIParsingResult_t result, size_t index) noexcept;
 
 private:
     bool bCaseSensitive = false;

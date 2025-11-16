@@ -18,7 +18,7 @@
 
 NuATParser &NuATParser::onExecute(
     const ::std::string commandName,
-    NuATCommandCallback_t callback)
+    NuATCommandCallback_t callback) noexcept
 {
     if (callback && (commandName.length() > 0))
     {
@@ -34,7 +34,7 @@ NuATParser &NuATParser::onExecute(
 
 NuATParser &NuATParser::onSet(
     const ::std::string commandName,
-    NuATCommandCallback_t callback)
+    NuATCommandCallback_t callback) noexcept
 {
     if (callback && (commandName.length() > 0))
     {
@@ -50,7 +50,7 @@ NuATParser &NuATParser::onSet(
 
 NuATParser &NuATParser::onQuery(
     const ::std::string commandName,
-    NuATCommandCallback_t callback)
+    NuATCommandCallback_t callback) noexcept
 {
     if (callback && (commandName.length() > 0))
     {
@@ -66,7 +66,7 @@ NuATParser &NuATParser::onQuery(
 
 NuATParser &NuATParser::onTest(
     const ::std::string commandName,
-    NuATCommandCallback_t callback)
+    NuATCommandCallback_t callback) noexcept
 {
     if (callback && (commandName.length() > 0))
     {
@@ -80,7 +80,7 @@ NuATParser &NuATParser::onTest(
 
 //-----------------------------------------------------------------------------
 
-NuATParser &NuATParser::onError(NuATErrorCallback_t callback)
+NuATParser &NuATParser::onError(NuATErrorCallback_t callback) noexcept
 {
     if (callback)
         cbErrorCallback = callback;
@@ -90,7 +90,7 @@ NuATParser &NuATParser::onError(NuATErrorCallback_t callback)
 //-----------------------------------------------------------------------------
 
 NuATParser &NuATParser::onNotACommandLine(
-    NuATNotACommandLineCallback_t callback)
+    NuATNotACommandLineCallback_t callback) noexcept
 {
     if (callback)
         cbNoCommandsCallback = callback;
@@ -101,7 +101,7 @@ NuATParser &NuATParser::onNotACommandLine(
 // Other
 //-----------------------------------------------------------------------------
 
-bool NuATParser::allowLowerCase(bool yesOrNo)
+bool NuATParser::allowLowerCase(bool yesOrNo) noexcept
 {
     bool result = bAllowLowerCase;
     bAllowLowerCase = yesOrNo;
@@ -110,7 +110,7 @@ bool NuATParser::allowLowerCase(bool yesOrNo)
 
 //-----------------------------------------------------------------------------
 
-bool NuATParser::stopOnFirstFailure(bool yesOrNo)
+bool NuATParser::stopOnFirstFailure(bool yesOrNo) noexcept
 {
     bool result = bStopOnFirstFailure;
     bStopOnFirstFailure = yesOrNo;
