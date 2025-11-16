@@ -34,7 +34,7 @@ Serial communications are already available through the old [Bluetooth classic](
 However, this is not the case with the [Bluetooth Low Energy (BLE) specification](https://en.wikipedia.org/wiki/Bluetooth_Low_Energy).
 **No standard** protocol was defined for serial communications in BLE (see [this article](https://punchthrough.com/serial-over-ble/) for further information).
 
-As bluetooth classic is being dropped in favor of BLE, an alternative is needed. [Nordic UART Service (NuS)](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/bluetooth_services/services/nus.html) is a popular alternative, if not the *de facto* standard.
+As Bluetooth Classic is being dropped in favor of BLE, an alternative is needed. [Nordic UART Service (NuS)](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/bluetooth_services/services/nus.html) is a popular alternative, if not the *de facto* standard.
 This library implements the Nordic UART service on the *NimBLE-Arduino* stack.
 
 ## Client-side application
@@ -43,14 +43,14 @@ You may need a generic terminal (PC or smartphone) application in order to commu
 
 - Android:
   - [nRF connect for mobile](https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp)
-  - [Serial bluetooth terminal](https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal)
+  - [Serial Bluetooth terminal](https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal)
 - iOS:
   - [nRF connect for mobile](https://apps.apple.com/es/app/nrf-connect-for-mobile/id1054362403)
 - Multi-platform:
   - [NeutralNUS](https://github.com/KevinJohnMulligan/neutral-nus-terminal/releases)
 
 > [!NOTE]
-> In Android, you have to enable both bluetooth and geolocalization,
+> In Android, you have to enable both Bluetooth and geolocation,
 > otherwise, your device will not be discovered.
 
 ## How to use this library
@@ -291,6 +291,7 @@ void setup()
     {
       ...
     }
+    )
     .onUnknown([](NuCommandLine_t &commandLine)
     {
       Serial.printf("ERROR: unknown command \"%s\"\n",commandLine[0].c_str());
