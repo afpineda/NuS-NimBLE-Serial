@@ -83,6 +83,12 @@
 
   Replace `<integer>` with an integer number.
 
+- [UartBleAdapter.ino](./UartBleAdapter/UartBleAdapter.ino)
+
+  Turns your ESP32 into UART to BLE adapter - transfers data between ESP32 TX/RX pins
+  and Bluetooth service. Also copies the same data data to USB UART interface,
+  and to UART1 on pins 4 and 5, which can be used to avoid seeing boot logs on UART0.
+
 ## Testing
 
 In order to test those sketches, you need a serial terminal app compatible with NuS in your smartphone or PC. During development, this one was used (Android):
