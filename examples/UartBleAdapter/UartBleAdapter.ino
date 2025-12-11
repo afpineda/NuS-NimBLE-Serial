@@ -42,25 +42,25 @@ void setup()
 {
 #if UART0_BAUD_RATE > 0
     // Initialize the 1st hardware UART
-    Serial0.setRxBufferSize(2048);
+    Serial0.setRxBufferSize(BUFFER_SIZE);
     Serial0.begin(UART0_BAUD_RATE);
     Serial0.setTimeout(20);
 #endif
 #if UART1_BAUD_RATE > 0
     // Initialize the 2nd hardware UART
-    Serial1.setRxBufferSize(2048);
+    Serial1.setRxBufferSize(BUFFER_SIZE);
     // Configured to pins 4 and 5. Feel free to change.
     Serial1.begin(UART1_BAUD_RATE, SERIAL_8N1, 4, 5);
     Serial1.setTimeout(20);
 #endif
 #if ARDUINO_USB_CDC_ON_BOOT && ARDUINO_USB_MODE
     // Initialize the USB CDC UART (if available)
-    HWCDCSerial.setRxBufferSize(2048);
+    HWCDCSerial.setRxBufferSize(BUFFER_SIZE);
     HWCDCSerial.begin(); // Note: USB CDC ignores the baud parameter
     HWCDCSerial.setTimeout(20);
 #endif
 #if ARDUINO_USB_CDC_ON_BOOT && !ARDUINO_USB_MODE
-    USBSerial.setRxBufferSize(2048);
+    USBSerial.setRxBufferSize(BUFFER_SIZE);
     USBSerial.begin(); // Note: USB CDC ignores the baud parameter
     USBSerial.setTimeout(20);
 #endif

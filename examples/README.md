@@ -124,7 +124,7 @@
   > to the Bluetooth side.
 
   If your devkit is connected to the PC serial monitor,
-  this sketch behaves quite similar to the *NuSEcho.ino* example above.
+  this sketch behaves quite similar to the *NuSerialDump.ino* example above.
   In such a case, make sure to configure
   the same line ending character sequence in both sides.
 
