@@ -83,6 +83,30 @@
 
   Replace `<integer>` with an integer number.
 
+- [UartBleAdapter.ino](./UartBleAdapter/UartBleAdapter.ino)
+
+  Turns your ESP32 into a **Bluetooth-to-UART bridge**.
+  Transfers data between the configured UARTs (TX/RX pins)
+  and the Nordic UART Service back and forth.
+
+  This is quite handy to debug code in other devices having a hardware UART,
+  but no USB-to-UART bridge.
+
+  Without modification, it bridges UART0, UART1 (configured to pins 4 and 5)
+  and the USB CDC UART (if available), so make sure the involved pins are not floating.
+  Otherwise, the sketch will read random data and send it to the Bluetooth side (⚠️).
+  You may edit the sketch to disable the unneeded UARTs.
+
+  > **Note**:
+  > if your device gets data from two or more UARTs,
+  > you don't know which one of them is sending it
+  > to the Bluetooth side.
+
+  If your devkit is connected to the PC serial monitor,
+  this sketch behaves quite similar to the *NuSEcho.ino* example above.
+  In such a case, make sure to configure
+  the same line ending character sequence in both sides.
+
 ## Testing
 
 In order to test those sketches, you need a serial terminal app compatible with NuS in your smartphone or PC. During development, this one was used (Android):

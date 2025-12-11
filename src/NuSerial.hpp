@@ -57,6 +57,15 @@ public:
     };
 
     /**
+     * @brief Start the Nordic UART Service
+     *
+     */
+    void begin()
+    {
+        start();
+    };
+
+    /**
      * @brief
      *
      * @param dummy
