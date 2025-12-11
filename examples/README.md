@@ -4,47 +4,62 @@
 
 - [NuSEcho.ino](./NuSEcho/NuSEcho.ino)
 
-  Runs a service that takes incoming data from a BLE peer and dumps it back to the same peer.
-  This is called an "echo" service. The serial monitor is also feed with log messages.
+  Runs a service that takes incoming data from a BLE peer
+  and dumps it back to the same peer.
+  This is called an "echo" service.
+  The serial monitor is also feed with log messages.
   The device is advertised as "NuSerial Echo".
-  Demonstrates the usage of non-blocking communications by the means of `NuSerial`.
+  Demonstrates the usage of non-blocking communications
+  by the means of `NuSerial`.
 
-  You may type `E` or `e` at the serial monitor to forcedly terminate current peer connection and wait for another.
+  You may type `E` or `e` at the serial monitor to
+  forcedly terminate current peer connection and wait for another.
 
 - [NuSerialDump.ino](./NuSerialDump/NuSerialDump.ino)
 
-  Runs a service that takes incoming data from a BLE peer and dumps it to the serial monitor.
+  Runs a service that takes incoming data from a BLE peer
+  and dumps it to the serial monitor.
   The device is advertised as "NuPacket demo".
   Demonstrates the usage of blocking communications by the means of `NuPacket`.
 
 - [ReadBytesDemo.ino](./ReadBytesDemo/ReadBytesDemo.ino)
 
-  As the previous one, runs a service that takes incoming data from a BLE peer and dumps it into the serial monitor.
-  However, this example uses a fixed size buffer and does not care about packet size.
+  As the previous one, runs a service that takes incoming data
+  from a BLE peer and dumps it into the serial monitor.
+  However, this example uses a fixed size buffer
+  and does not care about packet size.
   The device is advertised as "ReadBytes demo".
-  Demonstrates the usage of blocking communications by the means of `NuSerial.readBytes()` with no active waiting.
+  Demonstrates the usage of blocking communications
+  by the means of `NuSerial.readBytes()` with no active waiting.
 
-  Since incoming data is buffered, you have to send at least 4 characters or disconnect to see any output at the serial monitor.
+  Since incoming data is buffered, you have to send
+  at least 4 characters or disconnect to see any output at the serial monitor.
   Note that the terminating LF character (`\n`) also counts.
 
 - [CustomCommandProcessor.ino](./CustomCommandProcessor/CustomCommandProcessor.ino)
 
-  Runs a service that parses incoming commands from a BLE peer and executes them.
-  The serial monitor is also feed with log messages. The device is advertised as "Custom commands demo".
+  Runs a service that parses incoming commands from a BLE peer
+  and executes them.
+  The serial monitor is also feed with log messages.
+  The device is advertised as "Custom commands demo".
   Demonstrates how to write a custom protocol based on NuS.
 
   Commands and their syntax:
 
   - `exit`: forces the service to disconnect.
-  - `sum <int> <int>`: retrieve the sum of two integer numbers. Substitute `<int>` with those numbers.
+  - `sum <int> <int>`: retrieve the sum of two integer numbers.
+    Substitute `<int>` with those numbers.
 
   All commands are lower-case. Arguments must be separated by blank spaces.
 
 - [ATCommandDemo.ino](./ATCommandDemo/ATCommandDemo.ino)
 
-  Runs a service that parses incoming AT commands from a BLE peer and executes them.
-  The serial monitor is also feed with log messages. The device is advertised as "AT commands demo".
-  Demonstrates how to serve custom AT commands on NuS. The service works as a simple calculator.
+  Runs a service that parses incoming AT commands
+  from a BLE peer and executes them.
+  The serial monitor is also feed with log messages.
+  The device is advertised as "AT commands demo".
+  Demonstrates how to serve custom AT commands on NuS.
+  The service works as a simple calculator.
 
   Supported commands (always follow AT command syntax):
 
@@ -66,13 +81,17 @@
 
   Works just the same as the previous demo.
 
-  Uses the legacy API (up to version 2.0.5). You should not base your code in this example anymore.
+  Uses the legacy API (up to version 2.0.5).
+  You should not base your code in this example anymore.
 
 - [ShellCommandDemo.ino](./ShellCommandDemo/ShellCommandDemo.ino)
 
-  Runs a service that parses shell-like commands from a BLE peer and executes them.
-  The serial monitor is also feed with log messages. The device is advertised as "Shell commands demo".
-  Demonstrates how to serve shell commands on NuS. The service works as a simple calculator.
+  Runs a service that parses shell-like commands from a BLE peer
+  and executes them.
+  The serial monitor is also feed with log messages.
+  The device is advertised as "Shell commands demo".
+  Demonstrates how to serve shell commands on NuS.
+  The service works as a simple calculator.
 
   Supported commands (one per line):
 
@@ -93,8 +112,10 @@
   but no USB-to-UART bridge.
 
   Without modification, it bridges UART0, UART1 (configured to pins 4 and 5)
-  and the USB CDC UART (if available), so make sure the involved pins are not floating.
-  Otherwise, the sketch will read random data and send it to the Bluetooth side (⚠️).
+  and the USB CDC UART (if available),
+  so make sure the involved pins are not floating.
+  Otherwise, the sketch will read random data
+  and send it to the Bluetooth side (⚠️).
   You may edit the sketch to disable the unneeded UARTs.
 
   > **Note**:
@@ -109,7 +130,9 @@
 
 ## Testing
 
-In order to test those sketches, you need a serial terminal app compatible with NuS in your smartphone or PC. During development, this one was used (Android):
+In order to test those sketches,
+you need a serial terminal app compatible with NuS in your smartphone or PC.
+During development, this one was used (Android):
 [Serial Bluetooth terminal](https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal).
 
 Configure LF (line feed, aka `\n`) as the line-terminating character.
